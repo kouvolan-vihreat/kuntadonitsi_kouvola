@@ -23,9 +23,9 @@
     .card h3 { margin: 0 0 8px 0; font-size: 13px; color: #4a5568; text-transform: uppercase; letter-spacing: 0.5px; }
     .card .val { font-size: 26px; font-weight: bold; color: #1a202c; }
     .card .desc { font-size: 13px; color: #718096; margin-top: 4px; }
-    .chart-box { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 24px; }
-    .ring-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); gap: 20px; margin-bottom: 24px; }
-    .legend-bar { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; margin-bottom: 14px; font-size: 14px; background: #f1f5f9; padding: 12px 18px; border-radius: 8px; }
+    .chart-box { background: white; border-radius: 12px; padding: 24px 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 24px; box-sizing: border-box; }
+    .ring-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 24px; margin-bottom: 24px; }
+    .legend-bar { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; margin-bottom: 18px; font-size: 14px; background: #f1f5f9; padding: 12px 18px; border-radius: 8px; }
     .legend-item { display: flex; align-items: center; gap: 8px; }
     .dot { width: 16px; height: 16px; border-radius: 4px; display: inline-block; }
     .ring-line { width: 22px; height: 8px; border-radius: 2px; display: inline-block; background: #ffffff; border: 2px solid #000000; }
@@ -180,12 +180,12 @@
 
   <div class="ring-grid">
     <div class="chart-box" style="margin-bottom:0;">
-      <h2 style="margin-top:0;">1. Sisäkehän mittarit: Sosiaalinen perusta</h2>
-      <div id="chart-social"></div>
+      <h2 style="margin-top:0; margin-bottom:16px;">1. Sisäkehän mittarit: Sosiaalinen perusta</h2>
+      <div id="chart-social" style="padding: 4px 10px;"></div>
     </div>
     <div class="chart-box" style="margin-bottom:0;">
-      <h2 style="margin-top:0;">2. Ulkokehän mittarit: Ekologinen katto</h2>
-      <div id="chart-eco"></div>
+      <h2 style="margin-top:0; margin-bottom:16px;">2. Ulkokehän mittarit: Ekologinen katto</h2>
+      <div id="chart-eco" style="padding: 4px 10px;"></div>
     </div>
   </div>
 
@@ -216,7 +216,6 @@
   </table>
 
   <script>
-    // Oma kevyt ja vikasietoinen CSV-jäsennin (ei vaadi ulkoista PapaParse-kirjastoa!)
     function parseCSV(text) {
       var lines = text.replace(/\r/g, "").split("\n").filter(function(l) { return l.trim().length > 0; });
       if (lines.length < 2) return [];
@@ -253,7 +252,7 @@
     }
 
     function wrapLabel(str) {
-      if (!str || str.length <= 22) return str || "";
+      if (!str || str.length <= 20) return str || "";
       var words = str.split(" ");
       var mid = Math.ceil(words.length / 2);
       return words.slice(0, mid).join(" ") + "<br>" + words.slice(mid).join(" ");
@@ -272,7 +271,7 @@
       })
       .catch(function(err) { console.warn("config.yaml lukuohitus:", err); });
 
-    // 2. Haetaan doughnut_results.csv suoraan selaimen fetch()-komennolla
+    // 2. Haetaan doughnut_results.csv ja piirretään kaaviot selkeillä suojaväleillä
     fetch("doughnut_results.csv?t=" + Date.now())
       .then(function(res) {
         if (!res.ok) throw new Error("HTTP " + res.status);
@@ -301,7 +300,6 @@
         document.getElementById("eco-metric").innerText = ecoSafe + " / " + eco.length + " rajoissa";
         document.getElementById("total-metric").innerText = totalSafePct + " %";
 
-        // Päivitetään taulukko heti ensin (jotta se näkyy vaikka Plotly vielä latautuisi)
         var tbody = document.querySelector("#data-table tbody");
         tbody.innerHTML = "";
         data.forEach(function(r) {
@@ -323,11 +321,18 @@
 
         var labels = data.map(function(r) { return wrapLabel(r.name); });
 
+        // KEHÄRAKENNE SELKEILLÄ SUOJAVÄLEILLÄ (ei päällekkäisyyttä rajojen kanssa):
+        // Säde 25..90  = Sisäkehän vajealue (4 yksikön rako ennen sisärajaa!)
+        // Säde 94..102 = SISÄRAJA-RENGAS (valkoinen täyttö, mustat reunat)
+        // Säde 106..154= VIHREÄ DONITSIKEHÄ (4 yksikön rako molemmin puolin rajarenkaisiin!)
+        // Säde 158..166= ULKORAJA-RENGAS (valkoinen täyttö, mustat reunat)
+        // Säde 170..340= Ulkokehän ylitysalue (4 yksikön rako ulkorajan jälkeen!)
+
         var innerBgTrace = {
           type: "barpolar",
           theta: labels,
           base: data.map(function() { return 25; }),
-          r: data.map(function() { return 71; }),
+          r: data.map(function() { return 65; }),
           marker: { color: "#f8fafc", line: { color: "#e2e8f0", width: 1 } },
           hoverinfo: "skip"
         };
@@ -340,16 +345,16 @@
             var isSafe = String(r.is_safe).toLowerCase() === "true";
             if (r.domain === "Sosiaalinen perusta" && !isSafe) {
               var pct = parseFloat(r.ratio_pct) || 100;
-              var depth = Math.min(71, Math.max(22, (pct - 100) * 0.45));
-              return 96 - depth;
+              var depth = Math.min(65, Math.max(20, (pct - 100) * 0.42));
+              return 90 - depth;
             }
-            return 96;
+            return 90;
           }),
           r: data.map(function(r) {
             var isSafe = String(r.is_safe).toLowerCase() === "true";
             if (r.domain === "Sosiaalinen perusta" && !isSafe) {
               var pct = parseFloat(r.ratio_pct) || 100;
-              return Math.min(71, Math.max(22, (pct - 100) * 0.45));
+              return Math.min(65, Math.max(20, (pct - 100) * 0.42));
             }
             return 0;
           }),
@@ -363,8 +368,8 @@
         var innerRimTrace = {
           type: "barpolar",
           theta: labels,
-          base: data.map(function() { return 96; }),
-          r: data.map(function() { return 6; }),
+          base: data.map(function() { return 94; }),
+          r: data.map(function() { return 8; }),
           marker: { color: "#ffffff", line: { color: "#000000", width: 2 } },
           hovertemplate: data.map(function() { return "<b>Sisäraja: Sosiaalinen perusta (100 %)</b><extra></extra>"; })
         };
@@ -373,8 +378,8 @@
           type: "barpolar",
           name: "Turvallinen tila (Donitsi)",
           theta: labels,
-          base: data.map(function() { return 102; }),
-          r: data.map(function() { return 56; }),
+          base: data.map(function() { return 106; }),
+          r: data.map(function() { return 48; }),
           marker: {
             color: data.map(function(r) { return String(r.is_safe).toLowerCase() === "true" ? "#2e7d32" : "#86efac"; }),
             line: { color: "#ffffff", width: 2 }
@@ -389,7 +394,7 @@
           type: "barpolar",
           theta: labels,
           base: data.map(function() { return 158; }),
-          r: data.map(function() { return 6; }),
+          r: data.map(function() { return 8; }),
           marker: { color: "#ffffff", line: { color: "#000000", width: 2 } },
           hovertemplate: data.map(function() { return "<b>Ulkoraja: Ekologinen katto (100 %)</b><extra></extra>"; })
         };
@@ -398,12 +403,12 @@
           type: "barpolar",
           name: "Ekologinen ylitys",
           theta: labels,
-          base: data.map(function() { return 164; }),
+          base: data.map(function() { return 170; }),
           r: data.map(function(r) {
             var pct = parseFloat(r.ratio_pct) || 0;
             var isSafe = String(r.is_safe).toLowerCase() === "true";
             if (r.domain === "Ekologinen katto" && !isSafe && pct > 100) {
-              return Math.min(180, (pct - 100) * 0.72);
+              return Math.min(170, (pct - 100) * 0.68);
             }
             return 0;
           }),
@@ -417,19 +422,19 @@
         var mainLayout = {
           polar: {
             barmode: "overlay",
-            bargap: 0.04,
-            radialaxis: { visible: true, range: [0, 350], showticklabels: false, ticks: "", showline: false, gridcolor: "#e2e8f0", gridwidth: 1 },
-            angularaxis: { type: "category", tickfont: { size: 13, color: "#1a202c" }, direction: "clockwise", gridcolor: "#e2e8f0" }
+            bargap: 0.06,
+            radialaxis: { visible: true, range: [0, 355], showticklabels: false, ticks: "", showline: false, gridcolor: "#e2e8f0", gridwidth: 1 },
+            angularaxis: { type: "category", tickfont: { size: 12.5, color: "#1a202c" }, ticks: "outside", ticklen: 10, tickcolor: "rgba(0,0,0,0)", direction: "clockwise", gridcolor: "#e2e8f0" }
           },
           showlegend: false,
-          height: 660,
-          margin: { t: 50, b: 50, l: 110, r: 110 }
+          height: 680,
+          margin: { t: 65, b: 65, l: 145, r: 145 }
         };
 
         Plotly.newPlot("doughnut-main", [innerBgTrace, innerDeficitTrace, innerRimTrace, safeDoughnutTrace, outerRimTrace, outerOvershootTrace], mainLayout, { responsive: true });
 
         function renderBarChart(divId, subset, overColor) {
-          var ratios = subset.map(function(r) { return (parseFloat(r.ratio_pct) || 0) * 1.15; });
+          var ratios = subset.map(function(r) { return (parseFloat(r.ratio_pct) || 0) * 1.22; });
           var maxRatio = Math.max.apply(null, [360].concat(ratios));
           var barTrace = {
             type: "bar",
@@ -446,10 +451,10 @@
 
           var barLayout = {
             xaxis: { title: "Suhde kestävään tavoiterajaan (100 % = raja)", range: [0, maxRatio], ticksuffix: "%" },
-            yaxis: { automargin: true },
+            yaxis: { automargin: true, ticks: "outside", ticklen: 8, tickcolor: "rgba(0,0,0,0)" },
             shapes: [{ type: "line", x0: 100, x1: 100, y0: -0.5, y1: subset.length - 0.5, line: { color: "#1a202c", width: 2.5, dash: "dash" } }],
-            height: 320,
-            margin: { t: 10, b: 45, l: 10, r: 30 }
+            height: 340,
+            margin: { t: 20, b: 55, l: 25, r: 55, pad: 10 }
           };
 
           Plotly.newPlot(divId, [barTrace], barLayout, { responsive: true, displayModeBar: false });
@@ -463,7 +468,7 @@
         console.error(err);
       });
 
-    // 3. Haetaan doughnut_history.csv suoraan selaimen fetch()-komennolla
+    // 3. Haetaan doughnut_history.csv
     fetch("doughnut_history.csv?t=" + Date.now())
       .then(function(res) {
         if (!res.ok) throw new Error("HTTP " + res.status);
@@ -542,8 +547,8 @@
             yaxis: { title: yTitle, ticksuffix: "%", rangemode: "tozero" },
             shapes: [{ type: "line", xref: "paper", x0: 0, x1: 1, y0: 100, y1: 100, line: { color: "#2e7d32", width: 2.5, dash: "dash" } }],
             legend: { orientation: "h", y: -0.25 },
-            height: 400,
-            margin: { t: 20, b: 80, l: 60, r: 30 }
+            height: 420,
+            margin: { t: 25, b: 90, l: 70, r: 45, pad: 8 }
           };
 
           Plotly.newPlot("chart-history", traces, histLayout, { responsive: true });
