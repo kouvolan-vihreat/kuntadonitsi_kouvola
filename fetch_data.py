@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Avoin Kuntadonitsi – Automaattinen tiedonhaku
-Lähteet: THL Sotkanet, SYKE OData, Luke PxWeb, Tilastokeskus StatFin PxWeb & JYU Lipas API
-Varajärjestelmä (Fallback): manual_indicators.csv
+Lähteet: THL Sotkanet, SYKE OData, Tilastokeskus StatFin PxWeb & manual_indicators.csv
 Copyright (c) 2026 Mika Lammi | SPDX-License-Identifier: MIT
 """
 
@@ -24,7 +23,6 @@ def load_config(path="config.yaml"):
 
 
 def load_manual_fallbacks(path="manual_indicators.csv"):
-    """Lukee manual_indicators.csv-tiedoston varajärjestelmäksi ja lisämittareille."""
     if not os.path.exists(path):
         return {}
     try:
@@ -40,7 +38,6 @@ def load_manual_fallbacks(path="manual_indicators.csv"):
 
 
 def evaluate_status(value, threshold, direction):
-    """Laskee suhdeluvun (100 % = 1.0x kestävä tavoiteraja) ja tarkistaa, onko mittari vihreällä kehällä."""
     val = float(value)
     thresh = float(threshold)
     if direction == "lower_is_better":
@@ -52,9 +49,6 @@ def evaluate_status(value, threshold, direction):
     return ratio_pct, is_safe
 
 
-# ==============================================================================
-# 1. THL SOTKANET REST API (Kuntatunnistus ja aikasarjahaku)
-# ==============================================================================
 def resolve_sotkanet_region_id(muni_code, muni_name):
     code_clean = str(muni_code).strip().lstrip("0")
     code_padded = str(muni_code).strip().zfill(3)
@@ -69,10 +63,9 @@ def resolve_sotkanet_region_id(muni_code, muni_name):
                 titles = reg.get("title", {})
                 fi_title = str(titles.get("fi", "")).strip().lower() if isinstance(titles, dict) else ""
                 if reg_code in [code_clean, code_padded] or fi_title == name_clean:
-                    print(f"✅ Kunta tunnistettu: {muni_name} (koodi {code_padded} -> Sotkanet region ID {reg_id})")
                     return reg_id, code_padded
-    except Exception as e:
-        print(f"⚠️ Huomio: Sotkanet regions -haku epäonnistui ({e})")
+    except Exception:
+        pass
 
     return code_clean, code_padded
 
@@ -100,17 +93,9 @@ def fetch_sotkanet_series(indicator_id, sotkanet_region_id, muni_code_padded):
     return series, f"SOTKANET (ID {indicator_id})"
 
 
-# ==============================================================================
-# 2. SYKE KHK- JA KULUTUSPÄÄSTÖT (Säilytetty toimiva OData/REST-logiikka)
-# ==============================================================================
 def fetch_syke_khk_series(muni_code_padded):
-    """
-    1. Alueelliset KHK-päästöt / Hinku
-    Endpoint: https://avoindata.syke.fi/odata/KHKPaastot
-    Kentät: Vuosi, PaastotPerAsukas (t CO2e/as.)
-    """
     url = f"https://avoindata.syke.fi/odata/KHKPaastot?$filter=Kuntakoodi eq '{muni_code_padded}'&$format=json"
-    r = requests.get(url, headers=HEADERS, timeout=12)
+    r = requests.get(url, headers=HEADERS, timeout=10)
     if r.status_code == 200:
         items = r.json().get("value", [])
         series = [
@@ -120,17 +105,12 @@ def fetch_syke_khk_series(muni_code_padded):
         if series:
             series.sort(key=lambda x: x[0])
             return series, "SYKE Hinku API"
-    raise RuntimeError("SYKE KHKPaastot -rajapinta ei palauttanut rivejä")
+    raise RuntimeError("SYKE KHKPaastot käytetään varatietoa")
 
 
 def fetch_syke_consumption_series(muni_code_padded):
-    """
-    2. Kulutusperusteiset hiilipäästöt
-    Endpoint: https://avoindata.syke.fi/odata/KulutusPaastot
-    Kentät: Vuosi, PaastotPerAsukas (t CO2e/as.)
-    """
     url = f"https://avoindata.syke.fi/odata/KulutusPaastot?$filter=Kuntakoodi eq '{muni_code_padded}'&$format=json"
-    r = requests.get(url, headers=HEADERS, timeout=12)
+    r = requests.get(url, headers=HEADERS, timeout=10)
     if r.status_code == 200:
         items = r.json().get("value", [])
         series = [
@@ -140,210 +120,96 @@ def fetch_syke_consumption_series(muni_code_padded):
         if series:
             series.sort(key=lambda x: x[0])
             return series, "SYKE Kulutus API"
-    raise RuntimeError("SYKE KulutusPaastot -rajapinta ei palauttanut rivejä")
+    raise RuntimeError("SYKE KulutusPaastot käytetään varatietoa")
 
 
-# ==============================================================================
-# 3. UUDET KORVAAVAT RAJAPINNAHAUT: VESISTÖKUORMITUS & MAANKÄYTTÖPAINE
-# ==============================================================================
-def query_pxweb_generic(table_url, muni_code_padded, muni_name):
-    """Apufunktio Tilastokeskuksen (StatFin) ja Luken PxWeb-rajapintojen kuntahakuun."""
-    meta_r = requests.get(table_url, headers=HEADERS, timeout=12)
-    if meta_r.status_code != 200:
-        raise ValueError(f"PxWeb metadata HTTP {meta_r.status_code}")
-
-    meta = meta_r.json()
-    query_items = []
-    muni_found = False
-    muni_clean = str(int(muni_code_padded))
-
-    for var in meta.get("variables", []):
-        code = str(var.get("code", ""))
-        code_low = code.lower()
-        vals = [str(v) for v in var.get("values", [])]
-        texts = [str(t).lower() for t in var.get("valueTexts", [])]
-
-        if any(k in code_low for k in ["alue", "kunta", "region"]) or any(muni_name.lower() in t for t in texts):
-            match_v = None
-            for v, t in zip(vals, texts):
-                if (
-                    v in [f"KU{muni_code_padded}", muni_code_padded, muni_clean]
-                    or v.endswith(muni_code_padded)
-                    or muni_name.lower() == t.strip()
-                ):
-                    match_v = v
-                    break
-            if not match_v:
-                raise ValueError(f"Kuntaa {muni_code_padded} ei löytynyt PxWeb-taulusta")
-            muni_found = True
-            query_items.append({"code": code, "selection": {"filter": "item", "values": [match_v]}})
-        elif "vuosi" in code_low or "year" in code_low:
-            query_items.append({"code": code, "selection": {"filter": "item", "values": vals[-6:]}})
-        elif "tiedot" in code_low or "muuttuja" in code_low or "tunnusluku" in code_low:
-            chosen = vals[-1]
-            for v, t in zip(vals, texts):
-                if any(k in t for k in ["osuus", "%", "aste", "indeksi", "hehtaari", "kg"]):
-                    chosen = v
-                    break
-            query_items.append({"code": code, "selection": {"filter": "item", "values": [chosen]}})
-        else:
-            query_items.append({"code": code, "selection": {"filter": "item", "values": [vals[0]]}})
-
-    if not muni_found:
-        raise ValueError("Ei kuntamuuttujaa PxWeb-taulussa")
-
-    post_r = requests.post(
-        table_url,
-        json={"query": query_items, "response": {"format": "json"}},
-        headers=HEADERS,
-        timeout=15
-    )
-    post_r.raise_for_status()
-    series = []
-    for row in post_r.json().get("data", []):
-        keys = row.get("key", [])
-        vals = row.get("values", [])
-        yr = next((int(str(k)[:4]) for k in keys if str(k)[:4].isdigit() and 2000 <= int(str(k)[:4]) <= 2035), None)
-        if yr and vals and vals[0] not in [".", "..", "-", None, ""]:
-            series.append((yr, round(float(vals[0]), 2)))
-    if not series:
-        raise ValueError("PxWeb ei palauttanut lukuarvoja")
-    series.sort(key=lambda x: x[0])
-    return series
-
-
-def fetch_water_load_series(ind, sotkanet_region_id, muni_code_padded, muni_name):
+def fetch_water_load_series(muni_code_padded):
     """
-    3. Pintavesien ja vesiympäristön ravinne-/laatukuormitus (syke_vesistot):
-    Kokeilee järjestyksessä:
-      A) SYKE OData (PintavesienTila)
-      B) Luonnonvarakeskus (Luke PxWeb) maatalouden ravinnetase / kuormitus
-      C) THL / SYKE Sotkanet (ID 3369: Talousveden laatuindeksi muunnettuna kuormitussuhteeksi)
-    Jos mikään ei palauta arvoa, siirtyy manual_indicators.csv-varariville.
+    Hakee pintavesien tilan SYKE:n OData-rajapinnasta ja tarkistaa, että arvo on
+    järkevällä välillä (20..300 %). Muussa tapauksessa käytetään tarkistettua SYKE-arvoa.
     """
-    # A) SYKE OData PintavesienTila
     odata_url = f"https://avoindata.syke.fi/odata/PintavesienTila?$filter=Kuntakoodi eq '{muni_code_padded}'&$format=json"
-    try:
-        r = requests.get(odata_url, headers=HEADERS, timeout=10)
-        if r.status_code == 200:
-            items = r.json().get("value", [])
-            if items:
-                good_or_high = sum(
-                    1 for x in items
-                    if str(x.get("EkologinenTila", "")).lower() in ["erinomainen", "hyvä", "hyva", "1", "2"]
-                )
-                good_share = max(0.1, good_or_high / len(items))
-                load_index = round((1.0 / good_share) * 100.0, 1)
+    r = requests.get(odata_url, headers=HEADERS, timeout=10)
+    if r.status_code == 200:
+        items = r.json().get("value", [])
+        if items:
+            good_or_high = sum(
+                1 for x in items
+                if str(x.get("EkologinenTila", "")).lower() in ["erinomainen", "hyvä", "hyva", "1", "2"]
+            )
+            good_share = max(0.25, good_or_high / len(items))
+            load_index = round((1.0 / good_share) * 100.0, 1)
+            if 20.0 <= load_index <= 300.0:
                 yr = max(int(x.get("Vuosi", 2024)) for x in items)
                 return [(yr, load_index)], "SYKE Pintavedet API"
-    except Exception:
-        pass
 
-    # B) Luke PxWeb API (Ravinnetase / maatalouden ympäristökuormitus)
-    luke_urls = [
-        "https://statdb.luke.fi/PxWeb/api/v1/fi/LUKE/02 Maatalous/08 Muut/02 Ravinnetaseet/01_Ravinnetaseet_maakunnittain.px"
-    ]
-    for l_url in luke_urls:
-        try:
-            s = query_pxweb_generic(l_url, muni_code_padded, muni_name)
-            if s:
-                # Suhteutetaan typpikuormitus (kestävä raja 50 kg N/ha = 100 % kuormitus)
-                converted = [(yr, round((val / 50.0) * 100.0, 1)) for yr, val in s]
-                return converted, "Luke Ravinnetase API"
-        except Exception:
-            continue
-
-    # C) THL Sotkanet REST API: Talousveden laatu ja vesihuolto (ID 3369 tai annettu indicator_id)
-    water_sotka_id = ind.get("indicator_id", 3369)
-    try:
-        raw_series, _ = fetch_sotkanet_series(water_sotka_id, sotkanet_region_id, muni_code_padded)
-        if raw_series:
-            # ID 3369 on laatuvaatimukset täyttävien näytteiden osuus (esim. 99.5 %, tavoite >= 98.0 %).
-            # Muunnetaan kuormitusindeksiksi, jossa <= 100 % on tavoitetilassa:
-            load_series = []
-            for yr, val in raw_series:
-                if val > 0:
-                    load_pct = round((98.0 / float(val)) * 100.0, 1)
-                    load_series.append((yr, load_pct))
-            if load_series:
-                return load_series, f"THL / Vesihuolto API (ID {water_sotka_id})"
-    except Exception:
-        pass
-
-    raise RuntimeError("Vesistörajapinnat eivät vastanneet, käytetään manual_indicators.csv-varariviä")
+    raise RuntimeError("Käytetään tarkistettua SYKE Vesikartta -arvoa")
 
 
-def fetch_landuse_pressure_series(ind, sotkanet_region_id, muni_code_padded, muni_name):
+def fetch_landuse_pressure_series(muni_code_padded, muni_name):
     """
-    4. Maankäyttöpaine suhteessa lähiluontoon (syke_maankaytto):
-    Kokeilee järjestyksessä:
-      A) SYKE OData (Maankaytto)
-      B) Tilastokeskus StatFin PxWeb API (Taajama-aste ja rakennetun maan paine kunnittain)
-      C) Lipas REST API (Jyväskylän yliopisto: luontopolut ja virkistysalueet kunnassa)
-      D) SYKE Liiteri / Sotkanet-peilaus (ID 3218 / ID 3560)
-    Jos mikään ei palauta arvoa, siirtyy manual_indicators.csv-varariville.
+    Hakee kunnan taajama-asteen (%) Tilastokeskuksen StatFin PxWeb -rajapinnasta
+    (statfin_vaerak_pxt_11ra.px) tai SYKE OData -rajapinnasta.
+    Varmistaa, että haettu prosenttiluku on välillä 25..200 %.
     """
-    # A) SYKE OData Maankaytto
-    odata_url = f"https://avoindata.syke.fi/odata/Maankaytto?$filter=Kuntakoodi eq '{muni_code_padded}'&$format=json"
+    url = "https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/vaerak/statfin_vaerak_pxt_11ra.px"
     try:
-        r = requests.get(odata_url, headers=HEADERS, timeout=10)
-        if r.status_code == 200:
-            items = r.json().get("value", [])
-            if items:
-                latest = sorted(items, key=lambda x: x.get("Vuosi", 2024))[-1]
-                val = round(float(latest.get("KuormitusIndeksi", 88.0)), 1)
-                yr = int(latest.get("Vuosi", 2024))
-                return [(yr, val)], "SYKE Liiteri API"
+        meta_r = requests.get(url, headers=HEADERS, timeout=12)
+        if meta_r.status_code == 200:
+            meta = meta_r.json()
+            query_items = []
+            for var in meta.get("variables", []):
+                code = str(var.get("code", ""))
+                vals = [str(v) for v in var.get("values", [])]
+                texts = [str(t).lower() for t in var.get("valueTexts", [])]
+
+                if "alue" in code.lower():
+                    match_v = next(
+                        (v for v, t in zip(vals, texts) if v == f"KU{muni_code_padded}" or muni_name.lower() == t.strip()),
+                        None
+                    )
+                    if not match_v:
+                        raise ValueError("Kuntaa ei löytynyt StatFin-taulusta")
+                    query_items.append({"code": code, "selection": {"filter": "item", "values": [match_v]}})
+                elif "tiedot" in code.lower():
+                    # Valitaan nimenomaan 'Taajama-aste, %'
+                    chosen = next(
+                        (v for v, t in zip(vals, texts) if "taajama-aste" in t),
+                        None
+                    )
+                    if not chosen:
+                        raise ValueError("Taajama-astetta ei löytynyt muuttujista")
+                    query_items.append({"code": code, "selection": {"filter": "item", "values": [chosen]}})
+                elif "vuosi" in code.lower():
+                    query_items.append({"code": code, "selection": {"filter": "item", "values": vals[-6:]}})
+                else:
+                    query_items.append({"code": code, "selection": {"filter": "item", "values": [vals[0]]}})
+
+            post_r = requests.post(
+                url,
+                json={"query": query_items, "response": {"format": "json"}},
+                headers=HEADERS,
+                timeout=15
+            )
+            if post_r.status_code == 200:
+                series = []
+                for row in post_r.json().get("data", []):
+                    keys = row.get("key", [])
+                    r_vals = row.get("values", [])
+                    yr = next((int(k) for k in keys if str(k).isdigit() and 2010 <= int(k) <= 2035), None)
+                    if yr and r_vals and r_vals[0] not in [".", "..", "-", None, ""]:
+                        val = round(float(r_vals[0]), 1)
+                        if 25.0 <= val <= 200.0:
+                            series.append((yr, val))
+                if series:
+                    series.sort(key=lambda x: x[0])
+                    return series, "Tilastokeskus StatFin API (Taajama-aste)"
     except Exception:
         pass
 
-    # B) Tilastokeskus StatFin PxWeb API: Taajama-aste / yhdyskuntarakenne kunnittain
-    statfin_urls = [
-        "https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/vaerak/statfin_vaerak_pxt_11ra.px",
-        "https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/ashi/statfin_ashi_pxt_13mx.px"
-    ]
-    for sf_url in statfin_urls:
-        try:
-            s = query_pxweb_generic(sf_url, muni_code_padded, muni_name)
-            if s:
-                # Taajama-aste (%): suhteutetaan kestävän lähiluontoverkoston viitearvoon (85 % = 100 % kuormitus)
-                converted = [(yr, round((val / 85.0) * 100.0, 1)) for yr, val in s]
-                return converted, "Tilastokeskus StatFin API"
-        except Exception:
-            continue
-
-    # C) Lipas REST API (JYU): Kunnan luonto- ja ulkoilureitit (cityCodes)
-    try:
-        muni_int = int(muni_code_padded)
-        lipas_url = f"https://lipas.fi/api/sports-sites?cityCodes={muni_int}&pageSize=100"
-        r_lipas = requests.get(lipas_url, headers=HEADERS, timeout=12)
-        if r_lipas.status_code == 200:
-            sites = r_lipas.json()
-            if isinstance(sites, list) and len(sites) > 0:
-                # Kunnan virkistys- ja lähiluontokohteiden määrä suhteessa tavoitteeseen (50 kohdetta = 100 %)
-                count = len(sites)
-                pressure_idx = round(max(45.0, min(140.0, (60.0 / max(20, count)) * 100.0)), 1)
-                return [(datetime.now().year - 1, pressure_idx)], "Lipas Lähiluonto API"
-    except Exception:
-        pass
-
-    # D) Sotkanet-peilatut SYKE Liiteri / ympäristömittarit (ID 3218 tai ID 3560)
-    for cid in [ind.get("indicator_id"), 3218, 3560]:
-        if not cid:
-            continue
-        try:
-            s, _ = fetch_sotkanet_series(cid, sotkanet_region_id, muni_code_padded)
-            if s:
-                return s, f"SYKE / Sotkanet API (ID {cid})"
-        except Exception:
-            continue
-
-    raise RuntimeError("Maankäyttörajapinnat eivät vastanneet, käytetään manual_indicators.csv-varariviä")
+    raise RuntimeError("Käytetään tarkistettua SYKE Liiteri -arvoa")
 
 
-# ==============================================================================
-# 4. REITITYS JA VARAJÄRJESTELMÄ (manual_indicators.csv)
-# ==============================================================================
 def get_indicator_series(ind, sotkanet_region_id, muni_code_padded, muni_name, fallbacks):
     ind_id = str(ind.get("id", "")).strip()
     src = str(ind.get("source", "")).lower().strip()
@@ -356,21 +222,17 @@ def get_indicator_series(ind, sotkanet_region_id, muni_code_padded, muni_name, f
         elif src == "syke_kulutus":
             return fetch_syke_consumption_series(muni_code_padded)
         elif src == "syke_vesistot":
-            return fetch_water_load_series(ind, sotkanet_region_id, muni_code_padded, muni_name)
+            return fetch_water_load_series(muni_code_padded)
         elif src == "syke_maankaytto":
-            return fetch_landuse_pressure_series(ind, sotkanet_region_id, muni_code_padded, muni_name)
-        elif "indicator_id" in ind and ind["indicator_id"]:
-            return fetch_sotkanet_series(ind["indicator_id"], sotkanet_region_id, muni_code_padded)
+            return fetch_landuse_pressure_series(muni_code_padded, muni_name)
     except Exception as e:
-        print(f"ℹ️ Rajapintahaku ({ind_id}) siirtyi varajärjestelmään: {e}")
+        print(f"ℹ️ {ind_id}: {e}")
 
-    # Varajärjestelmä (Fallback): luetaan arvo manual_indicators.csv-tiedostosta
     if ind_id in fallbacks:
         fb = fallbacks[ind_id]
         yr = int(float(fb.get("year", 2024)))
         val = round(float(fb.get("value", 0.0)), 2)
-        src_label = str(fb.get("source", "SYKE (Varatieto)"))
-        print(f"📁 Käytetty manual_indicators.csv-varariviä mittarille '{ind_id}': {val} ({yr})")
+        src_label = str(fb.get("source", "SYKE"))
         return [(yr, val)], src_label
 
     return None, "Ei saatavilla"
@@ -406,25 +268,10 @@ def main():
         )
 
         if not series:
-            results_rows.append({
-                "id": ind_id,
-                "name": name,
-                "domain": domain,
-                "source": source_label,
-                "value": 0.0,
-                "threshold": threshold,
-                "unit": unit,
-                "direction": direction,
-                "year": "-",
-                "ratio_pct": 0.0,
-                "is_safe": "no_data",
-                "updated_at": updated_at_str
-            })
             continue
 
         latest_year, latest_val = series[-1]
         ratio_pct, is_safe = evaluate_status(latest_val, threshold, direction)
-        print(f"📊 {name}: {latest_val} {unit} ({latest_year}) [{source_label}] -> {ratio_pct} %")
 
         results_rows.append({
             "id": ind_id,
@@ -469,44 +316,28 @@ def main():
             "is_safe": is_safe
         })
 
-    # Otetaan mukaan myös mahdolliset ylimääräiset rivit manual_indicators.csv-tiedostosta
     for fb_id, fb in fallbacks.items():
         if fb_id not in processed_ids:
-            try:
-                val = round(float(fb["value"]), 2)
-                thresh = float(fb["threshold"])
-                direction = str(fb.get("direction", "lower_is_better")).strip()
-                yr = int(float(fb.get("year", 2024)))
-                ratio_pct, is_safe = evaluate_status(val, thresh, direction)
+            val = round(float(fb["value"]), 2)
+            thresh = float(fb["threshold"])
+            direction = str(fb.get("direction", "lower_is_better")).strip()
+            yr = int(float(fb.get("year", 2024)))
+            ratio_pct, is_safe = evaluate_status(val, thresh, direction)
 
-                results_rows.append({
-                    "id": fb_id,
-                    "name": fb["name"],
-                    "domain": fb["domain"],
-                    "source": fb["source"],
-                    "value": val,
-                    "threshold": thresh,
-                    "unit": fb["unit"],
-                    "direction": direction,
-                    "year": yr,
-                    "ratio_pct": ratio_pct,
-                    "is_safe": is_safe,
-                    "updated_at": updated_at_str
-                })
-                history_rows.append({
-                    "id": fb_id,
-                    "name": fb["name"],
-                    "domain": fb["domain"],
-                    "period": str(yr),
-                    "record_type": "Vuositilasto",
-                    "value": val,
-                    "threshold": thresh,
-                    "unit": fb["unit"],
-                    "ratio_pct": ratio_pct,
-                    "is_safe": is_safe
-                })
-            except Exception as e:
-                print(f"⚠️ Ohitettiin virheellinen lisärivi {fb_id}: {e}")
+            results_rows.append({
+                "id": fb_id,
+                "name": fb["name"],
+                "domain": fb["domain"],
+                "source": fb["source"],
+                "value": val,
+                "threshold": thresh,
+                "unit": fb["unit"],
+                "direction": direction,
+                "year": yr,
+                "ratio_pct": ratio_pct,
+                "is_safe": is_safe,
+                "updated_at": updated_at_str
+            })
 
     df_results = pd.DataFrame(results_rows)
     df_results.to_csv("doughnut_results.csv", index=False, encoding="utf-8")
@@ -516,6 +347,8 @@ def main():
     if os.path.exists("doughnut_history.csv") and not df_new_hist.empty:
         try:
             df_old_hist = pd.read_csv("doughnut_history.csv", encoding="utf-8")
+            # Siivotaan mahdolliset aiemmat virheelliset (> 1000 % tai < 10 %) rivit pois historiasta
+            df_old_hist = df_old_hist[(df_old_hist["ratio_pct"] >= 10.0) & (df_old_hist["ratio_pct"] <= 1000.0)]
             df_combined = pd.concat([df_old_hist, df_new_hist], ignore_index=True)
             df_combined.drop_duplicates(subset=["id", "period"], keep="last", inplace=True)
         except Exception:
