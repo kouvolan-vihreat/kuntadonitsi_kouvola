@@ -5,7 +5,7 @@ municipality:
 
 indicators:
   - id: "sairastavuus"
-    name: "Kansanterveys (THL sairastavuusindeksi)"
+    name: "Kansanterveys (THL sairastavuusindeksi, ikävakioitu)"
     domain: "Sosiaalinen perusta"
     source: "sotkanet"
     indicator_id: 244
@@ -26,8 +26,8 @@ indicators:
     name: "Pienituloisuusaste"
     domain: "Sosiaalinen perusta"
     source: "sotkanet"
-    indicator_id: 186
-    threshold: 10.0
+    indicator_id: 3190
+    threshold: 12.0
     unit: "%"
     direction: "lower_is_better"
 
@@ -35,7 +35,7 @@ indicators:
     name: "Työllisyysaste (18-64-v.)"
     domain: "Sosiaalinen perusta"
     source: "statfin"
-    metric_code: "M408"
+    metric_code: "tyollaste"
     threshold: 75.0
     unit: "%"
     direction: "higher_is_better"
