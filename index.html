@@ -24,30 +24,26 @@
     .subtitle { color: #4a5568; margin-bottom: 24px; }
     .cards { display: flex; gap: 20px; margin-bottom: 24px; flex-wrap: wrap; }
     .card { flex: 1; min-width: 240px; background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
-    .card.soc { border-left: 5px solid #c62828; }
+    .card.soc { border-left: 5px solid #dd6b20; }
     .card.safe { border-left: 5px solid #2e7d32; }
     .card.eco { border-left: 5px solid #c62828; }
     .card h3 { margin: 0 0 8px 0; font-size: 13px; color: #4a5568; text-transform: uppercase; }
     .card .val { font-size: 26px; font-weight: bold; color: #1a202c; }
     .card .desc { font-size: 13px; color: #718096; margin-top: 4px; }
-    .chart-box { background: white; border-radius: 12px; padding: 24px 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 24px; box-sizing: border-box; position: relative; }
+    .chart-box { background: white; border-radius: 12px; padding: 24px 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 24px; box-sizing: border-box; }
     .ring-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(500px, 1fr)); gap: 24px; margin-bottom: 24px; }
-    .legend-bar { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; margin-bottom: 12px; font-size: 13.5px; background: #f1f5f9; padding: 12px 16px; border-radius: 8px; }
+    .legend-bar { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; margin-bottom: 18px; font-size: 14px; background: #f1f5f9; padding: 12px 16px; border-radius: 8px; }
     .legend-item { display: flex; align-items: center; gap: 8px; }
     .dot { width: 16px; height: 16px; border-radius: 4px; display: inline-block; }
-    .ring-line { width: 22px; height: 8px; border-radius: 2px; display: inline-block; background: #ffffff; border: 2px solid #1a202c; }
-    #doughnut-main { width: 100%; display: flex; justify-content: center; align-items: center; overflow-x: auto; }
-    #doughnut-main svg { width: 100%; max-width: 1100px; height: auto; display: block; }
-    .sector-hover { cursor: pointer; transition: opacity 0.15s ease; }
-    .sector-hover:hover { opacity: 0.82; }
-    .svg-tooltip { position: fixed; display: none; pointer-events: none; background: rgba(15, 23, 42, 0.94); color: #ffffff; padding: 10px 14px; border-radius: 8px; font-size: 13px; line-height: 1.45; box-shadow: 0 6px 18px rgba(0,0,0,0.22); z-index: 2000; max-width: 300px; }
+    .ring-line { width: 22px; height: 8px; border-radius: 2px; display: inline-block; background: #ffffff; border: 2px solid #000000; }
     .controls-row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; background: #f1f5f9; padding: 12px 16px; border-radius: 8px; }
     select { padding: 8px 12px; border-radius: 6px; border: 1px solid #cbd5e0; font-size: 14px; background: white; font-weight: bold; }
     table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
     th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
     th { background: #edf2f7; font-weight: bold; }
     .badge-ok { background: #c6f6d5; color: #22543d; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; }
-    .badge-breach { background: #fed7d7; color: #742a2a; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; }
+    .badge-soc { background: #feebc8; color: #7b341e; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; }
+    .badge-eco { background: #fed7d7; color: #742a2a; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; }
     .site-footer { margin-top: 36px; padding-top: 16px; border-top: 1px solid #cbd5e0; text-align: center; font-size: 13px; color: #4a5568; line-height: 1.6; }
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.65); z-index: 1000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
     .modal-content { background: white; max-width: 960px; width: 100%; max-height: 88vh; overflow-y: auto; border-radius: 12px; padding: 28px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
@@ -90,188 +86,6 @@
       return w.slice(0, mid).join(" ") + "<br>" + w.slice(mid).join(" ");
     }
 
-    function polarToCartesian(cx, cy, r, angleDeg) {
-      var rad = (angleDeg - 90) * Math.PI / 180.0;
-      return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
-    }
-
-    function describeRingSector(cx, cy, rIn, rOut, startAngle, endAngle) {
-      var p1 = polarToCartesian(cx, cy, rOut, startAngle);
-      var p2 = polarToCartesian(cx, cy, rOut, endAngle);
-      var p3 = polarToCartesian(cx, cy, rIn, endAngle);
-      var p4 = polarToCartesian(cx, cy, rIn, startAngle);
-      var largeArc = (endAngle - startAngle) > 180 ? 1 : 0;
-      return [
-        "M", p1.x.toFixed(2), p1.y.toFixed(2),
-        "A", rOut, rOut, 0, largeArc, 1, p2.x.toFixed(2), p2.y.toFixed(2),
-        "L", p3.x.toFixed(2), p3.y.toFixed(2),
-        "A", rIn, rIn, 0, largeArc, 0, p4.x.toFixed(2), p4.y.toFixed(2),
-        "Z"
-      ].join(" ");
-    }
-
-    function escapeHTML(str) {
-      return String(str).replace(/&/g, "&").replace(/</g, "<").replace(/>/g, ">").replace(/"/g, """);
-    }
-
-    function renderSVGDoughnut(containerId, soc, eco) {
-      var container = document.getElementById(containerId);
-      var cx = 560, cy = 380;
-      var R_CORE = 34;
-      var R_SOC_100 = 110;
-      var R_GREEN_MID = 138;
-      var R_ECO_100 = 166;
-      var R_MAX = 306; // 3.0x kehä
-
-      var svgParts = [];
-      svgParts.push('<svg viewBox="0 0 1120 760" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Kuntadonitsin kokonaiskuva">');
-      svgParts.push('<defs><style>.lbl-title{font-size:12.5px;font-weight:bold;fill:#1a202c}.lbl-sub{font-size:11.5px;fill:#4a5568}.scale-lbl{font-size:10.5px;font-weight:bold;fill:#1a365d;paint-order:stroke;stroke:#ffffff;stroke-width:4px}</style></defs>');
-
-      // 1. Ulkokehän mitta-asteikon apuympyrät (1.5x, 2.0x, 2.5x, 3.0x)
-      var mults = [
-        { label: "1.5x", r: 201 },
-        { label: "2.0x", r: 236 },
-        { label: "2.5x", r: 271 },
-        { label: "3.0x", r: 306 }
-      ];
-      mults.forEach(function(m) {
-        svgParts.push('<circle cx="' + cx + '" cy="' + cy + '" r="' + m.r + '" fill="none" stroke="#cbd5e0" stroke-width="1" stroke-dasharray="4,4"/>');
-      });
-
-      // 2. Sisäkehän sektorit (Sosiaalinen perusta: keskitetty 0°, 90°, 180°, 270° jne.)
-      var nSoc = Math.max(1, soc.length);
-      var socStep = 360 / nSoc;
-      var gap = 1.4;
-      var callouts = [];
-
-      soc.forEach(function(r, i) {
-        var centerAng = i * socStep;
-        var a1 = centerAng - socStep / 2 + gap;
-        var a2 = centerAng + socStep / 2 - gap;
-        var ok = String(r.is_safe).toLowerCase() === "true";
-        var pct = parseFloat(r.ratio_pct) || 0;
-        var multStr = (pct / 100).toFixed(1) + "x";
-        var tip = "<b>Sisäkehä (Sosiaalinen perusta)</b><br>" + escapeHTML(r.name) + "<br>Arvo: " + escapeHTML(r.value + " " + r.unit) + " (Raja: " + escapeHTML(r.threshold) + ")<br>Suhde: <b>" + pct + " % (" + multStr + ")</b> – " + (ok ? "Tavoitetilassa" : "Sisäkehän vaje");
-
-        // Sisäkehän taustakiila (R_CORE .. R_SOC_100)
-        svgParts.push('<path class="sector-hover" d="' + describeRingSector(cx, cy, R_CORE, R_SOC_100, a1, a2) + '" fill="#f8fafc" stroke="#cbd5e0" stroke-width="1" data-tip="' + escapeHTML(tip) + '"/>');
-
-        // Jos sosiaalinen vaje (> 100 %), punainen kiila kasvaa sisäänpäin kohden keskipistettä R_CORE
-        if (!ok && pct > 100) {
-          var depth = Math.min(R_SOC_100 - R_CORE, ((pct - 100) / 180) * (R_SOC_100 - R_CORE));
-          svgParts.push('<path class="sector-hover" d="' + describeRingSector(cx, cy, R_SOC_100 - depth, R_SOC_100, a1, a2) + '" fill="#c62828" stroke="#ffffff" stroke-width="1.2" data-tip="' + escapeHTML(tip) + '"/>');
-        }
-
-        // Vihreän kehän sisävyöhyke (R_SOC_100 .. R_GREEN_MID)
-        var greenFill = ok ? "#2e7d32" : "#86efac";
-        svgParts.push('<path class="sector-hover" d="' + describeRingSector(cx, cy, R_SOC_100, R_GREEN_MID, a1, a2) + '" fill="' + greenFill + '" stroke="#ffffff" stroke-width="1.5" data-tip="' + escapeHTML(tip) + '"/>');
-
-        callouts.push({
-          angle: (centerAng + 360) % 360,
-          rAnchor: (R_CORE + R_SOC_100) / 2,
-          title: r.name,
-          sub: "Sisäkehä: " + pct + " % (" + multStr + ") • " + (ok ? "Kunnossa" : "Vaje"),
-          isBreach: !ok
-        });
-      });
-
-      // 3. Ulkokehän sektorit (Ekologinen katto: limittäin 45°, 135°, 225°, 315° jne.)
-      var nEco = Math.max(1, eco.length);
-      var ecoStep = 360 / nEco;
-
-      eco.forEach(function(r, i) {
-        var centerAng = (i + 0.5) * ecoStep;
-        var a1 = centerAng - ecoStep / 2 + gap;
-        var a2 = centerAng + ecoStep / 2 - gap;
-        var ok = String(r.is_safe).toLowerCase() === "true";
-        var pct = parseFloat(r.ratio_pct) || 0;
-        var multStr = (pct / 100).toFixed(1) + "x";
-        var tip = "<b>Ulkokehä (Ekologinen katto)</b><br>" + escapeHTML(r.name) + "<br>Arvo: " + escapeHTML(r.value + " " + r.unit) + " (Raja: " + escapeHTML(r.threshold) + ")<br>Suhde: <b>" + pct + " % (" + multStr + ")</b> – " + (ok ? "Kantokyvyn rajoissa" : "Ekologinen ylitys");
-
-        // Vihreän kehän ulkovyöhyke (R_GREEN_MID .. R_ECO_100)
-        var greenFill = ok ? "#2e7d32" : "#86efac";
-        svgParts.push('<path class="sector-hover" d="' + describeRingSector(cx, cy, R_GREEN_MID, R_ECO_100, a1, a2) + '" fill="' + greenFill + '" stroke="#ffffff" stroke-width="1.5" data-tip="' + escapeHTML(tip) + '"/>');
-
-        // Jos ekologinen ylitys (> 100 %), punainen kiila kasvaa ulospäin R_ECO_100:sta
-        if (!ok && pct > 100) {
-          var overshootPx = Math.min(148, ((pct - 100) / 200) * (R_MAX - R_ECO_100));
-          svgParts.push('<path class="sector-hover" d="' + describeRingSector(cx, cy, R_ECO_100, R_ECO_100 + overshootPx, a1, a2) + '" fill="#c62828" stroke="#ffffff" stroke-width="1.2" data-tip="' + escapeHTML(tip) + '"/>');
-        }
-
-        callouts.push({
-          angle: (centerAng + 360) % 360,
-          rAnchor: ok ? (R_GREEN_MID + R_ECO_100) / 2 : (R_ECO_100 + 28),
-          title: r.name,
-          sub: "Ulkokehä: " + pct + " % (" + multStr + ") • " + (ok ? "Rajoissa" : "Ylitys"),
-          isBreach: !ok
-        });
-      });
-
-      // 4. Keskireikä ja terävät 100 % (1.0x) rajarenkaat
-      svgParts.push('<circle cx="' + cx + '" cy="' + cy + '" r="' + R_CORE + '" fill="#ffffff" stroke="#cbd5e0" stroke-width="1.5"/>');
-      svgParts.push('<circle cx="' + cx + '" cy="' + cy + '" r="' + R_SOC_100 + '" fill="none" stroke="#1a202c" stroke-width="2.2"/>');
-      svgParts.push('<circle cx="' + cx + '" cy="' + cy + '" r="' + R_ECO_100 + '" fill="none" stroke="#1a202c" stroke-width="2.2"/>');
-
-      // 5. Kerroinasteikon numerot (1.5x..3.0x) sijoitettu vapaaseen väliin kulmaan 22.5°
-      mults.forEach(function(m) {
-        var pt = polarToCartesian(cx, cy, m.r, 22.5);
-        svgParts.push('<text x="' + pt.x.toFixed(1) + '" y="' + (pt.y + 4).toFixed(1) + '" text-anchor="middle" class="scale-lbl">' + m.label + '</text>');
-      });
-
-      // 6. Ulkopuoliset otsikot ja osoitinviivat (taatusti ilman päällekkäisyyksiä)
-      callouts.forEach(function(c) {
-        var ang = c.angle;
-        var pStart = polarToCartesian(cx, cy, c.rAnchor, ang);
-        var pOut = polarToCartesian(cx, cy, R_MAX + 14, ang);
-        var tx, ty, anchor, pEnd;
-
-        if (Math.abs(ang - 0) < 5 || Math.abs(ang - 360) < 5) {
-          // Ylhäällä keskellä
-          pEnd = { x: cx, y: 48 };
-          tx = cx; ty = 22; anchor = "middle";
-        } else if (Math.abs(ang - 180) < 5) {
-          // Alhaalla keskellä
-          pEnd = { x: cx, y: 712 };
-          tx = cx; ty = 730; anchor = "middle";
-        } else if (ang > 0 && ang < 180) {
-          // Oikea puoli
-          var xElbow = Math.max(pOut.x + 14, 865);
-          pEnd = { x: xElbow, y: pOut.y };
-          tx = xElbow + 8; ty = pOut.y - 4; anchor = "start";
-        } else {
-          // Vasen puoli
-          var xElbowL = Math.min(pOut.x - 14, 255);
-          pEnd = { x: xElbowL, y: pOut.y };
-          tx = xElbowL - 8; ty = pOut.y - 4; anchor = "end";
-        }
-
-        // Osoitinviiva ja ankkuripiste sektorin sisällä
-        svgParts.push('<polyline points="' + pStart.x.toFixed(1) + ',' + pStart.y.toFixed(1) + ' ' + pOut.x.toFixed(1) + ',' + pOut.y.toFixed(1) + ' ' + pEnd.x.toFixed(1) + ',' + pEnd.y.toFixed(1) + '" fill="none" stroke="#64748b" stroke-width="1.3"/>');
-        svgParts.push('<circle cx="' + pStart.x.toFixed(1) + '" cy="' + pStart.y.toFixed(1) + '" r="3.2" fill="#1a202c" stroke="#ffffff" stroke-width="1"/>');
-
-        var subColor = c.isBreach ? "#b91c1c" : "#15803d";
-        svgParts.push('<text x="' + tx.toFixed(1) + '" y="' + ty.toFixed(1) + '" text-anchor="' + anchor + '" class="lbl-title">' + escapeHTML(c.title) + '</text>');
-        svgParts.push('<text x="' + tx.toFixed(1) + '" y="' + (ty + 16).toFixed(1) + '" text-anchor="' + anchor + '" class="lbl-sub" style="fill:' + subColor + ';font-weight:bold;">' + escapeHTML(c.sub) + '</text>');
-      });
-
-      svgParts.push('</svg>');
-      container.innerHTML = svgParts.join("");
-
-      // Hover-tooltipin kytkentä
-      var tooltip = document.getElementById("svg-tooltip");
-      container.querySelectorAll(".sector-hover").forEach(function(el) {
-        el.addEventListener("mousemove", function(e) {
-          tooltip.innerHTML = el.getAttribute("data-tip");
-          tooltip.style.display = "block";
-          tooltip.style.left = (e.clientX + 14) + "px";
-          tooltip.style.top = (e.clientY + 14) + "px";
-        });
-        el.addEventListener("mouseleave", function() {
-          tooltip.style.display = "none";
-        });
-      });
-    }
-
     window.addEventListener("DOMContentLoaded", function() {
       if (window.location.search.indexOf("embed=true") !== -1) document.body.classList.add("embed-mode");
 
@@ -305,17 +119,33 @@
           tbody.innerHTML = "";
           data.forEach(function(r) {
             var ok = String(r.is_safe).toLowerCase() === "true", isSoc = r.domain === "Sosiaalinen perusta";
-            var badge = ok ? "badge-ok" : "badge-breach";
-            var bTxt = ok ? "Tavoitetilassa (Vihreä kehä)" : (isSoc ? "Sisäkehän vaje" : "Ulkokehän ylitys");
+            var badge = ok ? "badge-ok" : (isSoc ? "badge-soc" : "badge-eco");
+            var bTxt = ok ? "Vihreällä kehällä (Kunnossa)" : (isSoc ? "Sisäkehän vaje" : "Ulkokehän ylitys");
             var tr = document.createElement("tr");
             tr.innerHTML = "<td><strong>" + (isSoc ? "Sisäkehä" : "Ulkokehä") + "</strong> (" + r.domain + ")</td><td><strong>" + r.name + "</strong></td><td>" + r.value + " " + r.unit + "</td><td>" + r.threshold + " " + r.unit + "</td><td>" + r.ratio_pct + " %</td><td><span class='" + badge + "'>" + bTxt + "</span></td><td>" + r.source + " (" + r.year + ")</td>";
             tbody.appendChild(tr);
           });
 
-          // Piirretään selkeä, eriytetty SVG-donitsi
-          renderSVGDoughnut("doughnut-main", soc, eco);
+          var labels = data.map(function(r) { return wrapLabel(r.name); });
+          var traces = [
+            { type: "barpolar", theta: labels, base: data.map(function(){return 25;}), r: data.map(function(){return 65;}), marker: { color: "#f8fafc", line: { color: "#e2e8f0", width: 1 } }, hoverinfo: "skip" },
+            { type: "barpolar", theta: labels, base: data.map(function(r){ var ok = String(r.is_safe).toLowerCase() === "true"; if (r.domain === "Sosiaalinen perusta" && !ok) return 90 - Math.min(65, Math.max(20, ((parseFloat(r.ratio_pct)||100) - 100) * 0.42)); return 90; }), r: data.map(function(r){ var ok = String(r.is_safe).toLowerCase() === "true"; if (r.domain === "Sosiaalinen perusta" && !ok) return Math.min(65, Math.max(20, ((parseFloat(r.ratio_pct)||100) - 100) * 0.42)); return 0; }), marker: { color: "#dd6b20", line: { color: "#ffffff", width: 1.5 } }, hovertemplate: data.map(function(r){ return "<b>" + r.name + "</b><br>Arvo: " + r.value + " " + r.unit + " (Raja: " + r.threshold + ")<br>Suhde: " + r.ratio_pct + " %<extra></extra>"; }) },
+            { type: "barpolar", theta: labels, base: data.map(function(){return 94;}), r: data.map(function(){return 8;}), marker: { color: "#ffffff", line: { color: "#000000", width: 2 } }, hovertemplate: data.map(function(){return "<b>Sisäraja: Sosiaalinen perusta (100 %)</b><extra></extra>";}) },
+            { type: "barpolar", theta: labels, base: data.map(function(){return 106;}), r: data.map(function(){return 48;}), marker: { color: data.map(function(r){ return String(r.is_safe).toLowerCase() === "true" ? "#2e7d32" : "#86efac"; }), line: { color: "#ffffff", width: 2 } }, hovertemplate: data.map(function(r){ return "<b>" + r.name + "</b><br>Suhde rajaan: " + r.ratio_pct + " %<extra></extra>"; }) },
+            { type: "barpolar", theta: labels, base: data.map(function(){return 158;}), r: data.map(function(){return 8;}), marker: { color: "#ffffff", line: { color: "#000000", width: 2 } }, hovertemplate: data.map(function(){return "<b>Ulkoraja: Ekologinen katto (100 %)</b><extra></extra>";}) },
+            { type: "barpolar", theta: labels, base: data.map(function(){return 170;}), r: data.map(function(r){ var pct = parseFloat(r.ratio_pct)||0, ok = String(r.is_safe).toLowerCase() === "true"; return (r.domain === "Ekologinen katto" && !ok && pct > 100) ? Math.min(170, (pct - 100) * 0.68) : 0; }), marker: { color: "#c62828", line: { color: "#ffffff", width: 1.5 } }, hovertemplate: data.map(function(r){ return "<b>" + r.name + "</b><br>Arvo: " + r.value + " " + r.unit + " (Raja: " + r.threshold + ")<br>Suhde: " + r.ratio_pct + " %<extra></extra>"; }) }
+          ];
 
-          function renderBar(divId, sub) {
+          Plotly.newPlot("doughnut-main", traces, {
+            polar: {
+              barmode: "overlay", bargap: 0.06,
+              radialaxis: { visible: true, range: [0, 355], showticklabels: false, ticks: "", showline: false, gridcolor: "#e2e8f0" },
+              angularaxis: { type: "category", tickfont: { size: 12.5, color: "#1a202c" }, ticks: "outside", ticklen: 10, tickcolor: "rgba(0,0,0,0)", direction: "clockwise", gridcolor: "#e2e8f0" }
+            },
+            showlegend: false, height: 680, margin: { t: 65, b: 65, l: 145, r: 145 }
+          }, { responsive: true });
+
+          function renderBar(divId, sub, col) {
             var maxR = Math.max.apply(null, [360].concat(sub.map(function(r){ return (parseFloat(r.ratio_pct)||0) * 1.22; })));
             Plotly.newPlot(divId, [{
               type: "bar", orientation: "h",
@@ -323,16 +153,16 @@
               x: sub.map(function(r){ return parseFloat(r.ratio_pct)||0; }),
               text: sub.map(function(r){ return r.value + " " + r.unit + " (" + r.ratio_pct + " %)"; }),
               textposition: "auto",
-              marker: { color: sub.map(function(r){ return String(r.is_safe).toLowerCase() === "true" ? "#2e7d32" : "#c62828"; }) }
+              marker: { color: sub.map(function(r){ return String(r.is_safe).toLowerCase() === "true" ? "#2e7d32" : col; }) }
             }], {
-              xaxis: { title: "Suhde kestävään tavoiterajaan (100 % = 1.0x raja)", range: [0, maxR], ticksuffix: "%" },
+              xaxis: { title: "Suhde kestävään tavoiterajaan (100 % = raja)", range: [0, maxR], ticksuffix: "%" },
               yaxis: { automargin: true, ticks: "outside", ticklen: 8, tickcolor: "rgba(0,0,0,0)" },
               shapes: [{ type: "line", x0: 100, x1: 100, y0: -0.5, y1: sub.length - 0.5, line: { color: "#1a202c", width: 2.5, dash: "dash" } }],
               height: 340, margin: { t: 20, b: 55, l: 25, r: 55, pad: 10 }
             }, { responsive: true, displayModeBar: false });
           }
-          renderBar("chart-social", soc);
-          renderBar("chart-eco", eco);
+          renderBar("chart-social", soc, "#dd6b20");
+          renderBar("chart-eco", eco, "#c62828");
         }).catch(function(e) { document.getElementById("last-updated").innerText = "⚠️ Virhe: " + e.message; });
 
       fetch("doughnut_history.csv?t=" + Date.now())
@@ -365,8 +195,6 @@
 </head>
 <body>
 
-  <div id="svg-tooltip" class="svg-tooltip"></div>
-
   <div class="header-row">
     <h1 id="main-title">🍩 Kuntakohtainen Kuntadonitsi</h1>
     <div class="header-actions">
@@ -383,11 +211,11 @@
         <button type="button" class="close-btn" onclick="document.getElementById('info-modal').style.display='none'">×</button>
       </div>
       <p style="font-size:14px; line-height:1.5; color:#2d3748; margin-top:0;">
-        Kuntadonitsi perustuu Kate Raworthin <strong>donitsitalousmalliin (Doughnut Economics)</strong> sekä suomalaiseen kuntatason sovellukseen (mm. Jyväskylän yliopiston JYU.Wisdom-tutkimusryhmä ja Sitra). Sisäkehä kuvaa yksinomaan <strong>sosiaalista perustaa</strong> (vajeet kasvavat sisäänpäin keskustaa kohti) ja ulkokehä kuvaa yksinomaan <strong>ekologista kattoa</strong> (ylitykset kasvavat kehän ulkopuolelle).
+        Kuntadonitsi perustuu Kate Raworthin <strong>donitsitalousmalliin (Doughnut Economics)</strong> sekä suomalaiseen kuntatason sovellukseen (mm. Jyväskylän yliopiston JYU.Wisdom-tutkimusryhmä ja Sitra). Tavoitteena on ohjata kuntaa <strong>turvalliseen ja oikeudenmukaiseen tilaan (vihreälle donitsikehälle)</strong>, jossa hyvinvoinnin perusta toteutuu ilman, että ympäristön kantokyky ylittyy.
       </p>
       <div class="modal-section-title">1. Sisäkehä: Sosiaalinen perusta (THL Sotkanet REST API)</div>
       <table class="modal-table">
-        <thead><tr><th>Mittari</th><th>Lähde & ID</th><th>Valintaperuste</th><th>Kestävä raja (100 % = 1.0x)</th></tr></thead>
+        <thead><tr><th>Mittari</th><th>Lähde & ID</th><th>Valintaperuste</th><th>Kestävä raja (100 %)</th></tr></thead>
         <tbody>
           <tr><td><strong>Kansanterveys</strong></td><td>Sotkanet (ID 244)</td><td>Yhdistää 7 vakavaa kansansairausryhmää ikävakioiduksi kokonaisluvuksi.</td><td><strong>100.0 indeksi</strong> (Maan keskiarvo = 100)</td></tr>
           <tr><td><strong>Työttömien osuus</strong></td><td>Sotkanet (ID 181)</td><td>Kuvaa kunnan elinvoimaa, työn saatavuutta ja osallisuutta.</td><td><strong>8.0 %</strong> (Hyvän työllisyyden raja)</td></tr>
@@ -397,11 +225,11 @@
       </table>
       <div class="modal-section-title">2. Ulkokehä: Ekologinen katto (SYKE:n tietopalvelut)</div>
       <table class="modal-table">
-        <thead><tr><th>Mittari</th><th>Lähde</th><th>Valintaperuste</th><th>Kestävä raja (100 % = 1.0x)</th></tr></thead>
+        <thead><tr><th>Mittari</th><th>Lähde</th><th>Valintaperuste</th><th>Kestävä raja (100 %)</th></tr></thead>
         <tbody>
           <tr><td><strong>Alueelliset KHK-päästöt</strong></td><td>SYKE Hinku</td><td>Virallinen kuntien ilmastotyön seurantamittari (liikenne, lämmitys, maatalous).</td><td><strong>2.0 t CO2e/as.</strong> (Hinku -80 % tavoitetaso)</td></tr>
-          <tr><td><strong>Kulutuksen hiilijalanjälki</strong></td><td>SYKE Kulutus</td><td>Sisältää kuntalaisten kuluttamien tavaroiden, ruoan ja palveluiden päästöt.</td><td><strong>2.5 t CO2e/as.</strong> (1,5 asteen globaali raja)</td></tr>
-          <tr><td><strong>Vesistökuormitus</strong></td><td>SYKE Vesikartta</td><td>Kuvaa makean veden tilaa ja ravinnekuormitusta (rehevöitymistä).</td><td><strong>100.0 %</strong> (EU:n hyvä ekologinen tila)</td></tr>
+          <tr><td><strong>Kulutuksen hiilijalanjälki</strong></td><td>SYKE ENVIMAT</td><td>Sisältää kuntalaisten kuluttamien tavaroiden, ruoan ja palveluiden päästöt.</td><td><strong>2.5 t CO2e/as.</strong> (1,5 asteen globaali raja)</td></tr>
+          <tr><td><strong>Vesistökuormitus</strong></td><td>SYKE Hertta</td><td>Kuvaa makean veden tilaa ja ravinnekuormitusta (rehevöitymistä).</td><td><strong>100.0 %</strong> (EU:n hyvä ekologinen tila)</td></tr>
           <tr><td><strong>Maankäyttöpaine</strong></td><td>SYKE Liiteri</td><td>Kuvaa maankäytön muutosta ja lähiluonnon monimuotoisuuden säilymistä.</td><td><strong>100.0 %</strong> (Ekologisen verkoston säilyminen)</td></tr>
         </tbody>
       </table>
@@ -415,12 +243,12 @@
   </div>
 
   <div class="chart-box">
-    <h2 style="margin-top:0; text-align:center;">Kuntadonitsin kokonaiskuva (Eriytetty sisä- ja ulkokehä)</h2>
+    <h2 style="margin-top:0; text-align:center;">Kuntadonitsin kokonaiskuva</h2>
     <div class="legend-bar">
-      <div class="legend-item"><span class="dot" style="background:#c62828;"></span> <strong>Poikkeama turvallisesta tilasta</strong> (Sisäpuolella = sosiaalinen vaje, ulkopuolella = ekologinen ylitys)</div>
-      <div class="legend-item"><span class="ring-line"></span> <strong>100 % (1.0x) rajat</strong> (Sisä = Sosiaalinen perusta, Ulko = Ekologinen katto)</div>
-      <div class="legend-item"><span class="dot" style="background:#2e7d32;"></span> <strong>Tavoitetilassa</strong> (≤ 100 %)</div>
-      <div class="legend-item"><span class="dot" style="background:#86efac;"></span> <strong>Turvallisen tilan taustakehä</strong></div>
+      <div class="legend-item"><span class="dot" style="background:#dd6b20;"></span> <strong>Sosiaalinen vaje</strong> (Sisäkehän sisäpuoli)</div>
+      <div class="legend-item"><span class="ring-line"></span> <strong>Sisä- ja ulkoraja</strong> (100 % kestävä tavoiteraja)</div>
+      <div class="legend-item"><span class="dot" style="background:#2e7d32; border: 2px solid #14532d;"></span> <strong>Turvallinen tila</strong> (Vihreä donitsikehä)</div>
+      <div class="legend-item"><span class="dot" style="background:#c62828;"></span> <strong>Ekologinen ylitys</strong> (Ulkokehän ulkopuoli)</div>
     </div>
     <div id="doughnut-main"></div>
   </div>
@@ -440,7 +268,7 @@
     <div id="chart-history"></div>
   </div>
 
-  <h2>Lähdedata ja kynnysarvot (100 % = 1.0x kestävä tavoiteraja)</h2>
+  <h2>Lähdedata ja kynnysarvot (100 % = kestävä tavoiteraja)</h2>
   <table id="data-table">
     <thead><tr><th>Kehä / Ulottuvuus</th><th>Mittari</th><th>Kunnan arvo</th><th>Kestävä raja</th><th>Suhde rajaan</th><th>Tila donitsissa</th><th>Lähde (Vuosi)</th></tr></thead>
     <tbody></tbody>
