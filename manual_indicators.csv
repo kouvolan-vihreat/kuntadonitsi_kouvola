@@ -1,5 +1,5 @@
 id,name,domain,source,value,threshold,unit,direction,year
-hinku_paastot,Alueelliset KHK-paastot (SYKE Hinku),Ekologinen katto,SYKE Hinku,5.2,2.0,t CO2e/as.,lower_is_better,2024
-kulutus_hiili,Kulutusperusteinen hiilijalanjalki,Ekologinen katto,SYKE ENVIMAT,8.6,2.5,t CO2e/as.,lower_is_better,2023
-vesistot,Pintavesien ravinnekuormitus,Ekologinen katto,SYKE Hertta,130.0,100.0,% kuormitus,lower_is_better,2024
-luonto_paine,Maankayttopaine vs. lahiluonto,Ekologinen katto,SYKE Liiteri,88.0,100.0,% kuormitus,lower_is_better,2024
+hinku_paastot,Alueelliset KHK-päästöt (SYKE Hinku),Ekologinen katto,SYKE Hinku,4.9,2.0,t CO2e/as.,lower_is_better,2024
+kulutus_hiili,Kulutusperusteinen hiilijalanjälki,Ekologinen katto,SYKE Kulutus,8.2,2.5,t CO2e/as.,lower_is_better,2023
+vesistot,Pintavesien ravinnekuormitus,Ekologinen katto,SYKE Vesikartta,122.0,100.0,% kuormitus,lower_is_better,2024
+luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,SYKE Liiteri,88.0,100.0,% kuormitus,lower_is_better,2024
