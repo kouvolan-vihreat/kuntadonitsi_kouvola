@@ -1,20 +1,25 @@
-name: Paivita Kuntadonitsin Data
+name: Päivitä Kuntadonitsin data
 
 on:
   schedule:
-    - cron: '0 4 1 * *'
+    # Ajetaan automaattisesti joka kuukauden 1. päivä klo 06:00 UTC
+    - cron: '0 6 1 * *'
   workflow_dispatch:
   push:
+    branches:
+      - main
     paths:
       - 'config.yaml'
       - 'manual_indicators.csv'
       - 'fetch_data.py'
 
+# Estää kahta ajoa muokkaamasta CSV-tiedostoja yhtä aikaa
+concurrency:
+  group: kuntadonitsi-data-update
+  cancel-in-progress: true
+
 permissions:
   contents: write
-
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   fetch-and-update:
@@ -22,6 +27,8 @@ jobs:
     steps:
       - name: Lataa tietovarasto
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Asenna Python
         uses: actions/setup-python@v5
@@ -29,22 +36,16 @@ jobs:
           python-version: '3.11'
 
       - name: Asenna riippuvuudet
-        run: |
-          pip install --upgrade pip
-          pip install -r requirements.txt
+        run: pip install -r requirements.txt
 
-      - name: Hae data rajapinnoista ja paivita CSV-tiedostot
-        run: python fetch_data.py
+      - name: Hae tuorein main-haara ja paivita CSV-tiedostot
+        run: |
+          git pull origin main --no-rebase || true
+          python fetch_data.py
 
       - name: Tallenna paivitetyt tulokset GitHubiin
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add doughnut_results.csv doughnut_history.csv
-          if git diff --staged --quiet; then
-            echo "Ei uusia datamuutoksia tallennettavaksi."
-          else
-            git commit -m "Automaattinen datapaivitys (Sotkanet & SYKE)"
-            git pull --rebase origin main || true
-            git push
-          fi
+          git diff --staged --quiet || (git commit -m "Automaattinen datapaivitys (Sotkanet & SYKE)" && git push origin HEAD:main)
