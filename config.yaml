@@ -31,11 +31,11 @@ indicators:
     unit: "%"
     direction: "lower_is_better"
 
-  - id: "asuminen"
-    name: "Ahtaasti asuvat asuntokunnat"
+  - id: "tuloerot"
+    name: "Tuloerot (Gini-kerroin)"
     domain: "Sosiaalinen perusta"
     source: "sotkanet"
-    indicator_id: 226
-    threshold: 8.0
-    unit: "%"
+    indicator_id: 177
+    threshold: 25.0
+    unit: "indeksi"
     direction: "lower_is_better"
