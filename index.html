@@ -4,7 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Avoin Kuntadonitsi</title>
-  <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.30.0.min.js">
+    // Jos osoitteen perässä on ?embed=true, piilotetaan pääotsikko ja kevennetään reunuksia
+if (window.location.search.indexOf("embed=true") !== -1) {
+  document.body.style.background = "transparent";
+  document.body.style.padding = "0";
+  document.querySelector(".header-row").style.display = "none";
+  document.querySelector(".subtitle").style.display = "none";
+}
+  </script>
   <style>
     body { font-family: Arial, sans-serif; max-width: 1180px; margin: 0 auto; padding: 20px; color: #1a202c; background: #f8fafc; }
     .header-row { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 6px; }
