@@ -14,6 +14,17 @@ def get_sotkanet_region_id(muni_code_str):
             return reg["id"]
     raise ValueError(f"Kuntakoodia {muni_code_str} ei löytynyt Sotkanetista.")
 
+def get_sotkanet_indicator_title(indicator_id):
+    """Hakee indikaattorin virallisen suomenkielisen nimen suoraan Sotkanetista."""
+    try:
+        url = f"https://sotkanet.fi/rest/1.1/indicators/{indicator_id}"
+        res = requests.get(url, headers=HEADERS, timeout=15)
+        if res.status_code == 200:
+            return res.json().get("title", {}).get("fi", "")
+    except Exception:
+        pass
+    return ""
+
 def get_sotkanet_value(indicator_id, sotkanet_region_id):
     """Hakee tietyn kunnan tuoreimman arvon THL Sotkanet REST API:sta."""
     years = range(2017, 2027)
@@ -24,7 +35,6 @@ def get_sotkanet_value(indicator_id, sotkanet_region_id):
     res.raise_for_status()
     data = res.json()
     
-    # Suodatetaan vain oman kunnan rivit, joilla on arvo
     muni_rows = [
         r for r in data 
         if r.get("region") == sotkanet_region_id and r.get("value") is not None
@@ -32,38 +42,12 @@ def get_sotkanet_value(indicator_id, sotkanet_region_id):
     if not muni_rows:
         return 0.0, "N/A"
         
-    # Järjestetään vuoden mukaan ja otetaan tuorein
     latest = sorted(muni_rows, key=lambda x: x["year"])[-1]
     return float(latest["value"]), str(latest["year"])
 
-def get_statfin_employment(muni_code):
-    """Hakee kunnan tuoreimman työllisyysasteen Tilastokeskuksen StatFin-rajapinnasta."""
-    url = "https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/tyokay/statfin_tyokay_pxt_115x.px"
-    
-    # 1. Haetaan ensin taulukon metatiedot, jotta tiedämme viimeisimmän tilastovuoden
-    meta_res = requests.get(url, headers=HEADERS, timeout=20)
-    meta_res.raise_for_status()
-    meta = meta_res.json()
-    
-    latest_year = meta["variables"][-1]["values"][-1]
-    
-    # 2. Tehdään varsinainen datakysely kunnalle (esim. KU286)
-    payload = {
-        "query": [
-            {"code": "Alue", "selection": {"filter": "item", "values": [muni_code]}},
-            {"code": "Tiedot", "selection": {"filter": "item", "values": ["tyollaste"]}},
-            {"code": "Vuosi", "selection": {"filter": "item", "values": [latest_year]}}
-        ],
-        "response": {"format": "json-stat2"}
-    }
-    res = requests.post(url, json=payload, headers=HEADERS, timeout=20)
-    res.raise_for_status()
-    val = res.json()["value"][0]
-    return float(val), str(latest_year)
-
 def normalize_indicator(value, threshold, direction):
     """Muuntaa mittarin prosenttiluvuksi suhteessa kestävään rajaan (100 % = raja)."""
-    if value == 0.0:
+    if value <= 0.0:
         return 0.0, False
     ratio_pct = round((value / threshold) * 100, 1)
     if direction == "higher_is_better":
@@ -76,20 +60,17 @@ def main():
     with open("config.yaml", "r", encoding="utf-8") as f:
         config = yaml.safe_load(f)
 
-    muni_statfin = config["municipality"]["statfin_code"]
     muni_sotkanet = config["municipality"]["sotkanet_code"]
-    
-    # Haetaan kunnan sisäinen Sotkanet ID kerran alussa
     sotkanet_region_id = get_sotkanet_region_id(muni_sotkanet)
     rows = []
 
-    # 1. Haetaan automaattiset API-mittarit
+    # 1. Haetaan automaattiset API-mittarit Sotkanetista
     for ind in config["indicators"]:
         try:
-            if ind["source"] == "statfin":
-                val, year = get_statfin_employment(muni_statfin)
-            else:
-                val, year = get_sotkanet_value(ind["indicator_id"], sotkanet_region_id)
+            val, year = get_sotkanet_value(ind["indicator_id"], sotkanet_region_id)
+            official_title = get_sotkanet_indicator_title(ind["indicator_id"])
+            if official_title:
+                print(f"Haettu ID {ind['indicator_id']} ({official_title}): {val} ({year})")
         except Exception as e:
             print(f"Virhe haettaessa {ind['id']}: {e}")
             val, year = 0.0, "Virhe"
@@ -99,7 +80,7 @@ def main():
             "id": ind["id"],
             "name": ind["name"],
             "domain": ind["domain"],
-            "source": ind["source"].upper(),
+            "source": f"SOTKANET (ID {ind['indicator_id']})",
             "value": val,
             "threshold": ind["threshold"],
             "unit": ind["unit"],
