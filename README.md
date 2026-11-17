@@ -15,7 +15,7 @@ Ratkaisu toimii täysin **ilmaisilla, avoimen lähdekoodin työkaluilla** suoraa
 | **GitHub-tietovarasto** | Säilyttää asetustiedostot, hakuskriptin, tilasto- ja historiadatan sekä verkkosivun lähdekoodin. | 0 € (Julkinen projekti) |
 | **GitHub Actions** | Ajaa tiedonhaun automaattisesti kerran kuukaudessa (tai heti kun muokkaat asetuksia) ja tallentaa uudet luvut sekä aikasarjan. | 0 € |
 | **Python (`fetch_data.py`)** | Hakee kuntakohtaisen datan THL:n Sotkanet-rajapinnasta, yhdistää sen ympäristömittareihin ja laskee suhdeluvut kestäviin rajoihin (`100 % = raja`). | 0 € |
-| **GitHub Pages (`index.html`)** | Julkaisee interaktiivisen kuntadonitsin ja aikasarjakaaviot suoraan verkkosivuna ilman latausviiveitä. | 0 € |
+| **GitHub Pages (`index.html`)** | Julkaisee interaktiivisen kuntadonitsin, perustelumodaalin ja aikasarjakaaviot suoraan verkkosivuna ilman latausviiveitä. | 0 € |
 
 ---
 
@@ -30,7 +30,7 @@ kuntadonitsi/
 ├── doughnut_results.csv                # (Päivittyy automaattisesti) Viimeisin tilannekuva ja aikaleima
 ├── doughnut_history.csv                # (Päivittyy automaattisesti) Vuosi- ja kuukausitason aikasarja
 ├── fetch_data.py                       # Robottiskripti, joka hakee datan ja tallentaa historian
-├── index.html                          # Verkkosivun ja kaavioiden lähdekoodi
+├── index.html                          # Verkkosivun, perustelumodaalin ja kaavioiden lähdekoodi
 ├── requirements.txt                    # Python-kirjastoriippuvuudet
 └── .github/workflows/update_data.yml   # GitHub Actions -automaatioajastin
 ```
@@ -78,25 +78,124 @@ hinku_paastot,Alueelliset KHK-paastot (SYKE Hinku),Ekologinen katto,SYKE Hinku,5
 
 ---
 
-## 4. Mittariston ja raja-arvojen muokkaaminen
+## 4. Kuntatyypit ja niille suositellut mittaripaketit
 
-### Uuden automaattisen Sotkanet-mittarin lisääminen (`config.yaml`)
-THL:n Sotkanetissa on yli 3 000 kuntatason indikaattoria:
-1. Etsi haluamasi kuntatason mittari osoitteesta [sotkanet.fi](https://sotkanet.fi/sotkanet/fi/haku).
-2. Katso mittarin nimen perässä suluissa oleva ID-numero (esim. `244` = sairastavuusindeksi, `181` = työttömät %, `232` = toimeentulotuki %, `182` = taloudellinen huoltosuhde).
-3. Lisää uusi mittari `config.yaml`-tiedoston `indicators:`-listan jatkoksi seuraavassa muodossa:
+Oletuksena käytössä olevat 8 mittaria muodostavat **kansallisen peruspaketin**, joka on saatavilla kaikille Suomen 309 kunnalle. Suomen kunnat ovat kuitenkin elinkeinorakenteeltaan, väestöltään ja ympäristöhaasteiltaan hyvin erilaisia. 
+
+Alla olevasta taulukosta näet, miten eri kuntatyyppien kannattaa täydentää tai painottaa mittaristoaan:
+
+| Kuntaprofiili ja esimerkkikunnat | Tyypilliset kestävyyspiirteet | Suositeltava mittaripaketti (Peruspaketin lisäykset/vaihdot) |
+| :--- | :--- | :--- |
+| **1. Seutukaupungit ja teollisuuspaikkakunnat**<br>*(Kouvola, Lohja, Kotka, Pori, Rauma, Hämeenlinna, Mikkeli, Kemi)* | Rakenteellinen työttömyys, väestön ikääntyminen ja kansansairaudet haastavat sosiaalista perustaa; suuri taajama-aste ja liikenne vaikuttavat päästöihin. | **Sosiaalinen:** Peruspaketti (`244`, `181`, `232`, `182`) + *Nuorisotyöttömät (`ID 189`)* ja *Koulutuksen ulkopuolella olevat 17–24-v. (`ID 3199`)*.<br>**Ekologinen:** Peruspaketti + *Yhdyskuntajätteen kierrätysaste*. |
+| **2. Suuret kasvukeskukset ja yliopistokaupungit**<br>*(Helsinki, Tampere, Turku, Oulu, Jyväskylä, Kuopio, Vaasa)* | Suuri opiskelijamäärä nostaa näennäisesti toimeentulotuen saajia, mutta todellinen sosiaalinen vaje syntyy asumisen kalleudesta, asunnottomuudesta ja alueellisesta eriytymisestä. Täydennysrakentaminen luo painetta lähiluonnolle. | **Sosiaalinen:** Vaihda huoltosuhde -> *Asumismenojen rasittamat asuntokunnat (`ID 3219`)* ja lisää *Pitkäaikaistyöttömien osuus (`ID 304`)* sekä *Pienituloisuusaste (`ID 192`)*.<br>**Ekologinen:** Painota *Kulutusperusteista hiilijalanjälkeä* ja *Viheralueiden riittävyyttä / maankäyttöpainetta*. |
+| **3. Varakkaat kehyskunnat ja pendelöintikunnat**<br>*(Espoo, Kauniainen, Kirkkonummi, Pirkkala, Lempäälä, Kempele, Naantali, Sipoo)* | Työllisyys ja tulotaso ovat huippuluokkaa, jolloin perinteiset köyhyysmittarit näyttävät vihreää. Haasteina ovat nuorten henkinen kuormitus, autoiluvaltaisuus, pientalorakentamisen maankäyttö ja korkea kulutuksen hiilijalanjälki. | **Sosiaalinen:** Lisää *Nuorten kokema kohtalainen tai vaikea ahdistuneisuus (`ID 4111`)* ja *Kunnallisvaalien äänestysaktiivisuus (`ID 111`)*.<br>**Ekologinen:** Lisää `manual_indicators.csv`-tiedostoon *Henkilöautojen ajosuorite (km/as.)*. |
+| **4. Maatalous- ja alkutuotantovaltaiset maaseutukunnat**<br>*(Kurikka, Kauhajoki, Nivala, Kiuruvesi, Huittinen, Loimaa, Närpiö)* | Yrittäjävetoinen työllisyys on usein hyvää, mutta alueelliset KHK-päästöt asukasta kohden sekä vesistöjen ravinnekuormitus nousevat korkeiksi valtakunnallisen ruoantuotannon vuoksi. | **Sosiaalinen:** Peruspaketti + *Työkyvyttömyyseläkettä saavat 25–64-v. (`ID 313`)*.<br>**Ekologinen:** Tarkastele Hinku-päästöjen rinnalla *Maatalouden ravinnetasetta / Pintavesien ekologista tilaa* sekä *Uusiutuvan bioenergian osuutta*. |
+| **5. Pienet, ikääntyvät maaseutu- ja järvikunnat**<br>*(Puumala, Ilomantsi, Kuhmo, Viitasaari, Kangasniemi, Parikkala)* | Korkea eläkeläisosuus nostaa taloudellisen huoltosuhteen pysyvästi yli 200:n, vaikka työttömyys olisi matala. Keskeistä on ikäihmisten toimintakyky, palvelujen saavutettavuus ja metsä-/järviluonnon tila. | **Sosiaalinen:** Vaihda huoltosuhde (`182`) -> *Kotona asuvat 75 vuotta täyttäneet (`ID 1568`)* ja lisää *Yksinäiseksi itsensä tuntevat (`ID 4261`)*.<br>**Ekologinen:** *Pintavesien ravinnekuormitus* ja *Metsien hakkuiden suhde kasvuun*. |
+| **6. Matkailu- ja luontovetoiset kunnat**<br>*(Inari, Kittilä, Kolari, Kuusamo, Sotkamo, Hanko)* | Kausivaihtelu työllisyydessä on suurta, ja vapaa-ajan asukkaiden sekä matkailijoiden määrä moninkertaistaa kausittaisen jäte-, vesi- ja liikennekulutuksen vakituiseen väestöön nähden. | **Sosiaalinen:** Peruspaketti + *Asumisen ahtaus / kausiasuntojen saatavuus*.<br>**Ekologinen:** Lisää `manual_indicators.csv`-tiedostoon *Matkailupainotettu jäte- ja vedenkulutus* sekä *Suojelualueiden ja reitistöjen kulumispaine*. |
+
+---
+
+## 5. Valmiiden lisämittareiden pankki (`config.yaml` & `manual_indicators.csv`)
+
+Voit laajentaa kuntasi donitsia (esim. 8 mittarista 10–12 mittariin) tai vaihtaa nykyisiä mittareita kopioimalla alla olevia valmiita lohkoja suoraan `config.yaml`- tai `manual_indicators.csv`-tiedostoosi.
+
+*(Huom: Kaikki muutkin THL:n yli 3 000 mittarista löydät osoitteesta [sotkanet.fi](https://sotkanet.fi/sotkanet/fi/haku) – mittarin nimen perässä suluissa oleva numero on suoraan `indicator_id`.)*
+
+### A) Valmiit Sotkanet-lisämittarit (`config.yaml` -> `indicators:`-listaan)
 
 ```yaml
-  - id: "huoltosuhde"
-    name: "Taloudellinen huoltosuhde"
+  # --- NUORET, KOULUTUS JA MIELENTERVEYS ---
+  - id: "nuorisotyottomyys"
+    name: "Nuorisotyöttömät (% 18-24-v. työvoimasta)"
     domain: "Sosiaalinen perusta"
     source: "sotkanet"
-    indicator_id: 182
-    threshold: 135.0
-    unit: "indeksi"
+    indicator_id: 189
+    threshold: 10.0
+    unit: "%"
     direction: "lower_is_better"
-```
-* **Huom:** Kohdan `direction` arvo on `"lower_is_better"` (jos pienempi arvo on parempi, esim. työttömyys tai päästöt) tai `"higher_is_better"` (jos suurempi arvo on parempi, esim. kierrätysaste tai äänestysaktiivisuus).
 
-### Uuden manuaalisen mittarin lisääminen (`manual_indicators.csv`)
-Voit lisätä uusia ekologisen katon tai paikallisen seurannan mittareita lisäämällä uuden rivin `manual_indicators.csv`-tiedostoon. Varmista, että sarakkeet on eroteltu pilkulla ja desimaalierottimena on piste (`.`).
+  - id: "koulutuksen_ulkopuolella"
+    name: "Koulutuksen ulkopuolelle jääneet 17-24-vuotiaat"
+    domain: "Sosiaalinen perusta"
+    source: "sotkanet"
+    indicator_id: 3199
+    threshold: 6.5
+    unit: "%"
+    direction: "lower_is_better"
+
+  - id: "nuorten_ahdistuneisuus"
+    name: "Kohtalainen tai vaikea ahdistuneisuus (8.-9. lk)"
+    domain: "Sosiaalinen perusta"
+    source: "sotkanet"
+    indicator_id: 4111
+    threshold: 12.0
+    unit: "%"
+    direction: "lower_is_better"
+
+  # --- ASUMINEN, TULOEROT JA PITKÄAIKAISTYÖTTÖMYYS (KASVUKESKUKSET) ---
+  - id: "asumismenot"
+    name: "Asumismenojen rasittamat asuntokunnat"
+    domain: "Sosiaalinen perusta"
+    source: "sotkanet"
+    indicator_id: 3219
+    threshold: 7.0
+    unit: "%"
+    direction: "lower_is_better"
+
+  - id: "pitkaaikaistyottomyys"
+    name: "Pitkäaikaistyöttömien osuus työttömistä"
+    domain: "Sosiaalinen perusta"
+    source: "sotkanet"
+    indicator_id: 304
+    threshold: 25.0
+    unit: "%"
+    direction: "lower_is_better"
+
+  - id: "pienituloisuus"
+    name: "Pienituloisuusaste (asuntoväestö)"
+    domain: "Sosiaalinen perusta"
+    source: "sotkanet"
+    indicator_id: 192
+    threshold: 11.0
+    unit: "%"
+    direction: "lower_is_better"
+
+  # --- IKÄIHMISET, TYÖKYKY JA OSALLISUUS (MAASEUTU- JA SEUTUKUNNAT) ---
+  - id: "kotona_asuvat_75"
+    name: "Kotona asuvat 75 vuotta täyttäneet"
+    domain: "Sosiaalinen perusta"
+    source: "sotkanet"
+    indicator_id: 1568
+    threshold: 92.0
+    unit: "%"
+    direction: "higher_is_better"
+
+  - id: "tyokyvyttomyyselake"
+    name: "Työkyvyttömyyseläkettä saavat 25-64-vuotiaat"
+    domain: "Sosiaalinen perusta"
+    source: "sotkanet"
+    indicator_id: 313
+    threshold: 6.5
+    unit: "%"
+    direction: "lower_is_better"
+
+  - id: "aanestysaktiivisuus"
+    name: "Äänestysaktiivisuus kuntavaaleissa"
+    domain: "Sosiaalinen perusta"
+    source: "sotkanet"
+    indicator_id: 111
+    threshold: 60.0
+    unit: "%"
+    direction: "higher_is_better"
+```
+
+### B) Valmiit ekologiset lisämittarit (`manual_indicators.csv`-tiedostoon)
+
+Voit lisätä esimerkiksi seuraavat paikalliset ympäristömittarit `manual_indicators.csv`-tiedostoon (muuta sarake `value` vastaamaan oman kuntasi arvoa):
+
+```csv
+kierratysaste,Yhdyskuntajatteen kierratysaste,Ekologinen katto,Jateyhtio / SYKE,48.0,65.0,%,higher_is_better,2024
+vedenkulutus,Ominaisvedenkulutus (l/as./vrk),Ekologinen katto,Kunnan vesilaitos,125.0,110.0,l/vrk,lower_is_better,2024
+ajosuorite,Henkiloautojen ajosuorite asukasta kohti,Ekologinen katto,Traficom / Liiteri,6800.0,4500.0,km/as.,lower_is_better,2024
+metsahakkuut,Metsien hakkuiden suhde vuotuiseen kasvuun,Ekologinen katto,Luke,82.0,70.0,%,lower_is_better,2024
+```
