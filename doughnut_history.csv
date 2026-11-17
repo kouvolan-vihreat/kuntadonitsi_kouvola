@@ -1,20 +1,27 @@
 period,record_type,id,name,domain,value,threshold,unit,ratio_pct,is_safe
 2024,Vuositilasto,hinku_paastot,Alueelliset KHK-päästöt (SYKE Hinku),Ekologinen katto,4.9,2.0,t CO2e/as.,245.0,False
 2026-11,Kuukausiseuranta,hinku_paastot,Alueelliset KHK-päästöt (SYKE Hinku),Ekologinen katto,4.9,2.0,t CO2e/as.,245.0,False
-2018,Tilastovuosi,huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,156.7,135.0,indeksi,116.1,False
-2019,Tilastovuosi,huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,158.1,135.0,indeksi,117.1,False
-2020,Tilastovuosi,huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,164.7,135.0,indeksi,122.0,False
-2021,Tilastovuosi,huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,156.4,135.0,indeksi,115.9,False
-2022,Tilastovuosi,huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,153.2,135.0,indeksi,113.5,False
-2023,Tilastovuosi,huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,156.7,135.0,indeksi,116.1,False
+2018,Vuositilasto,huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,156.7,135.0,indeksi,116.1,False
+2019,Vuositilasto,huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,158.1,135.0,indeksi,117.1,False
+2020,Vuositilasto,huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,164.7,135.0,indeksi,122.0,False
+2021,Vuositilasto,huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,156.4,135.0,indeksi,115.9,False
+2022,Vuositilasto,huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,153.2,135.0,indeksi,113.5,False
+2023,Vuositilasto,huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,156.7,135.0,indeksi,116.1,False
 2024,Vuositilasto,huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,158.8,135.0,indeksi,117.6,False
 2026-11,Kuukausiseuranta,huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,158.8,135.0,indeksi,117.6,False
 2023,Vuositilasto,kulutus_hiili,Kulutusperusteinen hiilijalanjälki,Ekologinen katto,8.2,2.5,t CO2e/as.,328.0,False
 2026-11,Kuukausiseuranta,kulutus_hiili,Kulutusperusteinen hiilijalanjälki,Ekologinen katto,8.2,2.5,t CO2e/as.,328.0,False
-2024,Vuositilasto,luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,88.0,100.0,% kuormitus,88.0,True
-2026-11,Kuukausiseuranta,luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,88.0,100.0,% kuormitus,88.0,True
-2018,Tilastovuosi,sairastavuus,Kansanterveys (THL sairastavuusindeksi),Sosiaalinen perusta,117.0,100.0,indeksi,117.0,False
-2019,Tilastovuosi,sairastavuus,Kansanterveys (THL sairastavuusindeksi),Sosiaalinen perusta,114.8,100.0,indeksi,114.8,False
+2018,Vuositilasto,luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,4.1,100.0,% kuormitus,4.1,True
+2019,Vuositilasto,luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,4.1,100.0,% kuormitus,4.1,True
+2020,Vuositilasto,luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,4.1,100.0,% kuormitus,4.1,True
+2021,Vuositilasto,luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,4.2,100.0,% kuormitus,4.2,True
+2022,Vuositilasto,luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,4.1,100.0,% kuormitus,4.1,True
+2023,Vuositilasto,luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,4.2,100.0,% kuormitus,4.2,True
+2024,Vuositilasto,luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,4.2,100.0,% kuormitus,4.2,True
+2025,Vuositilasto,luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,4.2,100.0,% kuormitus,4.2,True
+2026-11,Kuukausiseuranta,luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,4.2,100.0,% kuormitus,4.2,True
+2018,Vuositilasto,sairastavuus,Kansanterveys (THL sairastavuusindeksi),Sosiaalinen perusta,117.0,100.0,indeksi,117.0,False
+2019,Vuositilasto,sairastavuus,Kansanterveys (THL sairastavuusindeksi),Sosiaalinen perusta,114.8,100.0,indeksi,114.8,False
 2024,Vuositilasto,sairastavuus,Kansanterveys (THL sairastavuusindeksi),Sosiaalinen perusta,114.8,100.0,indeksi,114.8,False
 2026-11,Kuukausiseuranta,sairastavuus,Kansanterveys (THL sairastavuusindeksi),Sosiaalinen perusta,114.8,100.0,indeksi,114.8,False
 2018,Tilastovuosi,toimeentulo,Toimeentulotukea saaneet asukkaat,Sosiaalinen perusta,9.3,6.0,%,155.0,False
@@ -26,16 +33,30 @@ period,record_type,id,name,domain,value,threshold,unit,ratio_pct,is_safe
 2024,Tilastovuosi,toimeentulo,Toimeentulotukea saaneet asukkaat,Sosiaalinen perusta,10.4,6.0,%,173.3,False
 2025,Tilastovuosi,toimeentulo,Toimeentulotukea saaneet asukkaat,Sosiaalinen perusta,15.3,6.0,%,255.0,False
 2026-11,Kuukausiseuranta,toimeentulo,Toimeentulotukea saaneet asukkaat,Sosiaalinen perusta,15.3,6.0,%,255.0,False
+2018,Vuositilasto,toimeentulotuki,Toimeentulotukea saaneet asukkaat,Sosiaalinen perusta,9.3,6.0,%,155.0,False
+2019,Vuositilasto,toimeentulotuki,Toimeentulotukea saaneet asukkaat,Sosiaalinen perusta,13.8,6.0,%,230.0,False
+2020,Vuositilasto,toimeentulotuki,Toimeentulotukea saaneet asukkaat,Sosiaalinen perusta,12.0,6.0,%,200.0,False
+2021,Vuositilasto,toimeentulotuki,Toimeentulotukea saaneet asukkaat,Sosiaalinen perusta,11.5,6.0,%,191.7,False
+2022,Vuositilasto,toimeentulotuki,Toimeentulotukea saaneet asukkaat,Sosiaalinen perusta,7.0,6.0,%,116.7,False
+2023,Vuositilasto,toimeentulotuki,Toimeentulotukea saaneet asukkaat,Sosiaalinen perusta,9.4,6.0,%,156.7,False
+2024,Vuositilasto,toimeentulotuki,Toimeentulotukea saaneet asukkaat,Sosiaalinen perusta,10.4,6.0,%,173.3,False
 2025,Vuositilasto,toimeentulotuki,Toimeentulotukea saaneet asukkaat,Sosiaalinen perusta,15.3,6.0,%,255.0,False
 2026-11,Kuukausiseuranta,toimeentulotuki,Toimeentulotukea saaneet asukkaat,Sosiaalinen perusta,15.3,6.0,%,255.0,False
-2018,Tilastovuosi,tyottomyys,Työttömien osuus työvoimasta,Sosiaalinen perusta,12.0,8.0,%,150.0,False
-2019,Tilastovuosi,tyottomyys,Työttömien osuus työvoimasta,Sosiaalinen perusta,11.2,8.0,%,140.0,False
-2020,Tilastovuosi,tyottomyys,Työttömien osuus työvoimasta,Sosiaalinen perusta,14.0,8.0,%,175.0,False
-2021,Tilastovuosi,tyottomyys,Työttömien osuus työvoimasta,Sosiaalinen perusta,11.7,8.0,%,146.2,False
-2022,Tilastovuosi,tyottomyys,Työttömien osuus työvoimasta,Sosiaalinen perusta,10.1,8.0,%,126.2,False
-2023,Tilastovuosi,tyottomyys,Työttömien osuus työvoimasta,Sosiaalinen perusta,10.5,8.0,%,131.2,False
-2024,Tilastovuosi,tyottomyys,Työttömien osuus työvoimasta,Sosiaalinen perusta,11.8,8.0,%,147.5,False
+2018,Vuositilasto,tyottomyys,Työttömien osuus työvoimasta,Sosiaalinen perusta,12.0,8.0,%,150.0,False
+2019,Vuositilasto,tyottomyys,Työttömien osuus työvoimasta,Sosiaalinen perusta,11.2,8.0,%,140.0,False
+2020,Vuositilasto,tyottomyys,Työttömien osuus työvoimasta,Sosiaalinen perusta,14.0,8.0,%,175.0,False
+2021,Vuositilasto,tyottomyys,Työttömien osuus työvoimasta,Sosiaalinen perusta,11.7,8.0,%,146.2,False
+2022,Vuositilasto,tyottomyys,Työttömien osuus työvoimasta,Sosiaalinen perusta,10.1,8.0,%,126.2,False
+2023,Vuositilasto,tyottomyys,Työttömien osuus työvoimasta,Sosiaalinen perusta,10.5,8.0,%,131.2,False
+2024,Vuositilasto,tyottomyys,Työttömien osuus työvoimasta,Sosiaalinen perusta,11.8,8.0,%,147.5,False
 2025,Vuositilasto,tyottomyys,Työttömien osuus työvoimasta,Sosiaalinen perusta,13.3,8.0,%,166.2,False
 2026-11,Kuukausiseuranta,tyottomyys,Työttömien osuus työvoimasta,Sosiaalinen perusta,13.3,8.0,%,166.2,False
-2024,Vuositilasto,vesistot,Vesistö- ja ravinnekuormitus,Ekologinen katto,122.0,100.0,% kuormitus,122.0,False
-2026-11,Kuukausiseuranta,vesistot,Vesistö- ja ravinnekuormitus,Ekologinen katto,122.0,100.0,% kuormitus,122.0,False
+2018,Vuositilasto,vesistot,Vesistö- ja ravinnekuormitus,Ekologinen katto,8166.7,100.0,% kuormitus,8166.7,False
+2019,Vuositilasto,vesistot,Vesistö- ja ravinnekuormitus,Ekologinen katto,9800.0,100.0,% kuormitus,9800.0,False
+2020,Vuositilasto,vesistot,Vesistö- ja ravinnekuormitus,Ekologinen katto,19600.0,100.0,% kuormitus,19600.0,False
+2021,Vuositilasto,vesistot,Vesistö- ja ravinnekuormitus,Ekologinen katto,19600.0,100.0,% kuormitus,19600.0,False
+2022,Vuositilasto,vesistot,Vesistö- ja ravinnekuormitus,Ekologinen katto,16333.3,100.0,% kuormitus,16333.3,False
+2023,Vuositilasto,vesistot,Vesistö- ja ravinnekuormitus,Ekologinen katto,19600.0,100.0,% kuormitus,19600.0,False
+2024,Vuositilasto,vesistot,Vesistö- ja ravinnekuormitus,Ekologinen katto,32666.7,100.0,% kuormitus,32666.7,False
+2025,Vuositilasto,vesistot,Vesistö- ja ravinnekuormitus,Ekologinen katto,32666.7,100.0,% kuormitus,32666.7,False
+2026-11,Kuukausiseuranta,vesistot,Vesistö- ja ravinnekuormitus,Ekologinen katto,32666.7,100.0,% kuormitus,32666.7,False
