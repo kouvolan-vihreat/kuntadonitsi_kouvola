@@ -4,8 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Avoin Kuntadonitsi</title>
-  <script src="[https://cdn.plot.ly/plotly-2.30.0.min.js](https://cdn.plot.ly/plotly-2.30.0.min.js)"></script>
-  <script src="[https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js](https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js)"></script>
+  <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
   <style>
     body { font-family: Arial, sans-serif; max-width: 1180px; margin: 0 auto; padding: 20px; color: #1a202c; background: #f8fafc; }
     .header-row { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 6px; }
@@ -217,8 +216,51 @@
   </table>
 
   <script>
-    // 1. Luetaan kunnan nimi suoraan config.yaml-tekstistä ilman ulkoista kirjastoa
-    fetch("config.yaml", { cache: "no-store" })
+    // Oma kevyt ja vikasietoinen CSV-jäsennin (ei vaadi ulkoista PapaParse-kirjastoa!)
+    function parseCSV(text) {
+      var lines = text.replace(/\r/g, "").split("\n").filter(function(l) { return l.trim().length > 0; });
+      if (lines.length < 2) return [];
+      var headers = splitCSVLine(lines[0]);
+      var rows = [];
+      for (var i = 1; i < lines.length; i++) {
+        var cols = splitCSVLine(lines[i]);
+        var obj = {};
+        for (var j = 0; j < headers.length; j++) {
+          obj[headers[j]] = cols[j] !== undefined ? cols[j] : "";
+        }
+        rows.push(obj);
+      }
+      return rows;
+    }
+
+    function splitCSVLine(line) {
+      var result = [];
+      var cur = "";
+      var inQuotes = false;
+      for (var i = 0; i < line.length; i++) {
+        var ch = line[i];
+        if (ch === '"') {
+          inQuotes = !inQuotes;
+        } else if (ch === ',' && !inQuotes) {
+          result.push(cur.trim());
+          cur = "";
+        } else {
+          cur += ch;
+        }
+      }
+      result.push(cur.trim());
+      return result;
+    }
+
+    function wrapLabel(str) {
+      if (!str || str.length <= 22) return str || "";
+      var words = str.split(" ");
+      var mid = Math.ceil(words.length / 2);
+      return words.slice(0, mid).join(" ") + "<br>" + words.slice(mid).join(" ");
+    }
+
+    // 1. Haetaan kunnan nimi config.yaml-tiedostosta
+    fetch("config.yaml?t=" + Date.now())
       .then(function(res) { return res.text(); })
       .then(function(text) {
         var match = text.match(/name:\s*["']?([^"'\r\n]+)["']?/);
@@ -230,20 +272,14 @@
       })
       .catch(function(err) { console.warn("config.yaml lukuohitus:", err); });
 
-    function wrapLabel(str) {
-      if (!str || str.length <= 22) return str || "";
-      var words = str.split(" ");
-      var mid = Math.ceil(words.length / 2);
-      return words.slice(0, mid).join(" ") + "<br>" + words.slice(mid).join(" ");
-    }
-
-    // 2. Luetaan doughnut_results.csv ja piirretään pääkaaviot
-    Papa.parse("doughnut_results.csv", {
-      download: true,
-      header: true,
-      skipEmptyLines: true,
-      complete: function(results) {
-        var data = results.data;
+    // 2. Haetaan doughnut_results.csv suoraan selaimen fetch()-komennolla
+    fetch("doughnut_results.csv?t=" + Date.now())
+      .then(function(res) {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.text();
+      })
+      .then(function(csvText) {
+        var data = parseCSV(csvText);
         if (!data || data.length === 0) {
           document.getElementById("last-updated").innerText = "⚠️ doughnut_results.csv on tyhjä";
           return;
@@ -252,7 +288,7 @@
         if (data[0].updated_at) {
           document.getElementById("last-updated").innerText = "🕒 Data päivitetty: " + data[0].updated_at;
         } else {
-          document.getElementById("last-updated").innerText = "🕒 Data ladattu (aja Actions saadaksesi aikaleiman)";
+          document.getElementById("last-updated").innerText = "🕒 Data ladattu (" + data[0].year + ")";
         }
 
         var soc = data.filter(function(r) { return r.domain === "Sosiaalinen perusta"; });
@@ -264,6 +300,26 @@
         document.getElementById("soc-metric").innerText = socSafe + " / " + soc.length + " kunnossa";
         document.getElementById("eco-metric").innerText = ecoSafe + " / " + eco.length + " rajoissa";
         document.getElementById("total-metric").innerText = totalSafePct + " %";
+
+        // Päivitetään taulukko heti ensin (jotta se näkyy vaikka Plotly vielä latautuisi)
+        var tbody = document.querySelector("#data-table tbody");
+        tbody.innerHTML = "";
+        data.forEach(function(r) {
+          var isSafe = String(r.is_safe).toLowerCase() === "true";
+          var isSoc = r.domain === "Sosiaalinen perusta";
+          var badgeClass = isSafe ? "badge-ok" : (isSoc ? "badge-soc" : "badge-eco");
+          var badgeText = isSafe ? "Vihreällä kehällä (Kunnossa)" : (isSoc ? "Sisäkehän vaje" : "Ulkokehän ylitys");
+          var tr = document.createElement("tr");
+          tr.innerHTML =
+            "<td><strong>" + (isSoc ? "Sisäkehä" : "Ulkokehä") + "</strong> (" + r.domain + ")</td>" +
+            "<td><strong>" + r.name + "</strong></td>" +
+            "<td>" + r.value + " " + r.unit + "</td>" +
+            "<td>" + r.threshold + " " + r.unit + "</td>" +
+            "<td>" + r.ratio_pct + " %</td>" +
+            "<td><span class='" + badgeClass + "'>" + badgeText + "</span></td>" +
+            "<td>" + r.source + " (" + r.year + ")</td>";
+          tbody.appendChild(tr);
+        });
 
         var labels = data.map(function(r) { return wrapLabel(r.name); });
 
@@ -401,43 +457,24 @@
 
         renderBarChart("chart-social", soc, "#dd6b20");
         renderBarChart("chart-eco", eco, "#c62828");
-
-        var tbody = document.querySelector("#data-table tbody");
-        tbody.innerHTML = "";
-        data.forEach(function(r) {
-          var isSafe = String(r.is_safe).toLowerCase() === "true";
-          var isSoc = r.domain === "Sosiaalinen perusta";
-          var badgeClass = isSafe ? "badge-ok" : (isSoc ? "badge-soc" : "badge-eco");
-          var badgeText = isSafe ? "Vihreällä kehällä (Kunnossa)" : (isSoc ? "Sisäkehän vaje" : "Ulkokehän ylitys");
-          var tr = document.createElement("tr");
-          tr.innerHTML =
-            "<td><strong>" + (isSoc ? "Sisäkehä" : "Ulkokehä") + "</strong> (" + r.domain + ")</td>" +
-            "<td><strong>" + r.name + "</strong></td>" +
-            "<td>" + r.value + " " + r.unit + "</td>" +
-            "<td>" + r.threshold + " " + r.unit + "</td>" +
-            "<td>" + r.ratio_pct + " %</td>" +
-            "<td><span class='" + badgeClass + "'>" + badgeText + "</span></td>" +
-            "<td>" + r.source + " (" + r.year + ")</td>";
-          tbody.appendChild(tr);
-        });
-      },
-      error: function(err) {
-        document.getElementById("last-updated").innerText = "⚠️ Virhe ladattaessa doughnut_results.csv";
+      })
+      .catch(function(err) {
+        document.getElementById("last-updated").innerText = "⚠️ Virhe: " + err.message;
         console.error(err);
-      }
-    });
+      });
 
-    // 3. Luetaan doughnut_history.csv ja piirretään kehityskäyrä
-    Papa.parse("doughnut_history.csv", {
-      download: true,
-      header: true,
-      skipEmptyLines: true,
-      complete: function(histResults) {
-        var histData = histResults.data;
+    // 3. Haetaan doughnut_history.csv suoraan selaimen fetch()-komennolla
+    fetch("doughnut_history.csv?t=" + Date.now())
+      .then(function(res) {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.text();
+      })
+      .then(function(histText) {
+        var histData = parseCSV(histText);
         var selectEl = document.getElementById("history-select");
         if (!histData || histData.length === 0) {
           var emptyOpt = document.createElement("option");
-          emptyOpt.innerText = "Historiatiedostoa (doughnut_history.csv) ei vielä löytynyt – aja Actions kerran";
+          emptyOpt.innerText = "Historiatiedosto on tyhjä – aja Actions kerran";
           selectEl.appendChild(emptyOpt);
           return;
         }
@@ -514,14 +551,13 @@
 
         selectEl.addEventListener("change", function(e) { updateHistoryChart(e.target.value); });
         updateHistoryChart("ALL");
-      },
-      error: function() {
+      })
+      .catch(function() {
         var selectEl = document.getElementById("history-select");
         var emptyOpt = document.createElement("option");
         emptyOpt.innerText = "Historiatiedostoa (doughnut_history.csv) ei vielä löytynyt – aja Actions kerran";
         selectEl.appendChild(emptyOpt);
-      }
-    });
+      });
   </script>
 </body>
 </html>
