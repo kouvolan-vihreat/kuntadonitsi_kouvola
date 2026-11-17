@@ -47,12 +47,13 @@ indicators:
     direction: "lower_is_better"
 
   # ==========================================
-  # 2. ULKOKEHÄ: EKOLOGINEN KATTO (SYKE, Luke, StatFin & Lipas API)
+  # 2. ULKOKEHÄ: EKOLOGINEN KATTO
   # ==========================================
   - id: "hinku_paastot"
-    name: "Alueelliset KHK-päästöt (SYKE Hinku)"
+    name: "Alueelliset KHK-päästöt (SYKE / Hinku)"
     domain: "Ekologinen katto"
     source: "syke_khk"
+    indicator_id: 4007
     threshold: 2.0
     unit: "t CO2e/as."
     direction: "lower_is_better"
