@@ -1,9 +1,9 @@
-id,name,domain,source,value,threshold,unit,ratio_pct,is_safe,year
-sairastavuus,Kansanterveys (THL sairastavuusindeksi),Sosiaalinen perusta,SOTKANET (ID 244),114.8,100.0,indeksi,114.8,False,2019
-tyottomyys,Työttömien osuus työvoimasta,Sosiaalinen perusta,SOTKANET (ID 181),13.3,8.0,%,166.2,False,2025
-toimeentulo,Toimeentulotukea saaneet asukkaat,Sosiaalinen perusta,SOTKANET (ID 232),15.3,6.0,%,255.0,False,2025
-huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,SOTKANET (ID 182),158.8,135.0,indeksi,117.6,False,2024
-hinku_paastot,Alueelliset KHK-paastot (SYKE Hinku),Ekologinen katto,SYKE Hinku,5.2,2.0,t CO2e/as.,260.0,False,2024
-kulutus_hiili,Kulutusperusteinen hiilijalanjalki,Ekologinen katto,SYKE ENVIMAT,8.6,2.5,t CO2e/as.,344.0,False,2023
-vesistot,Pintavesien ravinnekuormitus,Ekologinen katto,SYKE Hertta,130.0,100.0,% kuormitus,130.0,False,2024
-luonto_paine,Maankayttopaine vs. lahiluonto,Ekologinen katto,SYKE Liiteri,88.0,100.0,% kuormitus,88.0,True,2024
+id,name,domain,source,value,threshold,unit,ratio_pct,is_safe,year,updated_at
+sairastavuus,Kansanterveys (THL sairastavuusindeksi),Sosiaalinen perusta,SOTKANET (ID 244),114.8,100.0,indeksi,114.8,False,2019,17.11.2026 klo 14:51
+tyottomyys,Työttömien osuus työvoimasta,Sosiaalinen perusta,SOTKANET (ID 181),13.3,8.0,%,166.2,False,2025,17.11.2026 klo 14:51
+toimeentulo,Toimeentulotukea saaneet asukkaat,Sosiaalinen perusta,SOTKANET (ID 232),15.3,6.0,%,255.0,False,2025,17.11.2026 klo 14:51
+huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,SOTKANET (ID 182),158.8,135.0,indeksi,117.6,False,2024,17.11.2026 klo 14:51
+hinku_paastot,Alueelliset KHK-paastot (SYKE Hinku),Ekologinen katto,SYKE Hinku,5.2,2.0,t CO2e/as.,260.0,False,2024,17.11.2026 klo 14:51
+kulutus_hiili,Kulutusperusteinen hiilijalanjalki,Ekologinen katto,SYKE ENVIMAT,8.6,2.5,t CO2e/as.,344.0,False,2023,17.11.2026 klo 14:51
+vesistot,Pintavesien ravinnekuormitus,Ekologinen katto,SYKE Hertta,130.0,100.0,% kuormitus,130.0,False,2024,17.11.2026 klo 14:51
+luonto_paine,Maankayttopaine vs. lahiluonto,Ekologinen katto,SYKE Liiteri,88.0,100.0,% kuormitus,88.0,True,2024,17.11.2026 klo 14:51
