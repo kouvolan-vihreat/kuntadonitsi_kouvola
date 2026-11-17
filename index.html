@@ -4,15 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Avoin Kuntadonitsi</title>
-  <script src="https://cdn.plot.ly/plotly-2.30.0.min.js">
-    // Jos osoitteen perässä on ?embed=true, piilotetaan pääotsikko ja kevennetään reunuksia
-if (window.location.search.indexOf("embed=true") !== -1) {
-  document.body.style.background = "transparent";
-  document.body.style.padding = "0";
-  document.querySelector(".header-row").style.display = "none";
-  document.querySelector(".subtitle").style.display = "none";
-}
-  </script>
+  <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
   <style>
     body { font-family: Arial, sans-serif; max-width: 1180px; margin: 0 auto; padding: 20px; color: #1a202c; background: #f8fafc; }
     .header-row { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 6px; }
@@ -55,6 +47,11 @@ if (window.location.search.indexOf("embed=true") !== -1) {
     .modal-section-title { font-size: 16px; font-weight: bold; color: #2b6cb0; margin: 22px 0 10px 0; }
     .modal-table { width: 100%; border-collapse: collapse; margin-bottom: 18px; box-shadow: none; border: 1px solid #e2e8f0; }
     .modal-table th, .modal-table td { padding: 10px 12px; font-size: 13px; vertical-align: top; }
+
+    /* UPOTUSTILAN (?embed=true) TYYLIT */
+    body.embed-mode { background: transparent; padding: 4px; }
+    body.embed-mode #main-title, body.embed-mode .subtitle { display: none; }
+    body.embed-mode .header-row { justify-content: flex-end; margin-bottom: 12px; }
   </style>
 </head>
 <body>
@@ -224,6 +221,11 @@ if (window.location.search.indexOf("embed=true") !== -1) {
   </table>
 
   <script>
+    // Tunnistetaan upotustila (?embed=true), jolloin pääotsikko piilotetaan ja tausta muuttuu läpinäkyväksi
+    if (window.location.search.indexOf("embed=true") !== -1) {
+      document.body.classList.add("embed-mode");
+    }
+
     function parseCSV(text) {
       var lines = text.replace(/\r/g, "").split("\n").filter(function(l) { return l.trim().length > 0; });
       if (lines.length < 2) return [];
@@ -328,13 +330,6 @@ if (window.location.search.indexOf("embed=true") !== -1) {
         });
 
         var labels = data.map(function(r) { return wrapLabel(r.name); });
-
-        // KEHÄRAKENNE SELKEILLÄ SUOJAVÄLEILLÄ (ei päällekkäisyyttä rajojen kanssa):
-        // Säde 25..90  = Sisäkehän vajealue (4 yksikön rako ennen sisärajaa!)
-        // Säde 94..102 = SISÄRAJA-RENGAS (valkoinen täyttö, mustat reunat)
-        // Säde 106..154= VIHREÄ DONITSIKEHÄ (4 yksikön rako molemmin puolin rajarenkaisiin!)
-        // Säde 158..166= ULKORAJA-RENGAS (valkoinen täyttö, mustat reunat)
-        // Säde 170..340= Ulkokehän ylitysalue (4 yksikön rako ulkorajan jälkeen!)
 
         var innerBgTrace = {
           type: "barpolar",
