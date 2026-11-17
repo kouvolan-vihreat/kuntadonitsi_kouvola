@@ -83,7 +83,7 @@ luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,SYKE Liiteri,88.
 
 ---
 
-## 4. Upottaminen verkkosivuille (`<iframe>`)
+## 4. Upottaminen kunnan omille verkkosivuille (`<iframe>`)
 
 Voit upottaa Kuntadonitsi-näkymän suoraan osaksi mitä tahansa verkkosivustoa (esim. WordPress, Drupal, SharePoint tai muu julkaisujärjestelmä).
 
@@ -103,20 +103,20 @@ Sivussa on sisäänrakennettu **upotustila (`?embed=true`)**, joka piilottaa siv
 
 ---
 
-## 5. Kuntatyypit ja niille suositellut mittaripaketit
+## 5. Kuntatyypit ja niille suositellut mittaripaketit (Sotkanet & SYKE API)
 
-Oletuksena käytössä olevat 8 mittaria muodostavat **kansallisen peruspaketin**, joka on saatavilla kaikille Suomen 309 kunnalle. Suomen kunnat ovat kuitenkin elinkeinorakenteeltaan, väestöltään ja ympäristöhaasteiltaan hyvin erilaisia. 
+Oletuksena käytössä olevat 8 mittaria (4 Sotkanet-mittaria ja 4 SYKE-mittaria) muodostavat **kansallisen peruspaketin**, joka on saatavilla kaikille Suomen 309 kunnalle. Suomen kunnat ovat kuitenkin elinkeinorakenteeltaan, väestöltään ja ympäristöhaasteiltaan hyvin erilaisia. 
 
-Alla olevasta taulukosta näet, miten eri kuntatyyppien kannattaa täydentää tai painottaa mittaristoaan:
+Alla olevasta taulukosta näet, miten eri kuntatyyppien kannattaa täydentää tai painottaa mittaristoaan sekä **THL Sotkanetin** että **SYKE:n avoimien rajapintojen** osalta:
 
-| Kuntaprofiili ja esimerkkikunnat | Tyypilliset kestävyyspiirteet | Suositeltava mittaripaketti (Peruspaketin lisäykset/vaihdot) |
+| Kuntaprofiili ja esimerkkikunnat | Tyypilliset kestävyyspiirteet | Suositeltava mittaripaketti (`config.yaml` / SYKE & Sotkanet API) |
 | :--- | :--- | :--- |
-| **1. Seutukaupungit ja teollisuuspaikkakunnat**<br>*(Kouvola, Lohja, Kotka, Pori, Rauma, Hämeenlinna, Mikkeli, Kemi)* | Rakenteellinen työttömyys, väestön ikääntyminen ja kansansairaudet haastavat sosiaalista perustaa; suuri taajama-aste ja liikenne vaikuttavat päästöihin. | **Sosiaalinen:** Peruspaketti (`244`, `181`, `232`, `182`) + *Nuorisotyöttömät (`ID 189`)* ja *Koulutuksen ulkopuolella olevat 17–24-v. (`ID 3199`)*.<br>**Ekologinen:** Peruspaketti + *Yhdyskuntajätteen kierrätysaste*. |
-| **2. Suuret kasvukeskukset ja yliopistokaupungit**<br>*(Helsinki, Tampere, Turku, Oulu, Jyväskylä, Kuopio, Vaasa)* | Suuri opiskelijamäärä nostaa näennäisesti toimeentulotuen saajia, mutta todellinen sosiaalinen vaje syntyy asumisen kalleudesta, asunnottomuudesta ja alueellisesta eriytymisestä. Täydennysrakentaminen luo painetta lähiluonnolle. | **Sosiaalinen:** Vaihda huoltosuhde -> *Asumismenojen rasittamat asuntokunnat (`ID 3219`)* ja lisää *Pitkäaikaistyöttömien osuus (`ID 304`)* sekä *Pienituloisuusaste (`ID 192`)*.<br>**Ekologinen:** Painota *Kulutusperusteista hiilijalanjälkeä* ja *Viheralueiden riittävyyttä / maankäyttöpainetta*. |
-| **3. Varakkaat kehyskunnat ja pendelöintikunnat**<br>*(Espoo, Kauniainen, Kirkkonummi, Pirkkala, Lempäälä, Kempele, Naantali, Sipoo)* | Työllisyys ja tulotaso ovat huippuluokkaa, jolloin perinteiset köyhyysmittarit näyttävät vihreää. Haasteina ovat nuorten henkinen kuormitus, autoiluvaltaisuus, pientalorakentamisen maankäyttö ja korkea kulutuksen hiilijalanjälki. | **Sosiaalinen:** Lisää *Nuorten kokema kohtalainen tai vaikea ahdistuneisuus (`ID 4111`)* ja *Kunnallisvaalien äänestysaktiivisuus (`ID 111`)*.<br>**Ekologinen:** Lisää `manual_indicators.csv`-tiedostoon *Henkilöautojen ajosuorite (km/as.)*. |
-| **4. Maatalous- ja alkutuotantovaltaiset maaseutukunnat**<br>*(Kurikka, Kauhajoki, Nivala, Kiuruvesi, Huittinen, Loimaa, Närpiö)* | Yrittäjävetoinen työllisyys on usein hyvää, mutta alueelliset KHK-päästöt asukasta kohden sekä vesistöjen ravinnekuormitus nousevat korkeiksi valtakunnallisen ruoantuotannon vuoksi. | **Sosiaalinen:** Peruspaketti + *Työkyvyttömyyseläkettä saavat 25–64-v. (`ID 313`)*.<br>**Ekologinen:** Tarkastele Hinku-päästöjen rinnalla *Maatalouden ravinnetasetta / Pintavesien ekologista tilaa* sekä *Uusiutuvan bioenergian osuutta*. |
-| **5. Pienet, ikääntyvät maaseutu- ja järvikunnat**<br>*(Puumala, Ilomantsi, Kuhmo, Viitasaari, Kangasniemi, Parikkala)* | Korkea eläkeläisosuus nostaa taloudellisen huoltosuhteen pysyvästi yli 200:n, vaikka työttömyys olisi matala. Keskeistä on ikäihmisten toimintakyky, palvelujen saavutettavuus ja metsä-/järviluonnon tila. | **Sosiaalinen:** Vaihda huoltosuhde (`182`) -> *Kotona asuvat 75 vuotta täyttäneet (`ID 1568`)* ja lisää *Yksinäiseksi itsensä tuntevat (`ID 4261`)*.<br>**Ekologinen:** *Pintavesien ravinnekuormitus* ja *Metsien hakkuiden suhde kasvuun*. |
-| **6. Matkailu- ja luontovetoiset kunnat**<br>*(Inari, Kittilä, Kolari, Kuusamo, Sotkamo, Hanko)* | Kausivaihtelu työllisyydessä on suurta, ja vapaa-ajan asukkaiden sekä matkailijoiden määrä moninkertaistaa kausittaisen jäte-, vesi- ja liikennekulutuksen vakituiseen väestöön nähden. | **Sosiaalinen:** Peruspaketti + *Asumisen ahtaus / kausiasuntojen saatavuus*.<br>**Ekologinen:** Lisää `manual_indicators.csv`-tiedostoon *Matkailupainotettu jäte- ja vedenkulutus* sekä *Suojelualueiden ja reitistöjen kulumispaine*. |
+| **1. Seutukaupungit ja teollisuuspaikkakunnat**<br>*(Kouvola, Lohja, Kotka, Pori, Rauma, Hämeenlinna, Mikkeli, Kemi)* | Rakenteellinen työttömyys, väestön ikääntyminen ja kansansairaudet haastavat sosiaalista perustaa; suuri pinta-ala, tieliikenne ja teollisuus vaikuttavat ympäristöön. | **Sosiaalinen (Sotkanet API):** Peruspaketti (`244`, `181`, `232`, `182`) + *Nuorisotyöttömät (`ID 189`)* ja *Koulutuksen ulkopuolella olevat 17–24-v. (`ID 3199`)*.<br>**Ekologinen (SYKE API):** Peruspaketti (`syke_khk`, `syke_kulutus`, `syke_vesistot`, `syke_maankaytto`) + *Tieliikenteen päästöt (SYKE KHK)* ja *Yhdyskuntajätteen kierrätysaste*. |
+| **2. Suuret kasvukeskukset ja yliopistokaupungit**<br>*(Helsinki, Tampere, Turku, Oulu, Jyväskylä, Kuopio, Vaasa)* | Suuri opiskelijamäärä nostaa näennäisesti toimeentulotuen saajia, mutta todellinen sosiaalinen vaje syntyy asumisen kalleudesta ja segregaatiosta. Täydennysrakentaminen luo painetta kaupunkiluonnolle. | **Sosiaalinen (Sotkanet API):** Vaihda huoltosuhde -> *Asumismenojen rasittamat asuntokunnat (`ID 3219`)* ja lisää *Pitkäaikaistyöttömien osuus (`ID 304`)*.<br>**Ekologinen (SYKE API):** Painota *Kulutusperusteista hiilijalanjälkeä (`syke_kulutus`)*, *Maankäyttöpainetta (`syke_maankaytto`)* sekä SYKE/Liiteri-rajapinnan *Joukkoliikenteen ja kävelyn/pyöräilyn kulkutapaosuutta*. |
+| **3. Varakkaat kehyskunnat ja pendelöintikunnat**<br>*(Espoo, Kauniainen, Kirkkonummi, Pirkkala, Lempäälä, Kempele, Naantali, Sipoo)* | Työllisyys ja tulotaso ovat huippuluokkaa, jolloin perinteiset köyhyysmittarit näyttävät vihreää. Haasteina ovat nuorten henkinen kuormitus, autoiluvaltaisuus, pientalorakentamisen maankäyttö ja korkea kulutuksen hiilijalanjälki. | **Sosiaalinen (Sotkanet API):** Lisää *Nuorten kokema kohtalainen tai vaikea ahdistuneisuus (`ID 4111`)* ja *Kunnallisvaalien äänestysaktiivisuus (`ID 111`)*.<br>**Ekologinen (SYKE API):** *Kulutusperusteinen hiilijalanjälki (`syke_kulutus`)*, *Maankäyttöpaine (`syke_maankaytto`)* ja SYKE KHK -rajapinnan *Henkilöautoliikenteen päästöt/ajosuorite asukasta kohti*. |
+| **4. Maatalous- ja alkutuotantovaltaiset maaseutukunnat**<br>*(Kurikka, Kauhajoki, Nivala, Kiuruvesi, Huittinen, Loimaa, Närpiö)* | Yrittäjävetoinen työllisyys on usein hyvää, mutta alueelliset KHK-päästöt asukasta kohden sekä vesistöjen ravinnekuormitus nousevat korkeiksi valtakunnallisen ruoantuotannon vuoksi. | **Sosiaalinen (Sotkanet API):** Peruspaketti + *Työkyvyttömyyseläkettä saavat 25–64-v. (`ID 313`)*.<br>**Ekologinen (SYKE API):** Tarkastele *Pintavesien ekologista tilaa (`syke_vesistot` / SYKE Hertta OData)*, *Maatalouden päästöosuutta (SYKE KHK)* sekä *Tuulivoima- ja bioenergiatuotantoa*. |
+| **5. Pienet, ikääntyvät maaseutu- ja järvikunnat**<br>*(Puumala, Ilomantsi, Kuhmo, Viitasaari, Kangasniemi, Parikkala)* | Korkea eläkeläisosuus nostaa taloudellisen huoltosuhteen pysyvästi yli 200:n, vaikka työttömyys olisi matala. Keskeistä on ikäihmisten toimintakyky, palvelujen saavutettavuus ja metsä-/järviluonnon tila. | **Sosiaalinen (Sotkanet API):** Vaihda huoltosuhde (`182`) -> *Kotona asuvat 75 vuotta täyttäneet (`ID 1568`)* ja lisää *Yksinäiseksi itsensä tuntevat (`ID 4261`)*.<br>**Ekologinen (SYKE API):** *Pintavesien ravinnekuormitus (`syke_vesistot`)*, *Suojelualueiden osuus (SYKE OData)* ja *Metsien hakkuiden suhde kasvuun*. |
+| **6. Matkailu- ja luontovetoiset kunnat**<br>*(Inari, Kittilä, Kolari, Kuusamo, Sotkamo, Hanko)* | Kausivaihtelu työllisyydessä on suurta, ja vapaa-ajan asukkaiden sekä matkailijoiden määrä moninkertaistaa kausittaisen jäte-, vesi- ja liikennekulutuksen vakituiseen väestöön nähden. | **Sosiaalinen (Sotkanet API):** Peruspaketti + *Asumisen ahtaus / kausiasuntojen saatavuus*.<br>**Ekologinen (SYKE API):** *Pintavesien ja pohjavesien tila (`syke_vesistot`)*, *Natura- ja luonnonsuojelualueiden kulumispaine (`syke_maankaytto`)* sekä *Matkailupainotettu jäte- ja energiankulutus*. |
 
 ---
 
@@ -124,9 +124,9 @@ Alla olevasta taulukosta näet, miten eri kuntatyyppien kannattaa täydentää t
 
 Voit laajentaa kuntasi donitsia (esim. 8 mittarista 10–12 mittariin) tai vaihtaa nykyisiä mittareita kopioimalla alla olevia valmiita lohkoja suoraan `config.yaml`- tai `manual_indicators.csv`-tiedostoosi.
 
-*(Huom: Kaikki muutkin THL:n yli 3 000 mittarista löydät osoitteesta [sotkanet.fi](https://sotkanet.fi/sotkanet/fi/haku) – mittarin nimen perässä suluissa oleva numero on suoraan `indicator_id`.)*
+### A) Sosiaalisen perustan Sotkanet-lisämittarit (`config.yaml` -> `indicators:`-listaan)
 
-### A) Valmiit Sotkanet-lisämittarit (`config.yaml` -> `indicators:`-listaan)
+*(Huom: Kaikki muutkin THL:n yli 3 000 mittarista löydät osoitteesta [sotkanet.fi](https://sotkanet.fi/sotkanet/fi/haku) – mittarin nimen perässä suluissa oleva numero on suoraan `indicator_id`.)*
 
 ```yaml
   # --- NUORET, KOULUTUS JA MIELENTERVEYS ---
@@ -214,15 +214,74 @@ Voit laajentaa kuntasi donitsia (esim. 8 mittarista 10–12 mittariin) tai vaiht
     direction: "higher_is_better"
 ```
 
-### B) Valmiit ekologiset lisämittarit (`manual_indicators.csv`-tiedostoon)
+### B) Ekologisen katon automaattiset SYKE-rajapintamittarit (`config.yaml` -> `indicators:`-listaan)
 
-Voit lisätä esimerkiksi seuraavat paikalliset ympäristömittarit `manual_indicators.csv`-tiedostoon (muuta sarake `value` vastaamaan oman kuntasi arvoa):
+Nämä mittarit `fetch_data.py` hakee automaattisesti **SYKE:n avoimista rajapinnoista** (`avoindata.syke.fi`, `paastot.hiilineutraalisuomi.fi`, `kulutus.hiilineutraalisuomi.fi`). Lisäksi voit hyödyntää SYKE:n ja Tilastokeskuksen ympäristömittareita, jotka on peilattu suoraan Sotkanet-rajapintaan:
+
+```yaml
+  # --- SYKE AVOIMET RAJAPINNAT (OLETUSPAKETTI) ---
+  - id: "hinku_paastot"
+    name: "Alueelliset KHK-päästöt (SYKE Hinku)"
+    domain: "Ekologinen katto"
+    source: "syke_khk"
+    threshold: 2.0
+    unit: "t CO2e/as."
+    direction: "lower_is_better"
+
+  - id: "kulutus_hiili"
+    name: "Kulutusperusteinen hiilijalanjälki"
+    domain: "Ekologinen katto"
+    source: "syke_kulutus"
+    threshold: 2.5
+    unit: "t CO2e/as."
+    direction: "lower_is_better"
+
+  - id: "vesistot"
+    name: "Pintavesien ravinnekuormitus"
+    domain: "Ekologinen katto"
+    source: "syke_vesistot"
+    threshold: 100.0
+    unit: "% kuormitus"
+    direction: "lower_is_better"
+
+  - id: "luonto_paine"
+    name: "Maankäyttöpaine vs. lähiluonto"
+    domain: "Ekologinen katto"
+    source: "syke_maankaytto"
+    threshold: 100.0
+    unit: "% kuormitus"
+    direction: "lower_is_better"
+
+  # --- VALINNAISET SYKE-YMPÄRISTÖMITTARIT RAJAPINNASTA ---
+  - id: "khk_kokonais"
+    name: "Kasvihuonekaasupäästöt yhteensä (SYKE / Sotkanet)"
+    domain: "Ekologinen katto"
+    source: "sotkanet"
+    indicator_id: 4007
+    threshold: 2.0
+    unit: "t CO2e/as."
+    direction: "lower_is_better"
+
+  - id: "ilmanlaatu_altistus"
+    name: "Pienhiukkasille altistuminen / yhdyskuntarakenne"
+    domain: "Ekologinen katto"
+    source: "sotkanet"
+    indicator_id: 3560
+    threshold: 100.0
+    unit: "indeksi"
+    direction: "lower_is_better"
+```
+
+### C) Paikalliset täydentävät ympäristömittarit (`manual_indicators.csv`-tiedostoon)
+
+Jos haluat seurata sellaisia paikallisia ympäristölukuja, joita ei vielä julkaista valtakunnallisissa rajapinnoissa (tai haluat asettaa varajärjestelmän arvot), voit lisätä ne suoraan `manual_indicators.csv`-tiedostoon:
 
 ```csv
 kierratysaste,Yhdyskuntajätteen kierrätysaste,Ekologinen katto,Jäteyhtiö / SYKE,48.0,65.0,%,higher_is_better,2024
 vedenkulutus,Ominaisvedenkulutus (l/as./vrk),Ekologinen katto,Kunnan vesilaitos,125.0,110.0,l/vrk,lower_is_better,2024
-ajosuorite,Henkilöautojen ajosuorite asukasta kohti,Ekologinen katto,Traficom / Liiteri,6800.0,4500.0,km/as.,lower_is_better,2024
-metsahakkuut,Metsien hakkuiden suhde vuotuiseen kasvuun,Ekologinen katto,Luke,82.0,70.0,%,lower_is_better,2024
+ajosuorite,Henkilöautojen ajosuorite asukasta kohti,Ekologinen katto,Traficom / SYKE Liiteri,6800.0,4500.0,km/as.,lower_is_better,2024
+metsahakkuut,Metsien hakkuiden suhde vuotuiseen kasvuun,Ekologinen katto,Luke / SYKE,82.0,70.0,%,lower_is_better,2024
+suojelualueet,Suojellun maa- ja vesipinta-alan osuus,Ekologinen katto,SYKE Suojelualueet,12.5,30.0,%,higher_is_better,2024
 ```
 
 ---
