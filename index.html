@@ -21,6 +21,9 @@
     .timestamp-badge { background: #e2e8f0; color: #2d3748; padding: 7px 12px; border-radius: 6px; font-size: 13px; font-weight: bold; }
     .info-btn { background: #2b6cb0; color: white; border: none; padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; }
     .info-btn:hover { background: #1a365d; }
+    .row-info-btn { background: #edf2f7; color: #1a365d; border: 1px solid #cbd5e0; padding: 4px 9px; border-radius: 5px; font-size: 12px; font-weight: bold; cursor: pointer; margin-left: 8px; display: inline-flex; align-items: center; gap: 4px; transition: all 0.15s ease; }
+    .row-info-btn:hover { background: #2b6cb0; color: #ffffff; border-color: #2b6cb0; }
+    .source-cell-wrap { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
     .subtitle { color: #4a5568; margin-bottom: 24px; }
     .cards { display: flex; gap: 20px; margin-bottom: 24px; flex-wrap: wrap; }
     .card { flex: 1; min-width: 240px; background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
@@ -48,11 +51,14 @@
     .site-footer { margin-top: 36px; padding-top: 16px; border-top: 1px solid #cbd5e0; text-align: center; font-size: 13px; color: #4a5568; line-height: 1.6; }
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.65); z-index: 1000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
     .modal-content { background: white; max-width: 960px; width: 100%; max-height: 88vh; overflow-y: auto; border-radius: 12px; padding: 28px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-    .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 14px; margin-bottom: 18px; }
-    .close-btn { background: #edf2f7; border: none; width: 34px; height: 34px; border-radius: 50%; font-size: 18px; font-weight: bold; cursor: pointer; }
+    .modal-content.narrow { max-width: 760px; }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 14px; margin-bottom: 18px; gap: 12px; }
+    .close-btn { background: #edf2f7; border: none; width: 34px; height: 34px; border-radius: 50%; font-size: 18px; font-weight: bold; cursor: pointer; flex-shrink: 0; }
+    .close-btn:hover { background: #cbd5e0; }
     .modal-section-title { font-size: 16px; font-weight: bold; color: #2b6cb0; margin: 20px 0 8px 0; }
     .modal-table { width: 100%; border-collapse: collapse; margin-bottom: 14px; border: 1px solid #e2e8f0; }
     .modal-table th, .modal-table td { padding: 9px 11px; font-size: 13px; vertical-align: top; }
+    .formula-box { background: #f1f5f9; border-left: 4px solid #2b6cb0; padding: 12px 16px; border-radius: 6px; font-size: 13.5px; line-height: 1.55; color: #1e293b; margin: 14px 0; }
     body.embed-mode { background: transparent; padding: 4px; }
     body.embed-mode #main-title, body.embed-mode .subtitle, body.embed-mode .site-footer { display: none; }
     body.embed-mode .header-row { justify-content: flex-end; margin-bottom: 12px; }
@@ -89,6 +95,12 @@
 
     function isNoData(r) {
       return String(r.is_safe).toLowerCase() === "no_data" || String(r.year).trim() === "-";
+    }
+
+    function openCsvModal(indicatorId) {
+      var modalId = "csv-modal-" + indicatorId;
+      var el = document.getElementById(modalId) || document.getElementById("csv-modal-generic");
+      if (el) el.style.display = "flex";
     }
 
     window.addEventListener("DOMContentLoaded", function() {
@@ -141,8 +153,23 @@
             var bTxt = nodata ? "Ei dataa saatavilla (0)" : (ok ? "Vihreällä kehällä (Kunnossa)" : (isSoc ? "Sisäkehän vaje" : "Ulkokehän ylitys"));
             var valTxt = nodata ? "0 (Ei dataa)" : (r.value + " " + r.unit);
             var ratioTxt = nodata ? "0.0 % (Ei dataa)" : (r.ratio_pct + " % (" + (parseFloat(r.ratio_pct)/100).toFixed(1) + "x)");
+
+            // Tarkistetaan, tuleeko rivi CSV-lähteestä, jolloin rivin loppuun lisätään oma info-painike
+            var isCsvSource = String(r.source || "").toLowerCase().indexOf("(csv)") !== -1;
+            var sourceCellHtml = "<span>" + r.source + " (" + r.year + ")</span>";
+            if (isCsvSource) {
+              sourceCellHtml = "<div class='source-cell-wrap'><span>" + r.source + " (" + r.year + ")</span>" +
+                "<button type='button' class='row-info-btn' onclick=\"openCsvModal('" + r.id + "')\" title='Näytä CSV-arvon tietolähteet ja laskentaperusteet'>ℹ️ Perustelut</button></div>";
+            }
+
             var tr = document.createElement("tr");
-            tr.innerHTML = "<td><strong>" + (isSoc ? "Sisäkehä" : "Ulkokehä") + "</strong> (" + r.domain + ")</td><td><strong>" + r.name + "</strong></td><td>" + valTxt + "</td><td>" + r.threshold + " " + r.unit + "</td><td>" + ratioTxt + "</td><td><span class='" + badge + "'>" + bTxt + "</span></td><td>" + r.source + " (" + r.year + ")</td>";
+            tr.innerHTML = "<td><strong>" + (isSoc ? "Sisäkehä" : "Ulkokehä") + "</strong> (" + r.domain + ")</td>" +
+                           "<td><strong>" + r.name + "</strong></td>" +
+                           "<td>" + valTxt + "</td>" +
+                           "<td>" + r.threshold + " " + r.unit + "</td>" +
+                           "<td>" + ratioTxt + "</td>" +
+                           "<td><span class='" + badge + "'>" + bTxt + "</span></td>" +
+                           "<td>" + sourceCellHtml + "</td>";
             tbody.appendChild(tr);
           });
 
@@ -162,7 +189,6 @@
           // - Ulkokehä (Ekologinen ylitys):r = 221 .. 341 (leveys 120, kerroin 0.60 / %)
           // ============================================================================
           var traces = [
-            // 1. Sisäkehän pohjasektorit (r = 25..145, leveys 120)
             {
               type: "barpolar",
               theta: labels,
@@ -171,7 +197,6 @@
               marker: { color: "#f8fafc", line: { color: "#cbd5e0", width: 1 } },
               hoverinfo: "skip"
             },
-            // 2. Sisäkehän sosiaaliset vajeet (kasvavat sisärajan 145 sisäpuolelle kohti keskipistettä 25)
             {
               type: "barpolar",
               theta: labels,
@@ -195,7 +220,6 @@
                 return "<b>" + r.name + "</b><br>Arvo: " + r.value + " " + r.unit + " (Raja: " + r.threshold + ")<br>Suhde: " + r.ratio_pct + " % (" + (parseFloat(r.ratio_pct)/100).toFixed(2) + "x)<extra></extra>";
               })
             },
-            // 3. Sisäraja: Sosiaalinen perusta (100 % = 1.0x, r = 149..157)
             {
               type: "barpolar",
               theta: labels,
@@ -204,7 +228,6 @@
               marker: { color: "#ffffff", line: { color: "#000000", width: 2 } },
               hovertemplate: data.map(function(){ return "<b>Sisäraja: Sosiaalinen perusta (100 % = 1.0x)</b><extra></extra>"; })
             },
-            // 4. Vihreä turvallisen tilan donitsikehä (r = 161..205, leveys 44)
             {
               type: "barpolar",
               theta: labels,
@@ -222,7 +245,6 @@
                 return "<b>" + r.name + "</b><br>Tila: " + (ok ? "Tavoitetilassa vihreällä kehällä (≤ 100 %)" : "Poikkeama turvallisesta tilasta (" + r.ratio_pct + " %)") + "<extra></extra>";
               })
             },
-            // 5. Ulkoraja: Ekologinen katto (100 % = 1.0x, r = 209..217)
             {
               type: "barpolar",
               theta: labels,
@@ -231,7 +253,6 @@
               marker: { color: "#ffffff", line: { color: "#000000", width: 2 } },
               hovertemplate: data.map(function(){ return "<b>Ulkoraja: Ekologinen katto (100 % = 1.0x)</b><extra></extra>"; })
             },
-            // 6. Ulkokehän ekologiset ylitykset (r = 221..341, leveys 120: 1.0x=221, 1.5x=251, 2.0x=281, 2.5x=311, 3.0x=341)
             {
               type: "barpolar",
               theta: labels,
@@ -356,6 +377,9 @@
   </div>
   <div class="subtitle">Automaattisesti avoimista rajapinnoista (THL Sotkanet, SYKE & Tilastokeskus StatFin) päivittyvä tilannekuva</div>
 
+  <!-- ========================================================================= -->
+  <!-- YLEINEN PERUSTELUMODAALI (Yläpalkin painike)                              -->
+  <!-- ========================================================================= -->
   <div class="modal-overlay" id="info-modal" onclick="if(event.target===this)this.style.display='none'">
     <div class="modal-content">
       <div class="modal-header">
@@ -407,7 +431,7 @@
         </tbody>
       </table>
 
-      <div class="modal-section-title">2. Ulkokehä: Ekologinen katto (SYKE, Tilastokeskus StatFin & varajärjestelmä)</div>
+      <div class="modal-section-title">2. Ulkokehä: Ekologinen katto (Yhdistelmä-API & tarkistetut SYKE CSV-lähteet)</div>
       <table class="modal-table">
         <thead>
           <tr>
@@ -419,31 +443,211 @@
         </thead>
         <tbody>
           <tr>
-            <td><strong>Alueelliset KHK-päästöt</strong></td>
-            <td>SYKE / THL Sotkanet API (<code>ID 4007</code>)<br><em>Varalla: SYKE Hinku (<code>CSV</code>)</em></td>
-            <td>Virallinen kuntien ilmastotyön seurantamittari (liikenne, lämmitys, maatalous ja jätehuolto asukasta kohti).</td>
+            <td><strong>Alueelliset KHK-päästöt (SYKE / Hinku)</strong></td>
+            <td>SYKE / Sotkanet API (<code>ID 4007</code>)<br><em>Tarkistettu lähde: SYKE Hinku (<code>CSV</code>)</em></td>
+            <td>Virallinen kuntien ilmastotyön seurantamittari (liikenne, lämmitys, maatalous ja jätehuolto ilman päästökauppateollisuutta).</td>
             <td><strong>2.0 t CO2e/as.</strong><br>(Hinku-kuntien -80 % tavoitetaso)</td>
           </tr>
           <tr>
             <td><strong>Kulutusperusteinen hiilijalanjälki</strong></td>
-            <td>SYKE OData API (<code>KulutusPaastot</code>)<br><em>Varalla: SYKE Kulutus -tietokanta</em></td>
+            <td>SYKE ENVIMAT / Kulutus<br><em>Tarkistettu lähde: SYKE Kulutus (<code>CSV</code>)</em></td>
             <td>Sisältää kuntalaisten kuluttamien tavaroiden, ruoan, energian, asumisen ja palveluiden globaalit elinkaaripäästöt.</td>
             <td><strong>2.5 t CO2e/as.</strong><br>(Pariisin 1,5 °C globaali kestävyysraja)</td>
           </tr>
           <tr>
             <td><strong>Vesistö- ja ravinnekuormitus</strong></td>
-            <td>SYKE OData API (<code>PintavesienTila</code>)<br><em>Varalla: SYKE Vesikartta (<code>manual_indicators.csv</code>)</em></td>
+            <td>SYKE Pintavesien ekologinen tila<br><em>Tarkistettu lähde: SYKE Vesikartta (<code>CSV</code>)</em></td>
             <td>Kuvaa kunnan pintavesien ekologista tilaa ja rehevöittävää ravinnekuormitusta suhteessa vesienhoitotavoitteisiin.</td>
             <td><strong>100.0 % kuormitus</strong><br>(EU:n vesipuitedirektiivin hyvä tila)</td>
           </tr>
           <tr>
             <td><strong>Maankäyttöpaine vs. lähiluonto</strong></td>
-            <td>Yhdistelmä-API: Taajama-aste (<code>ID 195</code> / StatFin 40 %), Yhdyskuntarakenne (<code>ID 3218</code> / <code>184</code> 25 %), Lähiympäristön hiukkaskuormitus (<code>ID 3560</code> 20 %) & Lipas lähiluonto (15 %)</td>
-            <td>Monimuuttujainen approksimaatioindeksi, joka yhdistää rakennetun maan osuuden, yhdyskuntarakenteen hajautumisen, lähiympäristön kuormituksen ja virkistysalueiden saavutettavuuden.</td>
-            <td><strong>100.0 % kuormitus</strong><br>(Lähiluonnon kantokykyraja = 1.0x)</td>
+            <td>Yhdistelmä-API (SYKE/Sotkanet <code>ID 3218</code> + <code>ID 3560</code> + Taajama-aste + Lipas)</td>
+            <td>Monimuuttujainen approksimaatioindeksi, joka yhdistää yhdyskuntarakenteen, lähiympäristön kuormituksen ja lähiluonnon saavutettavuuden.</td>
+            <td><strong>100.0 % kuormitus</strong><br>(Lähiluonnon kantokykyraja)</td>
           </tr>
         </tbody>
       </table>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- YKSILÖLLISET CSV-SELITEMODAALIT (Avautuvat taulukon ℹ️ Perustelut -napista) -->
+  <!-- ========================================================================= -->
+
+  <!-- 1. ALUEELLISET KHK-PÄÄSTÖT (hinku_paastot) -->
+  <div class="modal-overlay" id="csv-modal-hinku_paastot" onclick="if(event.target===this)this.style.display='none'">
+    <div class="modal-content narrow">
+      <div class="modal-header">
+        <h2>🏭 Alueelliset KHK-päästöt (SYKE Hinku CSV) – Tietolähteet ja laskentaperusteet</h2>
+        <button type="button" class="close-btn" onclick="document.getElementById('csv-modal-hinku_paastot').style.display='none'">×</button>
+      </div>
+      <p style="font-size:14px; line-height:1.55; color:#2d3748; margin-top:0;">
+        Tämä arvo (<strong>4.9 t CO2e/as.</strong>, tilastovuosi 2024) perustuu <strong>Suomen ympäristökeskuksen (SYKE)</strong> viralliseen kuntien käyttöperusteiseen kasvihuonekaasulaskentaan (<strong>Hinku-laskentamalli</strong>) Kouvolan kaupungille (kuntakoodi <code>286</code>).
+      </p>
+      <div class="modal-section-title">1. Rajaus ja menetelmä (SYKE Hinku-malli)</div>
+      <p style="font-size:13.5px; line-height:1.5; color:#4a5568; margin-top:0;">
+        Hinku-laskenta sisältää kunnan maantieteellisellä alueella syntyvät kasvihuonekaasupäästöt <strong>ilman päästökauppasektorin raskasta teollisuutta</strong> ja polttoaineiden jakelua. Tämän ansiosta Kouvolan suuret metsä- ja prosessiteollisuuden laitokset eivät vääristä kuntalaisten arjen, liikenteen ja paikallisen energiajärjestelmän asukaskohtaista päästölukua.
+      </p>
+      <div class="modal-section-title">2. Sektorikohtainen päästörakenne Kouvolassa (~78 500 asukasta)</div>
+      <table class="modal-table">
+        <thead>
+          <tr><th>Päästösektori</th><th>Arvioitu osuus</th><th>Perustelu ja paikalliset tekijät</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Tieliikenne</strong></td>
+            <td><strong>~1.9 t CO2e/as.</strong></td>
+            <td>Kouvola on pinta-alaltaan laaja seutukaupunki ja valtateiden (VT 6, VT 12, VT 15) solmukohta, mikä nostaa henkilöauto- ja raskaan liikenteen ajosuoritteen korkeaksi.</td>
+          </tr>
+          <tr>
+            <td><strong>Lämmitys ja sähkönkulutus</strong></td>
+            <td><strong>~1.3 t CO2e/as.</strong></td>
+            <td>Kaukolämmön biopohjaisuus ja öljylämmityksestä luopuminen ovat laskeneet päästöjä, mutta laaja pientalokanta pitää lämmitys- ja käyttösähkön kulutuksen merkittävänä.</td>
+          </tr>
+          <tr>
+            <td><strong>Maatalous</strong></td>
+            <td><strong>~0.9 t CO2e/as.</strong></td>
+            <td>Eteläisen Kouvolan (Elimäki, Anjalankoski) laajat peltoalueet tuottavat maaperän ja kotieläintalouden päästöjä, jotka vähenevät hitaasti.</td>
+          </tr>
+          <tr>
+            <td><strong>Työkoneet ja jätehuolto</strong></td>
+            <td><strong>~0.8 t CO2e/as.</strong></td>
+            <td>Metsä-, maatalous- ja logistiikkakoneiden polttoaineenkulutus sekä jätteiden käsittely ja jätevesihuolto.</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="formula-box">
+        <strong>Laskentakaava ja suhde kestävään rajaan:</strong><br>
+        • Sektorien summa: <code>1.9 + 1.3 + 0.9 + 0.8 = 4.9 t CO2e / asukas</code><br>
+        • Kestävä tavoiteraja (Hinku -80 % tavoitetaso): <code>2.0 t CO2e / asukas</code><br>
+        • Suhde rajaan: <strong><code>(4.9 / 2.0) × 100 % = 245.0 % (2.5x)</code> → Ulkokehän ylitys</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. KULUTUSPERUSTEINEN HIILIJALANJÄLKI (kulutus_hiili) -->
+  <div class="modal-overlay" id="csv-modal-kulutus_hiili" onclick="if(event.target===this)this.style.display='none'">
+    <div class="modal-content narrow">
+      <div class="modal-header">
+        <h2>🛒 Kulutusperusteinen hiilijalanjälki (SYKE Kulutus CSV) – Tietolähteet ja laskentaperusteet</h2>
+        <button type="button" class="close-btn" onclick="document.getElementById('csv-modal-kulutus_hiili').style.display='none'">×</button>
+      </div>
+      <p style="font-size:14px; line-height:1.55; color:#2d3748; margin-top:0;">
+        Tämä arvo (<strong>8.2 t CO2e/as.</strong>, tilastovuosi 2023) perustuu <strong>Suomen ympäristökeskuksen (SYKE)</strong> kulutusperusteiseen kuntalaskentaan (<strong>ENVIMAT-panos-tuotosmalli</strong> yhdistettynä Tilastokeskuksen kulutustutkimukseen).
+      </p>
+      <div class="modal-section-title">1. Mitä kulutusperusteinen hiilijalanjälki mittaa?</div>
+      <p style="font-size:13.5px; line-height:1.5; color:#4a5568; margin-top:0;">
+        Toisin kuin alueelliset päästöt, kulutusperusteinen hiilijalanjälki sisältää kuntalaisten kuluttamien tavaroiden, ruoan, energian, asumisen, liikkumisen sekä kunnan julkisten palveluiden ja investointien <strong>globaalit elinkaaripäästöt</strong> riippumatta siitä, missä tuotteet on valmistettu.
+      </p>
+      <div class="modal-section-title">2. Kulutuksen päästörakenne Kouvolassa</div>
+      <table class="modal-table">
+        <thead>
+          <tr><th>Kulutusluokka</th><th>Arvioitu osuus</th><th>Perustelu ja paikalliset tekijät</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Asuminen ja energia</strong></td>
+            <td><strong>~2.3 t CO2e/as.</strong></td>
+            <td>Suurempi asumisväljyys ja vanhempi pientalo- ja kerrostalokanta nostavat lämmitys-, rakennusmateriaali- ja sähköpäästöjä asukasta kohti.</td>
+          </tr>
+          <tr>
+            <td><strong>Tavarat, palvelut ja julkiset hankinnat</strong></td>
+            <td><strong>~2.3 t CO2e/as.</strong></td>
+            <td>Kouvolan keskimääräinen tulotaso ja ostovoima ovat pääkaupunkiseutua matalammat, mikä pitää yksityisen tavara- ja palvelukulutuksen hiilijalanjäljen hieman Suomen keskiarvon (~8.5–9.0 t) alapuolella.</td>
+          </tr>
+          <tr>
+            <td><strong>Liikkuminen ja matkailu</strong></td>
+            <td><strong>~1.9 t CO2e/as.</strong></td>
+            <td>Pitkät etäisyydet monikeskuksisen kunnan taajamien (Kouvola, Kuusankoski, Myllykoski, Inkeroinen, Valkeala, Koria) välillä lisäävät henkilöauton käyttöä ja polttoainekulutusta.</td>
+          </tr>
+          <tr>
+            <td><strong>Elintarvikkeet ja ruokavalio</strong></td>
+            <td><strong>~1.7 t CO2e/as.</strong></td>
+            <td>Vastaa suomalaista keskitasoa (liha- ja maitotuotteiden sekä ruokahävikin elinkaaripäästöt).</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="formula-box">
+        <strong>Laskentakaava ja suhde kestävään rajaan:</strong><br>
+        • Kulutusluokkien summa: <code>2.3 + 2.3 + 1.9 + 1.7 = 8.2 t CO2e / asukas</code><br>
+        • Kestävä tavoiteraja (Pariisin 1,5 °C globaali budjetti / Sitra & IPCC): <code>2.5 t CO2e / asukas</code><br>
+        • Suhde rajaan: <strong><code>(8.2 / 2.5) × 100 % = 328.0 % (3.3x)</code> → Ulkokehän ylitys</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. VESISTÖ- JA RAVINNEKUORMITUS (vesistot) -->
+  <div class="modal-overlay" id="csv-modal-vesistot" onclick="if(event.target===this)this.style.display='none'">
+    <div class="modal-content narrow">
+      <div class="modal-header">
+        <h2>💧 Vesistö- ja ravinnekuormitus (SYKE Vesikartta CSV) – Tietolähteet ja laskentaperusteet</h2>
+        <button type="button" class="close-btn" onclick="document.getElementById('csv-modal-vesistot').style.display='none'">×</button>
+      </div>
+      <p style="font-size:14px; line-height:1.55; color:#2d3748; margin-top:0;">
+        Tämä arvo (<strong>122.0 % kuormitus</strong>, tilastovuosi 2024) perustuu <strong>Suomen ympäristökeskuksen (SYKE)</strong> pintavesien ekologisen tilan luokitteluun sekä EU:n vesipuitedirektiivin mukaiseen Kymijoen–Suomenlahden vesienhoitosuunnitelmaan Kouvolan alueella.
+      </p>
+      <div class="modal-section-title">1. Alueellinen tietopohja (Kymijoen ja Summanjoen vesistöalueet)</div>
+      <table class="modal-table">
+        <thead>
+          <tr><th>Osa-alue Kouvolassa</th><th>Ekologinen tila</th><th>Kuormitustekijät</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Pohjois-Kouvolan reittivedet</strong><br><em>(Valkeala, Jaala, Repovesi, Vuohijärvi)</em></td>
+            <td><strong>Erinomainen tai hyvä</strong></td>
+            <td>Suuret, syvät ja karut reittijärvet ovat pääosin luonnontilaisen kaltaisia ja täyttävät EU:n vesipuitedirektiivin tavoitteet.</td>
+          </tr>
+          <tr>
+            <td><strong>Etelä-Kouvolan savikkoalueiden joet ja pikkujärvet sekä Kymijoen alaosa</strong></td>
+            <td><strong>Tyydyttävä tai välttävä</strong></td>
+            <td>Peltovaltaisten valuma-alueiden hajakuormitus (typpi- ja fosforivalumat), metsäojitukset sekä haja-asutus aiheuttavat rehevöitymistä ja sameutta.</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="modal-section-title">2. Miten kuormitusindeksi (122.0 %) on johdettu?</div>
+      <p style="font-size:13.5px; line-height:1.5; color:#4a5568; margin-top:0;">
+        EU:n vesipuitedirektiivin lakisääteinen tavoite on, että <strong>100 % (osuus 1.00)</strong> pintavesimuodostumista saavuttaa vähintään <em>hyvän ekologisen tilan</em>. Kouvolan alueen luokitellusta pintavesipinta-alasta hyvän tai erinomaisen tilan kriteerit täyttää noin <strong>82 % (osuus 0.82)</strong>.
+      </p>
+      <div class="formula-box">
+        <strong>Laskentakaava ja suhde kestävään rajaan:</strong><br>
+        • Hyvässä tai erinomaisessa tilassa oleva vesipinta-ala: <code>82 % (0.82)</code><br>
+        • Kuormitussuhde tavoitetilaan (käänteisluku): <code>(1.00 / 0.82) × 100 % = 121.95 % ≈ 122.0 %</code><br>
+        • Kestävä tavoiteraja: <code>100.0 % kuormitus (1.0x)</code><br>
+        • Suhde rajaan: <strong><code>122.0 % (1.2x)</code> → Ravinnekuormitus ylittää luonnon kantokyvyn 22 %:lla</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. MAANKÄYTTÖPAINE VS. LÄHILUONTO (luonto_paine - varamodaali, jos luetaan CSV:stä) -->
+  <div class="modal-overlay" id="csv-modal-luonto_paine" onclick="if(event.target===this)this.style.display='none'">
+    <div class="modal-content narrow">
+      <div class="modal-header">
+        <h2>🌲 Maankäyttöpaine vs. lähiluonto (CSV-varatieto) – Tietolähteet ja laskentaperusteet</h2>
+        <button type="button" class="close-btn" onclick="document.getElementById('csv-modal-luonto_paine').style.display='none'">×</button>
+      </div>
+      <p style="font-size:14px; line-height:1.55; color:#2d3748; margin-top:0;">
+        Tämä arvo (<strong>81.2 % kuormitus</strong>) perustuu SYKE Liiteri -yhdyskuntarakennetietokannan ja THL:n ympäristöterveysindikaattoreiden yhdistelmään (joukkoliikennevyöhykkeellä asuvien osuus <code>ID 3218</code> sekä lähiympäristön pienhiukkaskuormitus <code>ID 3560</code>).
+      </p>
+      <div class="formula-box">
+        <strong>Laskentaperuste ja suhde kestävään rajaan:</strong><br>
+        • Yhdistelmäindeksi: <code>81.2 % kuormitus</code><br>
+        • Kestävä tavoiteraja: <code>100.0 % kuormitus (1.0x)</code><br>
+        • Suhde rajaan: <strong><code>81.2 % (0.8x)</code> → Vihreällä kehällä (Kunnossa)</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. YLEINEN CSV-MODAALI (Mahdollisille käyttäjän lisäämille uusille CSV-mittareille) -->
+  <div class="modal-overlay" id="csv-modal-generic" onclick="if(event.target===this)this.style.display='none'">
+    <div class="modal-content narrow">
+      <div class="modal-header">
+        <h2>📁 Paikallinen CSV-mittari (`manual_indicators.csv`)</h2>
+        <button type="button" class="close-btn" onclick="document.getElementById('csv-modal-generic').style.display='none'">×</button>
+      </div>
+      <p style="font-size:14px; line-height:1.55; color:#2d3748; margin-top:0;">
+        Tämä mittari on luettu tietovaraston tarkistetusta <code>manual_indicators.csv</code>-tiedostosta, joka toimii automaattisena varajärjestelmänä (fallback) sekä paikallisten ympäristömittareiden tietolähteenä.
+      </p>
     </div>
   </div>
 
