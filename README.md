@@ -1,4 +1,4 @@
-# 🍩 Avoin Kuntadonitsi – Koko toteutusopas ja dokumentaatio
+# 🍩 Avoin Kuntadonitsi – toteutusopas ja dokumentaatio
 
 Tämä tietovarasto ja vaiheittainen opas näyttävät, kuinka rakennat mille tahansa suomalaiselle kunnalle automaattisesti päivittyvän donitsitalousmallin (Kuntadonitsin) täysin **ilmaisilla, avoimen lähdekoodin työkaluilla**. 
 
