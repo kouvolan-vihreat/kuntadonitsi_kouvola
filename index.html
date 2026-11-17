@@ -4,9 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Avoin Kuntadonitsi</title>
-  <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+  <script src="[https://cdn.plot.ly/plotly-2.30.0.min.js](https://cdn.plot.ly/plotly-2.30.0.min.js)"></script>
+  <script src="[https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js](https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js)"></script>
   <style>
     body { font-family: Arial, sans-serif; max-width: 1180px; margin: 0 auto; padding: 20px; color: #1a202c; background: #f8fafc; }
     .header-row { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 6px; }
@@ -14,7 +13,7 @@
     h1 { color: #1a365d; margin: 0; }
     h2 { color: #1a365d; margin-top: 28px; margin-bottom: 12px; font-size: 20px; }
     .timestamp-badge { background: #e2e8f0; color: #2d3748; padding: 7px 12px; border-radius: 6px; font-size: 13px; font-weight: bold; display: inline-flex; align-items: center; gap: 6px; }
-    .info-btn { background: #2b6cb0; color: white; border: none; padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: background 0.2s; }
+    .info-btn { background: #2b6cb0; color: white; border: none; padding: 8px 14px; border-radius: 6px; font-size: 13px; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
     .info-btn:hover { background: #1a365d; }
     .subtitle { color: #4a5568; margin-bottom: 24px; }
     .cards { display: flex; gap: 20px; margin-bottom: 24px; flex-wrap: wrap; }
@@ -40,9 +39,7 @@
     .badge-soc { background: #feebc8; color: #7b341e; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; }
     .badge-eco { background: #fed7d7; color: #742a2a; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; }
 
-    /* MODAALI-IKKUNAN TYYLIT */
     .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.65); z-index: 1000; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box; }
-    .modal-overlay.open { display: flex; }
     .modal-content { background: white; max-width: 960px; width: 100%; max-height: 88vh; overflow-y: auto; border-radius: 12px; padding: 28px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); position: relative; }
     .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #e2e8f0; padding-bottom: 14px; margin-bottom: 18px; }
     .modal-header h2 { margin: 0; font-size: 22px; color: #1a365d; }
@@ -58,21 +55,21 @@
   <div class="header-row">
     <h1 id="main-title">🍩 Kuntakohtainen Kuntadonitsi</h1>
     <div class="header-actions">
-      <button class="info-btn" id="open-modal-btn">ℹ️ Mittareiden ja raja-arvojen perustelut</button>
-      <div class="timestamp-badge" id="last-updated">🕒 Data päivitetty: Ladataan...</div>
+      <button type="button" class="info-btn" onclick="document.getElementById('info-modal').style.display='flex'">ℹ️ Mittareiden ja raja-arvojen perustelut</button>
+      <div class="timestamp-badge" id="last-updated">🕒 Data päivitetty: Haetaan...</div>
     </div>
   </div>
   <div class="subtitle">Automaattisesti avoimista rajapinnoista (THL Sotkanet & SYKE) päivittyvä tilannekuva: Sisäkehä (Sosiaalinen perusta) ja Ulkokehä (Ekologinen katto)</div>
 
   <!-- MODAALI-IKKUNA: MITTAREIDEN JA RAJA-ARVOJEN PERUSTELUT -->
-  <div class="modal-overlay" id="info-modal">
+  <div class="modal-overlay" id="info-modal" onclick="if(event.target===this)this.style.display='none'">
     <div class="modal-content">
       <div class="modal-header">
         <h2>🍩 Miksi juuri nämä mittarit ja raja-arvot on valittu?</h2>
-        <button class="close-btn" id="close-modal-btn" title="Sulje">×</button>
+        <button type="button" class="close-btn" onclick="document.getElementById('info-modal').style.display='none'" title="Sulje">×</button>
       </div>
       <p style="font-size:14px; line-height:1.5; color:#2d3748; margin-top:0;">
-        Kuntadonitsi perustuu Kate Raworthin <strong>donitsitalousmalliin (Doughnut Economics)</strong> sekä suomalaiseen kuntatason sovellukseen (mm. Jyväskylän yliopiston JYU.Wisdom-tutkimusryhmä ja Sitra). Mallin tavoitteena on ohjata kuntaa <strong>turvalliseen ja oikeudenmukaiseen tilaan (vihreälle donitsikehälle)</strong>, jossa asukkaiden hyvinvoinnin perusta toteutuu ilman, että paikallinen tai globaali ympäristön kantokyky ylittyy. Kaikki mittarit on valittu valtakunnallisista viranomaislähteistä, joista data on saatavilla vertailukelpoisesti Suomen kunnille.
+        Kuntadonitsi perustuu Kate Raworthin <strong>donitsitalousmalliin (Doughnut Economics)</strong> sekä suomalaiseen kuntatason sovellukseen (mm. Jyväskylän yliopiston JYU.Wisdom-tutkimusryhmä ja Sitra). Mallin tavoitteena on ohjata kuntaa <strong>turvalliseen ja oikeudenmukaiseen tilaan (vihreälle donitsikehälle)</strong>, jossa asukkaiden hyvinvoinnin perusta toteutuu ilman, että paikallinen tai globaali ympäristön kantokyky ylittyy.
       </p>
 
       <div class="modal-section-title">1. Sisäkehä: Sosiaalinen perusta (THL Sotkanet REST API)</div>
@@ -89,7 +86,7 @@
           <tr>
             <td><strong>Kansanterveys (THL sairastavuusindeksi)</strong></td>
             <td>THL Sotkanet (ID 244)</td>
-            <td>Yhdistää seitsemän vakavaa kansansairausryhmää (mm. syövät, sepelvaltimotauti, mielenterveys, tuki- ja liikuntaelimet) yhdeksi ikävakioiduksi kokonaisluvuksi. Lakisääteisen hyvinvointikertomuksen ydinmittari.</td>
+            <td>Yhdistää seitsemän vakavaa kansansairausryhmää yhdeksi ikävakioiduksi kokonaisluvuksi. Lakisääteisen hyvinvointikertomuksen ydinmittari.</td>
             <td><strong>100.0 indeksi</strong> – Koko maan keskiarvo on 100. Arvo ≤ 100 kertoo, että kunnan väestö on keskimääräistä terveempää.</td>
           </tr>
           <tr>
@@ -127,7 +124,7 @@
           <tr>
             <td><strong>Alueelliset KHK-päästöt</strong></td>
             <td>SYKE Hinku / Päästötietopalvelu</td>
-            <td>Suomen virallinen kuntien ilmastotyön seurantamittari (taakanjakosektori: liikenne, lämmitys, maatalous, jätteet kunnan alueella).</td>
+            <td>Suomen virallinen kuntien ilmastotyön seurantamittari (liikenne, lämmitys, maatalous, jätteet kunnan alueella).</td>
             <td><strong>2.0 t CO2e/as.</strong> – Vastaa Suomen ilmastolain ja Hinku-kuntien 80 % päästövähennystavoitetta kohti hiilineutraaliutta.</td>
           </tr>
           <tr>
@@ -139,13 +136,13 @@
           <tr>
             <td><strong>Pintavesien ravinnekuormitus</strong></td>
             <td>SYKE Hertta / Vesikartta</td>
-            <td>Kuvaa planetaarisista rajoista makean veden tilaa sekä typen ja fosforin kiertoa (rehevöitymistä) kunnan järvissä, joissa ja rannikkovesissä.</td>
+            <td>Kuvaa planetaarisista rajoista makean veden tilaa sekä typen ja fosforin kiertoa (rehevöitymistä) kunnan vesistöissä.</td>
             <td><strong>100.0 % kuormitus</strong> – EU:n vesipuitedirektiivin mukainen <em>hyvä ekologinen tila</em> (kuormitus ei ylitä vesistön sietokykyä).</td>
           </tr>
           <tr>
             <td><strong>Maankäyttöpaine vs. lähiluonto</strong></td>
             <td>SYKE Liiteri / Corine Land Cover</td>
-            <td>Kuvaa maankäytön muutosta ja luonnon monimuotoisuutta (rakennetun ympäristön ja pirstoutumisen suhde suojeltuun ja virkistysluontoon).</td>
+            <td>Kuvaa maankäytön muutosta ja luonnon monimuotoisuutta (rakennetun ympäristön suhde suojeltuun ja virkistysluontoon).</td>
             <td><strong>100.0 % kuormitus</strong> – Kestävä maankäytön tasapaino (luontokadon pysäyttäminen ja ekologisen verkoston säilyminen).</td>
           </tr>
         </tbody>
@@ -171,7 +168,6 @@
     </div>
   </div>
 
-  <!-- PÄÄKAAVIO: PUHDAS VISUAALINEN KAKSIKEHÄINEN DONITSI -->
   <div class="chart-box">
     <h2 style="margin-top:0; text-align:center;">Kuntadonitsin kokonaiskuva</h2>
     <div class="legend-bar">
@@ -183,7 +179,6 @@
     <div id="doughnut-main"></div>
   </div>
 
-  <!-- RINNAKKAISET KEHÄT: SISÄKEHÄ VS ULKOKEHÄ -->
   <div class="ring-grid">
     <div class="chart-box" style="margin-bottom:0;">
       <h2 style="margin-top:0;">1. Sisäkehän mittarit: Sosiaalinen perusta</h2>
@@ -195,7 +190,6 @@
     </div>
   </div>
 
-  <!-- AJALLINEN KEHITYS JA KUUKAUSISEURANTA -->
   <div class="chart-box">
     <h2 style="margin-top:0;">📈 Ajallinen kehitys ja kuukausiseuranta</h2>
     <div class="controls-row">
@@ -223,132 +217,135 @@
   </table>
 
   <script>
-    // Modaalin avaus ja sulkeminen
-    const modal = document.getElementById("info-modal");
-    document.getElementById("open-modal-btn").addEventListener("click", () => modal.classList.add("open"));
-    document.getElementById("close-modal-btn").addEventListener("click", () => modal.classList.remove("open"));
-    modal.addEventListener("click", (e) => { if (e.target === modal) modal.classList.remove("open"); });
-    document.addEventListener("keydown", (e) => { if (e.key === "Escape") modal.classList.remove("open"); });
-
-    fetch("config.yaml?t=" + Date.now())
-      .then(response => response.text())
-      .then(yamlText => {
-        const config = jsyaml.load(yamlText);
-        if (config && config.municipality && config.municipality.name) {
-          const muniName = config.municipality.name;
-          document.getElementById("main-title").innerText = `🍩 Kuntadonitsi: ${muniName}`; document.title = `Kuntadonitsi – ${muniName}`;
+    // 1. Luetaan kunnan nimi suoraan config.yaml-tekstistä ilman ulkoista kirjastoa
+    fetch("config.yaml", { cache: "no-store" })
+      .then(function(res) { return res.text(); })
+      .then(function(text) {
+        var match = text.match(/name:\s*["']?([^"'\r\n]+)["']?/);
+        if (match && match[1]) {
+          var muniName = match[1].trim();
+          document.getElementById("main-title").innerText = "🍩 Kuntadonitsi: " + muniName;
+          document.title = "Kuntadonitsi – " + muniName;
         }
       })
-      .catch(err => console.warn("Kunnan nimeä ei voitu lukea config.yaml-tiedostosta:", err));
+      .catch(function(err) { console.warn("config.yaml lukuohitus:", err); });
 
     function wrapLabel(str) {
-      if (str.length <= 22) return str;
-      const words = str.split(" ");
-      const mid = Math.ceil(words.length / 2);
+      if (!str || str.length <= 22) return str || "";
+      var words = str.split(" ");
+      var mid = Math.ceil(words.length / 2);
       return words.slice(0, mid).join(" ") + "<br>" + words.slice(mid).join(" ");
     }
 
-    Papa.parse("doughnut_results.csv?t=" + Date.now(), {
+    // 2. Luetaan doughnut_results.csv ja piirretään pääkaaviot
+    Papa.parse("doughnut_results.csv", {
       download: true,
       header: true,
       skipEmptyLines: true,
       complete: function(results) {
-        const data = results.data;
-        if (data.length > 0 && data[0].updated_at) {
-          document.getElementById("last-updated").innerText = `🕒 Data päivitetty: ${data[0].updated_at}`;
-        } else {
-          document.getElementById("last-updated").innerText = `🕒 Data päivitetty: Automaattinen haku`;
+        var data = results.data;
+        if (!data || data.length === 0) {
+          document.getElementById("last-updated").innerText = "⚠️ doughnut_results.csv on tyhjä";
+          return;
         }
 
-        const soc = data.filter(r => r.domain === "Sosiaalinen perusta");
-        const eco = data.filter(r => r.domain === "Ekologinen katto");
-        const socSafe = soc.filter(r => String(r.is_safe).toLowerCase() === "true").length;
-        const ecoSafe = eco.filter(r => String(r.is_safe).toLowerCase() === "true").length;
-        const totalSafePct = Math.round(((socSafe + ecoSafe) / data.length) * 100);
+        if (data[0].updated_at) {
+          document.getElementById("last-updated").innerText = "🕒 Data päivitetty: " + data[0].updated_at;
+        } else {
+          document.getElementById("last-updated").innerText = "🕒 Data ladattu (aja Actions saadaksesi aikaleiman)";
+        }
 
-        document.getElementById("soc-metric").innerText = `${socSafe} / ${soc.length} kunnossa`; document.getElementById("eco-metric").innerText = `${ecoSafe} / ${eco.length} rajoissa`; document.getElementById("total-metric").innerText = `${totalSafePct} %`;
+        var soc = data.filter(function(r) { return r.domain === "Sosiaalinen perusta"; });
+        var eco = data.filter(function(r) { return r.domain === "Ekologinen katto"; });
+        var socSafe = soc.filter(function(r) { return String(r.is_safe).toLowerCase() === "true"; }).length;
+        var ecoSafe = eco.filter(function(r) { return String(r.is_safe).toLowerCase() === "true"; }).length;
+        var totalSafePct = Math.round(((socSafe + ecoSafe) / data.length) * 100);
 
-        const labels = data.map(r => wrapLabel(r.name));
+        document.getElementById("soc-metric").innerText = socSafe + " / " + soc.length + " kunnossa";
+        document.getElementById("eco-metric").innerText = ecoSafe + " / " + eco.length + " rajoissa";
+        document.getElementById("total-metric").innerText = totalSafePct + " %";
 
-        const innerBgTrace = {
+        var labels = data.map(function(r) { return wrapLabel(r.name); });
+
+        var innerBgTrace = {
           type: "barpolar",
           theta: labels,
-          base: data.map(() => 25),
-          r: data.map(() => 71),
+          base: data.map(function() { return 25; }),
+          r: data.map(function() { return 71; }),
           marker: { color: "#f8fafc", line: { color: "#e2e8f0", width: 1 } },
           hoverinfo: "skip"
         };
 
-        const innerDeficitTrace = {
+        var innerDeficitTrace = {
           type: "barpolar",
           name: "Sosiaalinen vaje",
           theta: labels,
-          base: data.map(r => {
-            const isSafe = String(r.is_safe).toLowerCase() === "true";
+          base: data.map(function(r) {
+            var isSafe = String(r.is_safe).toLowerCase() === "true";
             if (r.domain === "Sosiaalinen perusta" && !isSafe) {
-              const pct = parseFloat(r.ratio_pct) || 100;
-              const depth = Math.min(71, Math.max(22, (pct - 100) * 0.45));
+              var pct = parseFloat(r.ratio_pct) || 100;
+              var depth = Math.min(71, Math.max(22, (pct - 100) * 0.45));
               return 96 - depth;
             }
             return 96;
           }),
-          r: data.map(r => {
-            const isSafe = String(r.is_safe).toLowerCase() === "true";
+          r: data.map(function(r) {
+            var isSafe = String(r.is_safe).toLowerCase() === "true";
             if (r.domain === "Sosiaalinen perusta" && !isSafe) {
-              const pct = parseFloat(r.ratio_pct) || 100;
+              var pct = parseFloat(r.ratio_pct) || 100;
               return Math.min(71, Math.max(22, (pct - 100) * 0.45));
             }
             return 0;
           }),
           marker: { color: "#dd6b20", line: { color: "#ffffff", width: 1.5 } },
           opacity: 0.92,
-          hovertemplate: data.map(r =>
-            `<b>[SISÄKEHÄ: SOSIAALINEN PERUSTA]</b><br><b>${r.name}</b><br>Arvo:${r.value} ${r.unit} (Tavoiteraja:${r.threshold} ${r.unit})<br>Suhde rajaan:${r.ratio_pct} %<extra></extra>`
-          )
+          hovertemplate: data.map(function(r) {
+            return "<b>[SISÄKEHÄ: SOSIAALINEN PERUSTA]</b><br><b>" + r.name + "</b><br>Arvo: " + r.value + " " + r.unit + " (Tavoiteraja: " + r.threshold + " " + r.unit + ")<br>Suhde rajaan: " + r.ratio_pct + " %<extra></extra>";
+          })
         };
 
-        const innerRimTrace = {
+        var innerRimTrace = {
           type: "barpolar",
           theta: labels,
-          base: data.map(() => 96),
-          r: data.map(() => 6),
+          base: data.map(function() { return 96; }),
+          r: data.map(function() { return 6; }),
           marker: { color: "#ffffff", line: { color: "#000000", width: 2 } },
-          hovertemplate: data.map(() => `<b>Sisäraja: Sosiaalinen perusta (100 %)</b><extra></extra>`)
+          hovertemplate: data.map(function() { return "<b>Sisäraja: Sosiaalinen perusta (100 %)</b><extra></extra>"; })
         };
 
-        const safeDoughnutTrace = {
+        var safeDoughnutTrace = {
           type: "barpolar",
           name: "Turvallinen tila (Donitsi)",
           theta: labels,
-          base: data.map(() => 102),
-          r: data.map(() => 56),
+          base: data.map(function() { return 102; }),
+          r: data.map(function() { return 56; }),
           marker: {
-            color: data.map(r => String(r.is_safe).toLowerCase() === "true" ? "#2e7d32" : "#86efac"),
+            color: data.map(function(r) { return String(r.is_safe).toLowerCase() === "true" ? "#2e7d32" : "#86efac"; }),
             line: { color: "#ffffff", width: 2 }
           },
           opacity: 0.95,
-          hovertemplate: data.map(r =>
-            `<b>[TURVALLINEN TILA – DONITSIKEHÄ]</b><br><b>${r.name}</b><br>Tila:${String(r.is_safe).toLowerCase() === "true" ? "Tavoitteessa (Vihreä)" : "Raja rikottu"}<br>Suhde rajaan: ${r.ratio_pct} %<extra></extra>`
-          )
+          hovertemplate: data.map(function(r) {
+            return "<b>[TURVALLINEN TILA – DONITSIKEHÄ]</b><br><b>" + r.name + "</b><br>Tila: " + (String(r.is_safe).toLowerCase() === "true" ? "Tavoitteessa (Vihreä)" : "Raja rikottu") + "<br>Suhde rajaan: " + r.ratio_pct + " %<extra></extra>";
+          })
         };
 
-        const outerRimTrace = {
+        var outerRimTrace = {
           type: "barpolar",
           theta: labels,
-          base: data.map(() => 158),
-          r: data.map(() => 6),
+          base: data.map(function() { return 158; }),
+          r: data.map(function() { return 6; }),
           marker: { color: "#ffffff", line: { color: "#000000", width: 2 } },
-          hovertemplate: data.map(() => `<b>Ulkoraja: Ekologinen katto (100 %)</b><extra></extra>`)
+          hovertemplate: data.map(function() { return "<b>Ulkoraja: Ekologinen katto (100 %)</b><extra></extra>"; })
         };
 
-        const outerOvershootTrace = {
+        var outerOvershootTrace = {
           type: "barpolar",
           name: "Ekologinen ylitys",
           theta: labels,
-          base: data.map(() => 164),
-          r: data.map(r => {
-            const pct = parseFloat(r.ratio_pct) || 0;
-            const isSafe = String(r.is_safe).toLowerCase() === "true";
+          base: data.map(function() { return 164; }),
+          r: data.map(function(r) {
+            var pct = parseFloat(r.ratio_pct) || 0;
+            var isSafe = String(r.is_safe).toLowerCase() === "true";
             if (r.domain === "Ekologinen katto" && !isSafe && pct > 100) {
               return Math.min(180, (pct - 100) * 0.72);
             }
@@ -356,26 +353,45 @@
           }),
           marker: { color: "#c62828", line: { color: "#ffffff", width: 1.5 } },
           opacity: 0.92,
-          hovertemplate: data.map(r =>
-            `<b>[ULKOKEHÄ: EKOLOGINEN KATTO]</b><br><b>${r.name}</b><br>Arvo:${r.value} ${r.unit} (Kestävä raja: ${r.threshold} ${r.unit})<br>Suhde rajaan:${r.ratio_pct} % (Ylitys +${(parseFloat(r.ratio_pct)-100).toFixed(1)} \%)<extra></extra>` ) };  const mainLayout = { polar: { barmode: "overlay", bargap: 0.04, radialaxis: { visible: true, range: [0, 350], showticklabels: false, ticks: "", showline: false, gridcolor: "#e2e8f0", gridwidth: 1 }, angularaxis: { type: "category", tickfont: { size: 13, color: "#1a202c" }, direction: "clockwise", gridcolor: "#e2e8f0" } }, showlegend: false, height: 660, margin: { t: 50, b: 50, l: 110, r: 110 } };  Plotly.newPlot( "doughnut-main", [innerBgTrace, innerDeficitTrace, innerRimTrace, safeDoughnutTrace, outerRimTrace, outerOvershootTrace], mainLayout, { responsive: true } );  function renderBarChart(divId, subset, overColor) { const maxRatio = Math.max(360, ...subset.map(r => (parseFloat(r.ratio_pct) \vert{}\vert{} 0) * 1.15)); const barTrace = { type: "bar", orientation: "h", y: subset.map(r => wrapLabel(r.name)), x: subset.map(r => parseFloat(r.ratio_pct) \vert{}\vert{} 0), text: subset.map(r => `${r.value} ${r.unit} (${r.ratio_pct} %)`),
+          hovertemplate: data.map(function(r) {
+            return "<b>[ULKOKEHÄ: EKOLOGINEN KATTO]</b><br><b>" + r.name + "</b><br>Arvo: " + r.value + " " + r.unit + " (Kestävä raja: " + r.threshold + " " + r.unit + ")<br>Suhde rajaan: " + r.ratio_pct + " %<extra></extra>";
+          })
+        };
+
+        var mainLayout = {
+          polar: {
+            barmode: "overlay",
+            bargap: 0.04,
+            radialaxis: { visible: true, range: [0, 350], showticklabels: false, ticks: "", showline: false, gridcolor: "#e2e8f0", gridwidth: 1 },
+            angularaxis: { type: "category", tickfont: { size: 13, color: "#1a202c" }, direction: "clockwise", gridcolor: "#e2e8f0" }
+          },
+          showlegend: false,
+          height: 660,
+          margin: { t: 50, b: 50, l: 110, r: 110 }
+        };
+
+        Plotly.newPlot("doughnut-main", [innerBgTrace, innerDeficitTrace, innerRimTrace, safeDoughnutTrace, outerRimTrace, outerOvershootTrace], mainLayout, { responsive: true });
+
+        function renderBarChart(divId, subset, overColor) {
+          var ratios = subset.map(function(r) { return (parseFloat(r.ratio_pct) || 0) * 1.15; });
+          var maxRatio = Math.max.apply(null, [360].concat(ratios));
+          var barTrace = {
+            type: "bar",
+            orientation: "h",
+            y: subset.map(function(r) { return wrapLabel(r.name); }),
+            x: subset.map(function(r) { return parseFloat(r.ratio_pct) || 0; }),
+            text: subset.map(function(r) { return r.value + " " + r.unit + " (" + r.ratio_pct + " %)"; }),
             textposition: "auto",
-            marker: {
-              color: subset.map(r => String(r.is_safe).toLowerCase() === "true" ? "#2e7d32" : overColor)
-            },
-            hovertemplate: subset.map(r =>
-              `<b>${r.name}</b><br>Arvo:${r.value} ${r.unit}<br>Tavoiteraja:${r.threshold} ${r.unit} (100 \%)<br>Suhde rajaan:${r.ratio_pct} %<extra></extra>`
-            )
+            marker: { color: subset.map(function(r) { return String(r.is_safe).toLowerCase() === "true" ? "#2e7d32" : overColor; }) },
+            hovertemplate: subset.map(function(r) {
+              return "<b>" + r.name + "</b><br>Arvo: " + r.value + " " + r.unit + "<br>Tavoiteraja: " + r.threshold + " " + r.unit + " (100 %)<br>Suhde rajaan: " + r.ratio_pct + " %<extra></extra>";
+            })
           };
 
-          const barLayout = {
+          var barLayout = {
             xaxis: { title: "Suhde kestävään tavoiterajaan (100 % = raja)", range: [0, maxRatio], ticksuffix: "%" },
             yaxis: { automargin: true },
-            shapes: [{
-              type: "line",
-              x0: 100, x1: 100,
-              y0: -0.5, y1: subset.length - 0.5,
-              line: { color: "#1a202c", width: 2.5, dash: "dash" }
-            }],
+            shapes: [{ type: "line", x0: 100, x1: 100, y0: -0.5, y1: subset.length - 0.5, line: { color: "#1a202c", width: 2.5, dash: "dash" } }],
             height: 320,
             margin: { t: 10, b: 45, l: 10, r: 30 }
           };
@@ -386,105 +402,108 @@
         renderBarChart("chart-social", soc, "#dd6b20");
         renderBarChart("chart-eco", eco, "#c62828");
 
-        const tbody = document.querySelector("#data-table tbody");
-        data.forEach(r => {
-          const isSafe = String(r.is_safe).toLowerCase() === "true";
-          const isSoc = r.domain === "Sosiaalinen perusta";
-          const badgeClass = isSafe ? "badge-ok" : (isSoc ? "badge-soc" : "badge-eco");
-          const badgeText = isSafe ? "Vihreällä kehällä (Kunnossa)" : (isSoc ? "Sisäkehän vaje" : "Ulkokehän ylitys");
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td><strong>${isSoc ? "Sisäkehä" : "Ulkokehä"}</strong> (${r.domain})</td>
-            <td><strong>${r.name}</strong></td>
-            <td>${r.value}${r.unit}</td>
-            <td>${r.threshold}${r.unit}</td>
-            <td>${r.ratio_pct} %</td>
-            <td><span class="${badgeClass}">${badgeText}</span></td>
-            <td>${r.source} (${r.year})</td>
-          `;
+        var tbody = document.querySelector("#data-table tbody");
+        tbody.innerHTML = "";
+        data.forEach(function(r) {
+          var isSafe = String(r.is_safe).toLowerCase() === "true";
+          var isSoc = r.domain === "Sosiaalinen perusta";
+          var badgeClass = isSafe ? "badge-ok" : (isSoc ? "badge-soc" : "badge-eco");
+          var badgeText = isSafe ? "Vihreällä kehällä (Kunnossa)" : (isSoc ? "Sisäkehän vaje" : "Ulkokehän ylitys");
+          var tr = document.createElement("tr");
+          tr.innerHTML =
+            "<td><strong>" + (isSoc ? "Sisäkehä" : "Ulkokehä") + "</strong> (" + r.domain + ")</td>" +
+            "<td><strong>" + r.name + "</strong></td>" +
+            "<td>" + r.value + " " + r.unit + "</td>" +
+            "<td>" + r.threshold + " " + r.unit + "</td>" +
+            "<td>" + r.ratio_pct + " %</td>" +
+            "<td><span class='" + badgeClass + "'>" + badgeText + "</span></td>" +
+            "<td>" + r.source + " (" + r.year + ")</td>";
           tbody.appendChild(tr);
         });
+      },
+      error: function(err) {
+        document.getElementById("last-updated").innerText = "⚠️ Virhe ladattaessa doughnut_results.csv";
+        console.error(err);
       }
     });
 
-    Papa.parse("doughnut_history.csv?t=" + Date.now(), {
+    // 3. Luetaan doughnut_history.csv ja piirretään kehityskäyrä
+    Papa.parse("doughnut_history.csv", {
       download: true,
       header: true,
       skipEmptyLines: true,
       complete: function(histResults) {
-        const histData = histResults.data;
-        if (!histData || histData.length === 0) return;
+        var histData = histResults.data;
+        var selectEl = document.getElementById("history-select");
+        if (!histData || histData.length === 0) {
+          var emptyOpt = document.createElement("option");
+          emptyOpt.innerText = "Historiatiedostoa (doughnut_history.csv) ei vielä löytynyt – aja Actions kerran";
+          selectEl.appendChild(emptyOpt);
+          return;
+        }
 
-        const selectEl = document.getElementById("history-select");
-        const uniqueIds = [];
-        const idToName = {};
+        var uniqueIds = [];
+        var idToName = {};
 
-        histData.forEach(r => {
+        histData.forEach(function(r) {
           if (r.id && !idToName[r.id]) {
             uniqueIds.push(r.id);
             idToName[r.id] = r.name;
           }
         });
 
-        const allOpt = document.createElement("option");
+        var allOpt = document.createElement("option");
         allOpt.value = "ALL";
         allOpt.innerText = "Kaikki mittarit rinnakkain (Suhde rajaan %)";
         selectEl.appendChild(allOpt);
 
-        uniqueIds.forEach(id => {
-          const opt = document.createElement("option");
+        uniqueIds.forEach(function(id) {
+          var opt = document.createElement("option");
           opt.value = id;
           opt.innerText = idToName[id];
           selectEl.appendChild(opt);
         });
 
         function updateHistoryChart(selectedId) {
-          let traces = [];
-          let yTitle = "Suhde kestävään rajaan (%)";
+          var traces = [];
+          var yTitle = "Suhde kestävään rajaan (%)";
 
           if (selectedId === "ALL") {
-            uniqueIds.forEach(id => {
-              const rows = histData.filter(r => r.id === id);
+            uniqueIds.forEach(function(id) {
+              var rows = histData.filter(function(r) { return r.id === id; });
               traces.push({
                 type: "scatter",
                 mode: "lines+markers",
                 name: idToName[id],
-                x: rows.map(r => r.period),
-                y: rows.map(r => parseFloat(r.ratio_pct) || 0),
-                hovertemplate: rows.map(r =>
-                  `<b>${r.name}</b> (${r.period})<br>Arvo: ${r.value}${r.unit} (Raja: ${r.threshold})<br>Suhde rajaan:${r.ratio_pct} %<extra></extra>`
-                )
+                x: rows.map(function(r) { return r.period; }),
+                y: rows.map(function(r) { return parseFloat(r.ratio_pct) || 0; }),
+                hovertemplate: rows.map(function(r) {
+                  return "<b>" + r.name + "</b> (" + r.period + ")<br>Arvo: " + r.value + " " + r.unit + " (Raja: " + r.threshold + ")<br>Suhde rajaan: " + r.ratio_pct + " %<extra></extra>";
+                })
               });
             });
           } else {
-            const rows = histData.filter(r => r.id === selectedId);
-            const first = rows[0] || {};
-            yTitle = `${first.name} (${first.unit || ""}) & Suhde rajaan (%)`;
+            var rows = histData.filter(function(r) { return r.id === selectedId; });
+            var first = rows[0] || {};
+            yTitle = (first.name || "") + " (" + (first.unit || "") + ") & Suhde rajaan (%)";
             traces.push({
               type: "scatter",
               mode: "lines+markers",
               name: "Suhde kestävään rajaan (%)",
-              x: rows.map(r => r.period),
-              y: rows.map(r => parseFloat(r.ratio_pct) || 0),
+              x: rows.map(function(r) { return r.period; }),
+              y: rows.map(function(r) { return parseFloat(r.ratio_pct) || 0; }),
               line: { width: 3, color: first.domain === "Sosiaalinen perusta" ? "#dd6b20" : "#c62828" },
               marker: { size: 9 },
-              text: rows.map(r => `${r.value}${r.unit}`),
-              hovertemplate: rows.map(r =>
-                `<b>${r.name}</b><br>Ajanjakso:${r.period} (${r.record_type})<br>Kunnan arvo: <b>${r.value} ${r.unit}</b> (Tavoiteraja:${r.threshold} ${r.unit})<br>Suhde rajaan:${r.ratio_pct} %<extra></extra>`
-              )
+              hovertemplate: rows.map(function(r) {
+                return "<b>" + r.name + "</b><br>Ajanjakso: " + r.period + " (" + r.record_type + ")<br>Kunnan arvo: <b>" + r.value + " " + r.unit + "</b> (Tavoiteraja: " + r.threshold + " " + r.unit + ")<br>Suhde rajaan: " + r.ratio_pct + " %<extra></extra>";
+              })
             });
           }
 
-          const histLayout = {
+          var histLayout = {
             xaxis: { title: "Ajanjakso (Tilastovuodet & Kuukausiseuranta YYYY-MM)", type: "category" },
             yaxis: { title: yTitle, ticksuffix: "%", rangemode: "tozero" },
-            shapes: [{
-              type: "line",
-              xref: "paper",
-              x0: 0, x1: 1,
-              y0: 100, y1: 100,
-              line: { color: "#2e7d32", width: 2.5, dash: "dash" }
-            }],
+            shapes: [{ type: "line", xref: "paper", x0: 0, x1: 1, y0: 100, y1: 100, line: { color: "#2e7d32", width: 2.5, dash: "dash" } }],
             legend: { orientation: "h", y: -0.25 },
             height: 400,
             margin: { t: 20, b: 80, l: 60, r: 30 }
@@ -493,8 +512,14 @@
           Plotly.newPlot("chart-history", traces, histLayout, { responsive: true });
         }
 
-        selectEl.addEventListener("change", e => updateHistoryChart(e.target.value));
+        selectEl.addEventListener("change", function(e) { updateHistoryChart(e.target.value); });
         updateHistoryChart("ALL");
+      },
+      error: function() {
+        var selectEl = document.getElementById("history-select");
+        var emptyOpt = document.createElement("option");
+        emptyOpt.innerText = "Historiatiedostoa (doughnut_history.csv) ei vielä löytynyt – aja Actions kerran";
+        selectEl.appendChild(emptyOpt);
       }
     });
   </script>
