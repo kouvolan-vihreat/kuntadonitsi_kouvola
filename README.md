@@ -1,4 +1,4 @@
-# 🍩 Avoin Kuntadonitsi – Käyttöönotto- ja muokkausopas
+# 🍩 Avoin Kuntadonitsi – käyttöönotto- ja muokkausopas
 
 Tämä tietovarasto sisältää suomalaisille kunnille suunnatun, automaattisesti päivittyvän donitsitalousmallin (Kuntadonitsin). 
 
@@ -78,7 +78,27 @@ hinku_paastot,Alueelliset KHK-paastot (SYKE Hinku),Ekologinen katto,SYKE Hinku,5
 
 ---
 
-## 4. Kuntatyypit ja niille suositellut mittaripaketit
+## 4. Upottaminen kunnan omille verkkosivuille (`<iframe>`)
+
+Voit upottaa Kuntadonitsi-näkymän suoraan osaksi mitä tahansa verkkosivustoa (esim. WordPress, Drupal, SharePoint tai muu julkaisujärjestelmä).
+
+Sivussa on sisäänrakennettu **upotustila (`?embed=true`)**, joka piilottaa sivun oman pääotsikon ja tekee taustasta läpinäkyvän, jotta näkymä sulautuu saumattomasti kunnan oman sivuston ulkoasuun:
+
+```html
+<iframe 
+  src="https://<käyttäjätunnus>.github.io/kuntadonitsi/?embed=true" 
+  width="100%" 
+  height="1850" 
+  style="border: none; border-radius: 12px; overflow: hidden;" 
+  loading="lazy"
+  title="Kuntadonitsi">
+</iframe>
+```
+*(Jos haluat näyttää upotuksessa myös sivun oman pääotsikon ja taustavärin, jätä `?embed=true` pois osoitteen lopusta.)*
+
+---
+
+## 5. Kuntatyypit ja niille suositellut mittaripaketit
 
 Oletuksena käytössä olevat 8 mittaria muodostavat **kansallisen peruspaketin**, joka on saatavilla kaikille Suomen 309 kunnalle. Suomen kunnat ovat kuitenkin elinkeinorakenteeltaan, väestöltään ja ympäristöhaasteiltaan hyvin erilaisia. 
 
@@ -95,7 +115,7 @@ Alla olevasta taulukosta näet, miten eri kuntatyyppien kannattaa täydentää t
 
 ---
 
-## 5. Valmiiden lisämittareiden pankki (`config.yaml` & `manual_indicators.csv`)
+## 6. Valmiiden lisämittareiden pankki (`config.yaml` & `manual_indicators.csv`)
 
 Voit laajentaa kuntasi donitsia (esim. 8 mittarista 10–12 mittariin) tai vaihtaa nykyisiä mittareita kopioimalla alla olevia valmiita lohkoja suoraan `config.yaml`- tai `manual_indicators.csv`-tiedostoosi.
 
