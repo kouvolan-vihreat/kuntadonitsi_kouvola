@@ -1,4 +1,4 @@
-# Avoin Kuntadonitsi – Kuntakohtainen konfiguraatio
+# Avoin Kuntadonitsi – Kuntakohtainen konfiguraatio (100 % API-pohjainen)
 # Copyright (c) 2026 Mika Lammi | SPDX-License-Identifier: MIT
 
 municipality:
@@ -7,9 +7,9 @@ municipality:
   sotkanet_code: "286"
 
 indicators:
-  # ==========================================
-  # 1. SISÄKEHÄ: SOSIAALINEN PERUSTA (THL Sotkanet)
-  # ==========================================
+  # ====================================================================
+  # 1. SISÄKEHÄ: SOSIAALINEN PERUSTA (THL Sotkanet REST API)
+  # ====================================================================
   - id: "sairastavuus"
     name: "Kansanterveys (THL sairastavuusindeksi)"
     domain: "Sosiaalinen perusta"
@@ -46,9 +46,9 @@ indicators:
     unit: "indeksi"
     direction: "lower_is_better"
 
-  # ==========================================
-  # 2. ULKOKEHÄ: EKOLOGINEN KATTO (SYKE Avoimet Rajapinnat)
-  # ==========================================
+  # ====================================================================
+  # 2. ULKOKEHÄ: EKOLOGINEN KATTO (SYKE PxWeb, StatFin PxWeb & Sotkanet)
+  # ====================================================================
   - id: "hinku_paastot"
     name: "Alueelliset KHK-päästöt (SYKE Hinku)"
     domain: "Ekologinen katto"
@@ -65,18 +65,19 @@ indicators:
     unit: "t CO2e/as."
     direction: "lower_is_better"
 
-  - id: "vesistot"
-    name: "Pintavesien ravinnekuormitus"
+  - id: "fossiilinen_liikenne"
+    name: "Fossiilikäyttöisten autojen osuus"
     domain: "Ekologinen katto"
-    source: "syke_vesistot"
-    threshold: 100.0
-    unit: "% kuormitus"
+    source: "statfin_liikenne"
+    threshold: 50.0
+    unit: "%"
     direction: "lower_is_better"
 
-  - id: "luonto_paine"
-    name: "Maankäyttöpaine vs. lähiluonto"
+  - id: "ilmanlaatu_altistus"
+    name: "Pienhiukkasaltistus ja lähiympäristö"
     domain: "Ekologinen katto"
-    source: "syke_maankaytto"
-    threshold: 100.0
-    unit: "% kuormitus"
+    source: "sotkanet_ymparisto"
+    indicator_id: 3560
+    threshold: 5.0
+    unit: "µg/m³"
     direction: "lower_is_better"
