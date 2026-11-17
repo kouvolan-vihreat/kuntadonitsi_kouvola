@@ -1,8 +1,8 @@
 # 🍩 Avoin Kuntadonitsi – Käyttöönotto- ja muokkausopas
 
-Tämä tietovarasto sisältää suomalaisille kunnille suunnatun, automaattisesti avoimista rajapinnoista päivittyvän donitsitalousmallin (Kuntadonitsin). 
+Tämä tietovarasto sisältää suomalaisille kunnille suunnatun, automaattisesti avoimista viranomaisrajapinnoista päivittyvän donitsitalousmallin (Kuntadonitsin). 
 
-Ratkaisu toimii täysin **ilmaisilla, avoimen lähdekoodin työkaluilla** suoraan GitHubin sisällä (GitHub Actions & GitHub Pages) ja hakee kaiken datan suoraan **THL:n Sotkanet-rajapinnasta** ja **SYKE:n avoimista rajapinnoista** ilman manuaalisia datatiedostoja.
+Ratkaisu toimii täysin **ilmaisilla, avoimen lähdekoodin työkaluilla** suoraan GitHubin sisällä (GitHub Actions & GitHub Pages) ja hakee kaiken datan suoraan **THL:n Sotkanet-rajapinnasta**, **SYKE:n PxWeb-rajapinnasta** ja **Tilastokeskuksen StatFin-rajapinnasta** ilman manuaalisia datatiedostoja.
 
 *(Oletusasetuksissa esimerkkinä on Kouvolan kaupunki, kuntakoodi `286`, mutta minkä tahansa Suomen kunnan edustaja voi ottaa mallin käyttöönsä muuttamalla kuntanumeron `config.yaml`-asetustiedostossa.)*
 
@@ -14,7 +14,7 @@ Ratkaisu toimii täysin **ilmaisilla, avoimen lähdekoodin työkaluilla** suoraa
 | :--- | :--- | :--- |
 | **GitHub-tietovarasto** | Säilyttää asetustiedoston (`config.yaml`), hakuskriptin, tilasto- ja historiadatan sekä verkkosivun lähdekoodin. | 0 € (Julkinen projekti) |
 | **GitHub Actions** | Ajaa tiedonhaun automaattisesti kerran kuukaudessa (tai heti kun muokkaat asetuksia) ja tallentaa uudet luvut sekä aikasarjan. | 0 € |
-| **Python (`fetch_data.py`)** | Hakee kuntakohtaisen datan automaattisesti **THL:n Sotkanet-rajapinnasta** (sosiaalinen perusta) ja **SYKE:n avoimista rajapinnoista** (ekologinen katto). Jos jokin rajapinta ei vastaa tai dataa ei ole saatavilla, mittari merkitään arvolla `0` (`no_data`), mikä näkyy kaavioissa harmaana sektorina (*"Ei dataa saatavilla"*). | 0 € |
+| **Python (`fetch_data.py`)** | Hakee kuntakohtaisen datan automaattisesti **THL:n Sotkanet-rajapinnasta** (sosiaalinen perusta & ympäristöterveys), **SYKE:n PxWeb-rajapinnasta** (KHK- ja kulutuspäästöt) sekä **Tilastokeskuksen StatFin-rajapinnasta** (liikenteen käyttövoimat). Jos jokin rajapinta ei vastaa, mittari merkitään arvolla `0` (`no_data`), mikä näkyy kaavioissa harmaana sektorina (*"Ei dataa saatavilla"*). | 0 € |
 | **GitHub Pages (`index.html`)** | Julkaisee interaktiivisen kuntadonitsin, perustelumodaalin ja aikasarjakaaviot suoraan verkkosivuna ilman latausviiveitä. | 0 € |
 
 ---
@@ -28,7 +28,7 @@ kuntadonitsi/
 ├── config.yaml                         # AINOA MUOKATTAVA TIEDOSTO: Kunnan nimi, kuntakoodi ja rajapintamittarit
 ├── doughnut_results.csv                # (Päivittyy automaattisesti) Viimeisin tilannekuva ja aikaleima
 ├── doughnut_history.csv                # (Päivittyy automaattisesti) Vuosi- ja kuukausitason aikasarja
-├── fetch_data.py                       # Robottiskripti, joka hakee Sotkanet- ja SYKE-datan ja tallentaa historian
+├── fetch_data.py                       # Robottiskripti, joka hakee Sotkanet-, SYKE- ja StatFin-datan
 ├── index.html                          # Verkkosivun, perustelumodaalin ja kaavioiden lähdekoodi
 ├── requirements.txt                    # Python-kirjastoriippuvuudet
 └── .github/workflows/update_data.yml   # GitHub Actions -automaatioajastin
@@ -58,7 +58,7 @@ municipality:
   statfin_code: "KU286"
   sotkanet_code: "286"
 ```
-Kun tallennat muutoksen (**Commit changes**), GitHub Actions käynnistyy taustalla automaattisesti, hakee kuntasi tuoreet tilastot sekä THL:n Sotkanetista että SYKE:n avoimista rajapinnoista ja päivittää verkkosivun. Jos jokin rajapinta ei tarjoa tietoa kyseiselle kunnalle, se merkitään kaavioon automaattisesti nollaksi ja harmaaksi (*"Ei dataa saatavilla"*).
+Kun tallennat muutoksen (**Commit changes**), GitHub Actions käynnistyy taustalla automaattisesti, hakee kuntasi tuoreet tilastot kaikista avoimista rajapinnoista ja päivittää verkkosivun.
 
 ### Vaihe 4: Julkaise verkkosivu (GitHub Pages)
 1. Mene kohtaan **Settings** -> **Pages**.
@@ -83,24 +83,20 @@ Sivussa on sisäänrakennettu **upotustila (`?embed=true`)**, joka piilottaa siv
   title="Kuntadonitsi">
 </iframe>
 ```
-*(Jos haluat näyttää upotuksessa myös sivun oman pääotsikon ja taustavärin, jätä `?embed=true` pois osoitteen lopusta.)*
 
 ---
 
-## 5. Kuntatyypit ja niille suositellut mittaripaketit (Sotkanet & SYKE API)
+## 5. Kuntatyypit ja niille suositellut rajapintamittaripaketit
 
-Oletuksena käytössä olevat 8 mittaria (4 Sotkanet-mittaria ja 4 SYKE-mittaria) muodostavat **kansallisen peruspaketin**. Suomen kunnat ovat kuitenkin elinkeinorakenteeltaan, väestöltään ja ympäristöhaasteiltaan hyvin erilaisia. 
+Oletuksena käytössä olevat 8 rajapintamittaria muodostavat **kansallisen peruspaketin**, joka on saatavilla automaattisesti kaikille Suomen 309 kunnalle:
 
-Alla olevasta taulukosta näet, miten eri kuntatyyppien kannattaa täydentää tai painottaa mittaristoaan `config.yaml`-tiedostossa:
-
-| Kuntaprofiili ja esimerkkikunnat | Tyypilliset kestävyyspiirteet | Suositeltava mittaripaketti (`config.yaml` / SYKE & Sotkanet API) |
+| Kuntaprofiili ja esimerkkikunnat | Tyypilliset kestävyyspiirteet | Suositeltava mittaripaketti (`config.yaml`) |
 | :--- | :--- | :--- |
-| **1. Seutukaupungit ja teollisuuspaikkakunnat**<br>*(Kouvola, Lohja, Kotka, Pori, Rauma, Hämeenlinna, Mikkeli, Kemi)* | Rakenteellinen työttömyys, väestön ikääntyminen ja kansansairaudet haastavat sosiaalista perustaa; suuri pinta-ala, tieliikenne ja teollisuus vaikuttavat ympäristöön. | **Sosiaalinen (Sotkanet API):** Peruspaketti (`244`, `181`, `232`, `182`) + *Nuorisotyöttömät (`ID 189`)* ja *Koulutuksen ulkopuolella olevat 17–24-v. (`ID 3199`)*.<br>**Ekologinen (SYKE API):** Peruspaketti (`syke_khk`, `syke_kulutus`, `syke_vesistot`, `syke_maankaytto`). |
-| **2. Suuret kasvukeskukset ja yliopistokaupungit**<br>*(Helsinki, Tampere, Turku, Oulu, Jyväskylä, Kuopio, Vaasa)* | Suuri opiskelijamäärä nostaa näennäisesti toimeentulotuen saajia, mutta todellinen sosiaalinen vaje syntyy asumisen kalleudesta ja segregaatiosta. Täydennysrakentaminen luo painetta kaupunkiluonnolle. | **Sosiaalinen (Sotkanet API):** Vaihda huoltosuhde -> *Asumismenojen rasittamat asuntokunnat (`ID 3219`)* ja lisää *Pitkäaikaistyöttömien osuus (`ID 304`)*.<br>**Ekologinen (SYKE API):** Painota *Kulutusperusteista hiilijalanjälkeä (`syke_kulutus`)*, *Maankäyttöpainetta (`syke_maankaytto`)* sekä *Pienhiukkasaltistusta (`ID 3560`)*. |
-| **3. Varakkaat kehyskunnat ja pendelöintikunnat**<br>*(Espoo, Kauniainen, Kirkkonummi, Pirkkala, Lempäälä, Kempele, Naantali, Sipoo)* | Työllisyys ja tulotaso ovat huippuluokkaa, jolloin perinteiset köyhyysmittarit näyttävät vihreää. Haasteina ovat nuorten henkinen kuormitus, autoiluvaltaisuus, pientalorakentamisen maankäyttö ja korkea kulutuksen hiilijalanjälki. | **Sosiaalinen (Sotkanet API):** Lisää *Nuorten kokema kohtalainen tai vaikea ahdistuneisuus (`ID 4111`)* ja *Kunnallisvaalien äänestysaktiivisuus (`ID 111`)*.<br>**Ekologinen (SYKE API):** *Kulutusperusteinen hiilijalanjälki (`syke_kulutus`)*, *Maankäyttöpaine (`syke_maankaytto`)* ja *KHK-päästöt (`syke_khk`)*. |
-| **4. Maatalous- ja alkutuotantovaltaiset maaseutukunnat**<br>*(Kurikka, Kauhajoki, Nivala, Kiuruvesi, Huittinen, Loimaa, Närpiö)* | Yrittäjävetoinen työllisyys on usein hyvää, mutta alueelliset KHK-päästöt asukasta kohden sekä vesistöjen ravinnekuormitus nousevat korkeiksi valtakunnallisen ruoantuotannon vuoksi. | **Sosiaalinen (Sotkanet API):** Peruspaketti + *Työkyvyttömyyseläkettä saavat 25–64-v. (`ID 313`)*.<br>**Ekologinen (SYKE API):** Tarkastele *Pintavesien ekologista tilaa (`syke_vesistot`)* sekä *Alueellisia KHK-päästöjä (`syke_khk`)*. |
-| **5. Pienet, ikääntyvät maaseutu- ja järvikunnat**<br>*(Puumala, Ilomantsi, Kuhmo, Viitasaari, Kangasniemi, Parikkala)* | Korkea eläkeläisosuus nostaa taloudellisen huoltosuhteen pysyvästi yli 200:n, vaikka työttömyys olisi matala. Keskeistä on ikäihmisten toimintakyky, palvelujen saavutettavuus ja metsä-/järviluonnon tila. | **Sosiaalinen (Sotkanet API):** Vaihda huoltosuhde (`182`) -> *Kotona asuvat 75 vuotta täyttäneet (`ID 1568`)* ja lisää *Yksinäiseksi itsensä tuntevat (`ID 4261`)*.<br>**Ekologinen (SYKE API):** *Pintavesien ravinnekuormitus (`syke_vesistot`)* ja *Maankäyttöpaine (`syke_maankaytto`)*. |
-| **6. Matkailu- ja luontovetoiset kunnat**<br>*(Inari, Kittilä, Kolari, Kuusamo, Sotkamo, Hanko)* | Kausivaihtelu työllisyydessä on suurta, ja vapaa-ajan asukkaiden sekä matkailijoiden määrä moninkertaistaa kausittaisen kulutuksen vakituiseen väestöön nähden. | **Sosiaalinen (Sotkanet API):** Peruspaketti + *Asumismenojen rasittamat asuntokunnat (`ID 3219`)*.<br>**Ekologinen (SYKE API):** *Pintavesien tila (`syke_vesistot`)* ja *Luonto- ja maankäyttöpaine (`syke_maankaytto`)*. |
+| **1. Seutukaupungit ja teollisuuspaikkakunnat**<br>*(Kouvola, Lohja, Kotka, Pori, Rauma, Hämeenlinna, Mikkeli, Kemi)* | Rakenteellinen työttömyys, väestön ikääntyminen ja kansansairaudet haastavat sosiaalista perustaa; pitkät etäisyydet ja autokanta vaikuttavat päästöihin. | **Sosiaalinen:** Peruspaketti (`244`, `181`, `232`, `182`) + *Nuorisotyöttömät (`ID 189`)* ja *Koulutuksen ulkopuolella olevat 17–24-v. (`ID 3199`)*.<br>**Ekologinen:** Peruspaketti (`syke_khk`, `syke_kulutus`, `statfin_liikenne`, `sotkanet_ymparisto`). |
+| **2. Suuret kasvukeskukset ja yliopistokaupungit**<br>*(Helsinki, Tampere, Turku, Oulu, Jyväskylä, Kuopio, Vaasa)* | Suuri opiskelijamäärä nostaa näennäisesti toimeentulotuen saajia, mutta todellinen sosiaalinen vaje syntyy asumisen kalleudesta ja segregaatiosta. | **Sosiaalinen:** Vaihda huoltosuhde -> *Asumismenojen rasittamat asuntokunnat (`ID 3219`)* ja lisää *Pitkäaikaistyöttömien osuus (`ID 304`)*.<br>**Ekologinen:** Painota *Kulutusperusteista hiilijalanjälkeä (`syke_kulutus`)* ja *Pienhiukkasaltistusta (`ID 3560`)*. |
+| **3. Varakkaat kehyskunnat ja pendelöintikunnat**<br>*(Espoo, Kauniainen, Kirkkonummi, Pirkkala, Lempäälä, Kempele, Naantali, Sipoo)* | Työllisyys ja tulotaso ovat huippuluokkaa. Haasteina ovat nuorten henkinen kuormitus, autoiluvaltaisuus ja korkea kulutuksen hiilijalanjälki. | **Sosiaalinen:** Lisää *Nuorten kokema kohtalainen tai vaikea ahdistuneisuus (`ID 4111`)* ja *Kunnallisvaalien äänestysaktiivisuus (`ID 111`)*.<br>**Ekologinen:** *Kulutusperusteinen hiilijalanjälki (`syke_kulutus`)* ja *Fossiilikäyttöisten autojen osuus (`statfin_liikenne`)*. |
+| **4. Maatalous- ja alkutuotantovaltaiset maaseutukunnat**<br>*(Kurikka, Kauhajoki, Nivala, Kiuruvesi, Huittinen, Loimaa, Närpiö)* | Yrittäjävetoinen työllisyys on usein hyvää, mutta alueelliset KHK-päästöt asukasta kohden nousevat korkeiksi alkutuotannon ja pitkien etäisyyksien vuoksi. | **Sosiaalinen:** Peruspaketti + *Työkyvyttömyyseläkettä saavat 25–64-v. (`ID 313`)*.<br>**Ekologinen:** *Alueelliset KHK-päästöt (`syke_khk`)*, *Fossiilikäyttöisten autojen osuus (`statfin_liikenne`)* ja *Talousveden laatu (`ID 3369`)*. |
+| **5. Pienet, ikääntyvät maaseutu- ja järvikunnat**<br>*(Puumala, Ilomantsi, Kuhmo, Viitasaari, Kangasniemi, Parikkala)* | Korkea eläkeläisosuus nostaa taloudellisen huoltosuhteen pysyvästi yli 200:n, vaikka työttömyys olisi matala. Keskeistä on ikäihmisten toimintakyky. | **Sosiaalinen:** Vaihda huoltosuhde (`182`) -> *Kotona asuvat 75 vuotta täyttäneet (`ID 1568`)* ja lisää *Yksinäiseksi itsensä tuntevat (`ID 4261`)*.<br>**Ekologinen:** Peruspaketti (`syke_khk`, `syke_kulutus`, `statfin_liikenne`, `sotkanet_ymparisto`). |
 
 ---
 
@@ -110,10 +106,8 @@ Voit laajentaa kuntasi donitsia (esim. 8 mittarista 10–12 mittariin) tai vaiht
 
 *(Huom: Kaikki muutkin THL:n yli 3 000 mittarista löydät osoitteesta [sotkanet.fi](https://sotkanet.fi/sotkanet/fi/haku) – mittarin nimen perässä suluissa oleva numero on suoraan `indicator_id`.)*
 
-### A) Sosiaalisen perustan Sotkanet-lisämittarit (`config.yaml`)
-
 ```yaml
-  # --- NUORET, KOULUTUS JA MIELENTERVEYS ---
+  # --- SOSIAALISEN PERUSTAN LISÄMITTARIT (THL SOTKANET API) ---
   - id: "nuorisotyottomyys"
     name: "Nuorisotyöttömät (% 18-24-v. työvoimasta)"
     domain: "Sosiaalinen perusta"
@@ -141,7 +135,6 @@ Voit laajentaa kuntasi donitsia (esim. 8 mittarista 10–12 mittariin) tai vaiht
     unit: "%"
     direction: "lower_is_better"
 
-  # --- ASUMINEN, TULOEROT JA PITKÄAIKAISTYÖTTÖMYYS (KASVUKESKUKSET) ---
   - id: "asumismenot"
     name: "Asumismenojen rasittamat asuntokunnat"
     domain: "Sosiaalinen perusta"
@@ -160,16 +153,6 @@ Voit laajentaa kuntasi donitsia (esim. 8 mittarista 10–12 mittariin) tai vaiht
     unit: "%"
     direction: "lower_is_better"
 
-  - id: "pienituloisuus"
-    name: "Pienituloisuusaste (asuntoväestö)"
-    domain: "Sosiaalinen perusta"
-    source: "sotkanet"
-    indicator_id: 192
-    threshold: 11.0
-    unit: "%"
-    direction: "lower_is_better"
-
-  # --- IKÄIHMISET, TYÖKYKY JA OSALLISUUS (MAASEUTU- JA SEUTUKUNNAT) ---
   - id: "kotona_asuvat_75"
     name: "Kotona asuvat 75 vuotta täyttäneet"
     domain: "Sosiaalinen perusta"
@@ -179,79 +162,24 @@ Voit laajentaa kuntasi donitsia (esim. 8 mittarista 10–12 mittariin) tai vaiht
     unit: "%"
     direction: "higher_is_better"
 
-  - id: "tyokyvyttomyyselake"
-    name: "Työkyvyttömyyseläkettä saavat 25-64-vuotiaat"
-    domain: "Sosiaalinen perusta"
+  # --- EKOLOGISEN KATON LISÄMITTARIT (SOTKANET / SYKE / STATFIN API) ---
+  - id: "talousveden_laatu"
+    name: "Talousveden laatuindeksi (vesihuoltolaitokset)"
+    domain: "Ekologinen katto"
     source: "sotkanet"
-    indicator_id: 313
-    threshold: 6.5
-    unit: "%"
-    direction: "lower_is_better"
-
-  - id: "aanestysaktiivisuus"
-    name: "Äänestysaktiivisuus kuntavaaleissa"
-    domain: "Sosiaalinen perusta"
-    source: "sotkanet"
-    indicator_id: 111
-    threshold: 60.0
+    indicator_id: 3369
+    threshold: 98.0
     unit: "%"
     direction: "higher_is_better"
-```
 
-### B) Ekologisen katon automaattiset SYKE-rajapintamittarit (`config.yaml`)
-
-```yaml
-  # --- SYKE AVOIMET RAJAPINNAT (OLETUSPAKETTI) ---
-  - id: "hinku_paastot"
-    name: "Alueelliset KHK-päästöt (SYKE Hinku)"
-    domain: "Ekologinen katto"
-    source: "syke_khk"
-    threshold: 2.0
-    unit: "t CO2e/as."
-    direction: "lower_is_better"
-
-  - id: "kulutus_hiili"
-    name: "Kulutusperusteinen hiilijalanjälki"
-    domain: "Ekologinen katto"
-    source: "syke_kulutus"
-    threshold: 2.5
-    unit: "t CO2e/as."
-    direction: "lower_is_better"
-
-  - id: "vesistot"
-    name: "Pintavesien ravinnekuormitus"
-    domain: "Ekologinen katto"
-    source: "syke_vesistot"
-    threshold: 100.0
-    unit: "% kuormitus"
-    direction: "lower_is_better"
-
-  - id: "luonto_paine"
-    name: "Maankäyttöpaine vs. lähiluonto"
-    domain: "Ekologinen katto"
-    source: "syke_maankaytto"
-    threshold: 100.0
-    unit: "% kuormitus"
-    direction: "lower_is_better"
-
-  # --- VALINNAISET SYKE-YMPÄRISTÖMITTARIT SOTKANET-RAJAPINNASTA ---
-  - id: "khk_kokonais"
-    name: "Kasvihuonekaasupäästöt yhteensä (SYKE / Sotkanet)"
+  - id: "joukkoliikenne_asuminen"
+    name: "Joukkoliikennevyöhykkeellä asuvien osuus (SYKE Liiteri)"
     domain: "Ekologinen katto"
     source: "sotkanet"
-    indicator_id: 4007
-    threshold: 2.0
-    unit: "t CO2e/as."
-    direction: "lower_is_better"
-
-  - id: "ilmanlaatu_altistus"
-    name: "Pienhiukkasille altistuminen / yhdyskuntarakenne"
-    domain: "Ekologinen katto"
-    source: "sotkanet"
-    indicator_id: 3560
-    threshold: 100.0
-    unit: "indeksi"
-    direction: "lower_is_better"
+    indicator_id: 3218
+    threshold: 50.0
+    unit: "%"
+    direction: "higher_is_better"
 ```
 
 ---
@@ -260,4 +188,4 @@ Voit laajentaa kuntasi donitsia (esim. 8 mittarista 10–12 mittariin) tai vaiht
 
 * **Tekijänoikeus:** © 2026 **Mika Lammi**. Konsepti, järjestelmäarkkitehtuuri ja mittaristomäärittely: Mika Lammi (tekninen toteutus tuotettu tekoälyavusteisesti).
 * **Koodin lisenssi:** Julkaistu avoimella **MIT-lisenssillä** (`SPDX-License-Identifier: MIT`). Kuntien edustajat, tutkijat ja kehittäjät voivat vapaasti kopioida, muokata ja hyödyntää tätä tietovarastoa, kunhan alkuperäinen tekijänoikeusmerkintä (`© 2026 Mika Lammi`) säilytetään osana lähdekoodia ja dokumentaatiota.
-* **Tilastolähteet:** THL Sotkanet REST API ja Suomen ympäristökeskuksen (SYKE) avoimet rajapinnat (avoin viranomaisdata, CC BY 4.0).
+* **Tilastolähteet:** THL Sotkanet REST API, Suomen ympäristökeskuksen (SYKE) PxWeb-rajapinnat ja Tilastokeskuksen StatFin-rajapinnat (avoin viranomaisdata, CC BY 4.0).
