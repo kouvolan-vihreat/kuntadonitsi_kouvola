@@ -1,4 +1,6 @@
 id,name,domain,period,record_type,value,threshold,unit,ratio_pct,is_safe
+huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,2015,Vuositilasto,167.5,135.0,indeksi,124.1,false
+huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,2016,Vuositilasto,165.7,135.0,indeksi,122.7,false
 huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,2017,Vuositilasto,161.4,135.0,indeksi,119.6,false
 huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,2018,Vuositilasto,156.7,135.0,indeksi,116.1,false
 huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,2019,Vuositilasto,158.1,135.0,indeksi,117.1,false
@@ -8,10 +10,26 @@ huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,2022,Vuositilasto,153.
 huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,2023,Vuositilasto,156.7,135.0,indeksi,116.1,false
 huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,2024,Vuositilasto,158.8,135.0,indeksi,117.6,false
 huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,2026-11,Kuukausiseuranta,158.8,135.0,indeksi,117.6,false
+luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,2015,Vuositilasto,4.4,100.0,% kuormitus,4.4,true
+luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,2016,Vuositilasto,4.0,100.0,% kuormitus,4.0,true
+luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,2017,Vuositilasto,4.6,100.0,% kuormitus,4.6,true
+luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,2018,Vuositilasto,2.8,100.0,% kuormitus,2.8,true
+luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,2019,Vuositilasto,4.2,100.0,% kuormitus,4.2,true
+luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,2020,Vuositilasto,4.3,100.0,% kuormitus,4.3,true
+luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,2021,Vuositilasto,3.7,100.0,% kuormitus,3.7,true
+luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,2022,Vuositilasto,2.9,100.0,% kuormitus,2.9,true
+luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,2023,Vuositilasto,2.7,100.0,% kuormitus,2.7,true
+luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,2024,Vuositilasto,2.5,100.0,% kuormitus,2.5,true
+luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,2025,Vuositilasto,2.3,100.0,% kuormitus,2.3,true
+luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,2026-11,Kuukausiseuranta,2.3,100.0,% kuormitus,2.3,true
+sairastavuus,Kansanterveys (THL sairastavuusindeksi),Sosiaalinen perusta,2015,Vuositilasto,118.8,100.0,indeksi,118.8,false
+sairastavuus,Kansanterveys (THL sairastavuusindeksi),Sosiaalinen perusta,2016,Vuositilasto,115.6,100.0,indeksi,115.6,false
 sairastavuus,Kansanterveys (THL sairastavuusindeksi),Sosiaalinen perusta,2017,Vuositilasto,115.5,100.0,indeksi,115.5,false
 sairastavuus,Kansanterveys (THL sairastavuusindeksi),Sosiaalinen perusta,2018,Vuositilasto,117.0,100.0,indeksi,117.0,false
 sairastavuus,Kansanterveys (THL sairastavuusindeksi),Sosiaalinen perusta,2019,Vuositilasto,114.8,100.0,indeksi,114.8,false
 sairastavuus,Kansanterveys (THL sairastavuusindeksi),Sosiaalinen perusta,2026-11,Kuukausiseuranta,114.8,100.0,indeksi,114.8,false
+toimeentulotuki,Toimeentulotukea saaneet asukkaat,Sosiaalinen perusta,2015,Vuositilasto,11.1,6.0,%,185.0,false
+toimeentulotuki,Toimeentulotukea saaneet asukkaat,Sosiaalinen perusta,2016,Vuositilasto,11.7,6.0,%,195.0,false
 toimeentulotuki,Toimeentulotukea saaneet asukkaat,Sosiaalinen perusta,2017,Vuositilasto,11.0,6.0,%,183.3,false
 toimeentulotuki,Toimeentulotukea saaneet asukkaat,Sosiaalinen perusta,2018,Vuositilasto,9.3,6.0,%,155.0,false
 toimeentulotuki,Toimeentulotukea saaneet asukkaat,Sosiaalinen perusta,2019,Vuositilasto,13.8,6.0,%,230.0,false
@@ -22,6 +40,8 @@ toimeentulotuki,Toimeentulotukea saaneet asukkaat,Sosiaalinen perusta,2023,Vuosi
 toimeentulotuki,Toimeentulotukea saaneet asukkaat,Sosiaalinen perusta,2024,Vuositilasto,10.4,6.0,%,173.3,false
 toimeentulotuki,Toimeentulotukea saaneet asukkaat,Sosiaalinen perusta,2025,Vuositilasto,15.3,6.0,%,255.0,false
 toimeentulotuki,Toimeentulotukea saaneet asukkaat,Sosiaalinen perusta,2026-11,Kuukausiseuranta,15.3,6.0,%,255.0,false
+tyottomyys,Työttömien osuus työvoimasta,Sosiaalinen perusta,2015,Vuositilasto,14.8,8.0,%,185.0,false
+tyottomyys,Työttömien osuus työvoimasta,Sosiaalinen perusta,2016,Vuositilasto,14.7,8.0,%,183.8,false
 tyottomyys,Työttömien osuus työvoimasta,Sosiaalinen perusta,2017,Vuositilasto,13.8,8.0,%,172.5,false
 tyottomyys,Työttömien osuus työvoimasta,Sosiaalinen perusta,2018,Vuositilasto,12.0,8.0,%,150.0,false
 tyottomyys,Työttömien osuus työvoimasta,Sosiaalinen perusta,2019,Vuositilasto,11.2,8.0,%,140.0,false
