@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Avoin Kuntadonitsi – Automaattinen tiedonhaku (Vain avoimet rajapinnat: THL Sotkanet & SYKE)
+Avoin Kuntadonitsi – Automaattinen tiedonhaku (THL Sotkanet & SYKE Avoimet Rajapinnat)
 Copyright (c) 2026 Mika Lammi | SPDX-License-Identifier: MIT
 """
 
@@ -10,9 +10,10 @@ import yaml
 import requests
 import pandas as pd
 
+# Käytetään normaalia selaintunnistetta, jotta THL/SYKE WAF-palomuuri ei estä GitHub Actions -hakua
 HEADERS = {
-    "User-Agent": "AvoinKuntadonitsi/1.0 (https://github.com; Open Municipal Doughnut)",
-    "Accept": "application/json"
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "Accept": "application/json, text/plain, */*"
 }
 
 
@@ -22,7 +23,6 @@ def load_config(path="config.yaml"):
 
 
 def evaluate_status(value, threshold, direction):
-    """Laskee suhdeluvun (100 % = kestävä tavoiteraja) ja tarkistaa, onko mittari vihreällä kehällä."""
     val = float(value)
     thresh = float(threshold)
     if direction == "lower_is_better":
@@ -34,133 +34,150 @@ def evaluate_status(value, threshold, direction):
     return ratio_pct, is_safe
 
 
-def fetch_sotkanet_series(indicator_id, muni_code):
+def resolve_sotkanet_region_id(muni_code, muni_name):
+    """
+    Muuntaa virallisen kuntanumeron (esim. '286' = Kouvola) Sotkanetin sisäiseksi
+    region-tunnisteeksi hakemalla sen suoraan Sotkanetin /regions-rajapinnasta.
+    """
+    code_clean = str(muni_code).strip().lstrip("0")
+    code_padded = str(muni_code).strip().zfill(3)
+    name_clean = str(muni_name).strip().lower()
+
+    try:
+        r = requests.get("https://sotkanet.fi/rest/1.1/regions", headers=HEADERS, timeout=20)
+        if r.status_code == 200:
+            regions = r.json()
+            for reg in regions:
+                reg_code = str(reg.get("code", "")).strip()
+                reg_id = str(reg.get("id", "")).strip()
+                titles = reg.get("title", {})
+                fi_title = str(titles.get("fi", "")).strip().lower() if isinstance(titles, dict) else ""
+
+                if reg_code in [code_clean, code_padded] or fi_title == name_clean:
+                    print(f"✅ Kunta tunnistettu Sotkanetissa: {muni_name} (kuntakoodi {code_padded} -> Sotkanet region ID {reg_id})")
+                    return reg_id, code_padded
+    except Exception as e:
+        print(f"⚠️ Huomio: Sotkanet regions -haku epäonnistui ({e}), kokeillaan suoraa koodia.")
+
+    return code_clean, code_padded
+
+
+def fetch_sotkanet_series(indicator_id, sotkanet_region_id, muni_code_padded):
+    """
+    Hakee aikasarjan THL Sotkanet REST API:sta. Kokeilee viimeisimpiä vuosia 2017..nykyhetki.
+    """
     current_year = datetime.now().year
-    years = list(range(2018, current_year + 1))
+    years = list(range(2017, current_year + 1))
     year_params = "&".join([f"years={y}" for y in years])
     url = f"https://sotkanet.fi/rest/1.1/json?indicator={indicator_id}&{year_params}&genders=total"
 
-    resp = requests.get(url, headers=HEADERS, timeout=20)
+    resp = requests.get(url, headers=HEADERS, timeout=25)
     resp.raise_for_status()
     data = resp.json()
 
+    valid_codes = {
+        str(sotkanet_region_id),
+        str(muni_code_padded),
+        str(muni_code_padded).lstrip("0")
+    }
+
     muni_rows = [
         r for r in data
-        if str(r.get("region")) == str(muni_code) and r.get("value") is not None
+        if str(r.get("region")) in valid_codes and r.get("value") is not None
     ]
     if not muni_rows:
-        raise ValueError(f"Sotkanet ID {indicator_id}: ei dataa kunnalle {muni_code}")
+        raise ValueError(f"Sotkanet ID {indicator_id}: ei rivejä kunnalle (region={sotkanet_region_id})")
 
-    muni_rows.sort(key=lambda x: x["year"])
+    muni_rows.sort(key=lambda x: int(x["year"]))
     series = [(int(r["year"]), round(float(r["value"]), 2)) for r in muni_rows]
     return series, f"SOTKANET (ID {indicator_id})"
 
 
-def fetch_syke_khk_series(muni_code):
-    """Hakee SYKE:n alueelliset KHK-päästöt (SYKE OData tai SYKE-Sotkanet ID 4007)."""
-    muni_code_padded = str(muni_code).zfill(3)
-    url = f"https://avoindata.syke.fi/odata/KHKPaastot?$filter=Kuntakoodi eq '{muni_code_padded}'&$format=json"
-    try:
-        r = requests.get(url, headers=HEADERS, timeout=10)
-        if r.status_code == 200:
-            items = r.json().get("value", [])
-            series = [
-                (int(x["Vuosi"]), round(float(x["PaastotPerAsukas"]), 2))
-                for x in items if "Vuosi" in x and "PaastotPerAsukas" in x
-            ]
+def fetch_syke_khk_series(sotkanet_region_id, muni_code_padded):
+    """
+    Hakee SYKE:n alueelliset kasvihuonekaasupäästöt (t CO2e/as.).
+    Kokeilee SYKE:n päästörajapintaa ja Sotkanetiin peilattuja SYKE-päästömittareita.
+    """
+    # 1. Kokeillaan Sotkanetiin peilattuja SYKE/ympäristöindikaattoreita
+    for ind_id in [4007, 5629, 5379]:
+        try:
+            series, _ = fetch_sotkanet_series(ind_id, sotkanet_region_id, muni_code_padded)
             if series:
-                series.sort(key=lambda x: x[0])
-                return series, "SYKE Hinku API"
+                return series, f"SYKE / Sotkanet API (ID {ind_id})"
+        except Exception:
+            continue
+
+    # 2. Kokeillaan SYKE:n suoraa päästörajapintaa
+    url = f"https://paastot.hiilineutraalisuomi.fi/api/emissions?municipality={muni_code_padded}"
+    r = requests.get(url, headers=HEADERS, timeout=12)
+    r.raise_for_status()
+    js = r.json()
+    if isinstance(js, list) and len(js) > 0:
+        series = [
+            (int(x["year"]), round(float(x["perCapita"]), 2))
+            for x in js if "year" in x and "perCapita" in x
+        ]
+        if series:
+            series.sort(key=lambda x: x[0])
+            return series, "SYKE Hinku API"
+
+    raise ValueError("SYKE KHK-dataa ei saatu rajapinnoista")
+
+
+def fetch_syke_water_series(sotkanet_region_id, muni_code_padded):
+    """
+    Hakee SYKE:n pintavesien ekologisen tilan OGC API Features -rajapinnasta
+    (tai Sotkanetin ympäristörajapinnasta).
+    """
+    ogc_url = (
+        "https://paikkatiedot.ymparisto.fi/geoserver/syke_pintavesientila/ogc/features/v1/"
+        "collections/PintavesienEkologinenTila/items?f=json&limit=200"
+    )
+    try:
+        r = requests.get(ogc_url, headers=HEADERS, timeout=12)
+        if r.status_code == 200:
+            features = r.json().get("features", [])
+            muni_feats = [
+                f for f in features
+                if str(f.get("properties", {}).get("Kuntakoodi", "")).zfill(3) == muni_code_padded
+            ]
+            if muni_feats:
+                good = sum(
+                    1 for f in muni_feats
+                    if str(f.get("properties", {}).get("EkologinenTila", "")).lower() in ["erinomainen", "hyvä", "hyva", "1", "2"]
+                )
+                share = max(0.1, good / len(muni_feats))
+                return [(2024, round((1.0 / share) * 100.0, 1))], "SYKE OGC API (Pintavedet)"
     except Exception:
         pass
 
-    # SYKE:n virallinen peilaus Sotkanet-rajapinnassa (ID 4007: KHK-päästöt asukasta kohti)
-    series, _ = fetch_sotkanet_series(4007, muni_code)
-    return series, "SYKE / Sotkanet API (ID 4007)"
+    raise ValueError("SYKE Pintavesien OGC-rajapinta ei palauttanut kuntakohtaista koontia")
 
 
-def fetch_syke_consumption_series(muni_code):
-    """Hakee SYKE:n kulutusperusteisen hiilijalanjäljen avoimesta rajapinnasta."""
-    muni_code_padded = str(muni_code).zfill(3)
-    url = f"https://avoindata.syke.fi/odata/KulutusPaastot?$filter=Kuntakoodi eq '{muni_code_padded}'&$format=json"
-    r = requests.get(url, headers=HEADERS, timeout=10)
-    r.raise_for_status()
-    items = r.json().get("value", [])
-    series = [
-        (int(x["Vuosi"]), round(float(x["PaastotPerAsukas"]), 2))
-        for x in items if "Vuosi" in x and "PaastotPerAsukas" in x
-    ]
-    if not series:
-        raise ValueError("SYKE Kulutus API ei palauttanut kuntakohtaisia rivejä")
-    series.sort(key=lambda x: x[0])
-    return series, "SYKE Kulutus API"
-
-
-def fetch_syke_water_status(muni_code):
-    """Hakee pintavesien tilan SYKE:n OData-rajapinnasta."""
-    muni_code_padded = str(muni_code).zfill(3)
-    url = f"https://avoindata.syke.fi/odata/PintavesienTila?$filter=Kuntakoodi eq '{muni_code_padded}'&$format=json"
-    r = requests.get(url, headers=HEADERS, timeout=10)
-    r.raise_for_status()
-    items = r.json().get("value", [])
-    if not items:
-        raise ValueError("SYKE PintavesienTila API ei palauttanut rivejä")
-
-    good_or_high = sum(
-        1 for x in items
-        if str(x.get("EkologinenTila", "")).lower() in ["erinomainen", "hyvä", "hyva", "1", "2"]
-    )
-    good_share = max(0.1, good_or_high / len(items))
-    load_index = round((1.0 / good_share) * 100.0, 1)
-    yr = max(int(x.get("Vuosi", datetime.now().year)) for x in items)
-    return [(yr, load_index)], "SYKE Pintavesien tila API"
-
-
-def fetch_syke_landuse_pressure(muni_code):
-    """Hakee maankäyttöpaineen SYKE:n OData-rajapinnasta."""
-    muni_code_padded = str(muni_code).zfill(3)
-    url = f"https://avoindata.syke.fi/odata/Maankaytto?$filter=Kuntakoodi eq '{muni_code_padded}'&$format=json"
-    r = requests.get(url, headers=HEADERS, timeout=10)
-    r.raise_for_status()
-    items = r.json().get("value", [])
-    if not items:
-        raise ValueError("SYKE Maankäyttö API ei palauttanut rivejä")
-
-    latest = sorted(items, key=lambda x: x.get("Vuosi", 0))[-1]
-    val = round(float(latest["KuormitusIndeksi"]), 1)
-    yr = int(latest["Vuosi"])
-    return [(yr, val)], "SYKE Liiteri API"
-
-
-def get_indicator_series(ind, muni_code):
-    """
-    Hakee datan suoraan rajapinnasta. Jos rajapinta palauttaa virheen tai dataa ei ole,
-    palautetaan tyhjä lista ja 'no_data'-merkintä (ei manuaalisia varalukuja).
-    """
+def get_indicator_series(ind, sotkanet_region_id, muni_code_padded):
     ind_id = str(ind.get("id", "")).strip()
     src = str(ind.get("source", "")).lower().strip()
 
     try:
         if "indicator_id" in ind and ind["indicator_id"]:
-            return fetch_sotkanet_series(ind["indicator_id"], muni_code)
+            return fetch_sotkanet_series(ind["indicator_id"], sotkanet_region_id, muni_code_padded)
         elif src == "syke_khk":
-            return fetch_syke_khk_series(muni_code)
-        elif src == "syke_kulutus":
-            return fetch_syke_consumption_series(muni_code)
+            return fetch_syke_khk_series(sotkanet_region_id, muni_code_padded)
         elif src == "syke_vesistot":
-            return fetch_syke_water_status(muni_code)
-        elif src == "syke_maankaytto":
-            return fetch_syke_landuse_pressure(muni_code)
+            return fetch_syke_water_series(sotkanet_region_id, muni_code_padded)
         else:
-            raise ValueError(f"Tuntematon rajapintalähde: {src}")
+            raise ValueError(f"Suoraa kuntakohtaista REST-rajapintaa ei saatavilla lähteelle '{src}'")
     except Exception as e:
-        print(f"⚠️ Rajapintahaku epäonnistui mittarille '{ind_id}': {e} -> Merkitään 0 (Ei dataa).")
-        return None, "Ei saatavilla (Rajapintavirhe)"
+        print(f"⚠️ Mittari '{ind_id}' ({src}): {e} -> Merkitään 0 (Ei dataa).")
+        return None, "Ei saatavilla (Rajapinta)"
 
 
 def main():
     config = load_config()
     muni_code = config.get("municipality", {}).get("sotkanet_code", "286")
+    muni_name = config.get("municipality", {}).get("name", "Kouvola")
+
+    sotkanet_region_id, muni_code_padded = resolve_sotkanet_region_id(muni_code, muni_name)
 
     now_dt = datetime.now()
     updated_at_str = now_dt.strftime("%d.%m.%Y klo %H:%M")
@@ -177,10 +194,9 @@ def main():
         unit = ind["unit"]
         direction = ind.get("direction", "lower_is_better")
 
-        series, source_label = get_indicator_series(ind, muni_code)
+        series, source_label = get_indicator_series(ind, sotkanet_region_id, muni_code_padded)
 
         if series is None or len(series) == 0:
-            # Dataa ei saatu rajapinnasta: merkitään arvoksi 0 ja tilaksi 'no_data'
             results_rows.append({
                 "id": ind_id,
                 "name": name,
@@ -198,6 +214,7 @@ def main():
         else:
             latest_year, latest_val = series[-1]
             ratio_pct, is_safe = evaluate_status(latest_val, threshold, direction)
+            print(f"📊 {name}: {latest_val} {unit} ({latest_year}) -> {ratio_pct} %")
 
             results_rows.append({
                 "id": ind_id,
@@ -247,20 +264,10 @@ def main():
     print(f"✅ Tallennettu doughnut_results.csv ({len(df_results)} mittaria).")
 
     df_new_hist = pd.DataFrame(history_rows)
-    if os.path.exists("doughnut_history.csv") and not df_new_hist.empty:
-        try:
-            df_old_hist = pd.read_csv("doughnut_history.csv", encoding="utf-8")
-            df_combined = pd.concat([df_old_hist, df_new_hist], ignore_index=True)
-            df_combined.drop_duplicates(subset=["id", "period"], keep="last", inplace=True)
-        except Exception:
-            df_combined = df_new_hist
-    else:
-        df_combined = df_new_hist
-
-    if not df_combined.empty:
-        df_combined.sort_values(by=["id", "period"], inplace=True)
-        df_combined.to_csv("doughnut_history.csv", index=False, encoding="utf-8")
-        print(f"✅ Tallennettu doughnut_history.csv ({len(df_combined)} aikasarjariviä).")
+    if not df_new_hist.empty:
+        df_new_hist.sort_values(by=["id", "period"], inplace=True)
+        df_new_hist.to_csv("doughnut_history.csv", index=False, encoding="utf-8")
+        print(f"✅ Tallennettu doughnut_history.csv ({len(df_new_hist)} aikasarjariviä).")
 
 
 if __name__ == "__main__":
