@@ -1,0 +1,41 @@
+municipality:
+  name: "Kouvola"
+  statfin_code: "KU286"
+  sotkanet_code: "286"
+
+indicators:
+  - id: "sairastavuus"
+    name: "Kansanterveys (THL sairastavuusindeksi)"
+    domain: "Sosiaalinen perusta"
+    source: "sotkanet"
+    indicator_id: 244
+    threshold: 100.0
+    unit: "indeksi"
+    direction: "lower_is_better"
+
+  - id: "aanestys"
+    name: "Äänestysaktiivisuus kuntavaaleissa"
+    domain: "Sosiaalinen perusta"
+    source: "sotkanet"
+    indicator_id: 238
+    threshold: 65.0
+    unit: "%"
+    direction: "higher_is_better"
+
+  - id: "pienituloisuus"
+    name: "Pienituloisuusaste"
+    domain: "Sosiaalinen perusta"
+    source: "sotkanet"
+    indicator_id: 186
+    threshold: 10.0
+    unit: "%"
+    direction: "lower_is_better"
+
+  - id: "tyollisyys"
+    name: "Työllisyysaste (18-64-v.)"
+    domain: "Sosiaalinen perusta"
+    source: "statfin"
+    metric_code: "M408"
+    threshold: 75.0
+    unit: "%"
+    direction: "higher_is_better"
