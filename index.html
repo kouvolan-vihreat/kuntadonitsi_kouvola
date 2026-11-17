@@ -96,7 +96,7 @@
 
   <script>
     function wrapLabel(str) {
-      if (str.length <= 24) return str;
+      if (str.length <= 22) return str;
       const words = str.split(" ");
       const mid = Math.ceil(words.length / 2);
       return words.slice(0, mid).join(" ") + "<br>" + words.slice(mid).join(" ");
@@ -120,21 +120,13 @@
 
         const labels = data.map(r => wrapLabel(r.name));
 
-        // KEHÄRAKENNE:
-        // Säde 0..25   = Tyhjä napa
-        // Säde 25..100 = SISÄKEHÄN VAJEALUE (Vain Sosiaalisen perustan vajeet piirtyvät tähän oransseina!)
-        // Säde 100     = Musta/tummanvihreä SISÄKEHÄN RAJAVIIVA (Sosiaalinen perusta)
-        // Säde 100..160= VIHREÄ DONITSIKEHÄ ("Turvallinen ja oikeudenmukainen tila")
-        // Säde 160     = Musta/tummanvihreä ULKOKEHÄN RAJAVIIVA (Ekologinen katto)
-        // Säde 160..340= ULKOKEHÄN YLITYSALUE (Vain Ekologisen katon ylitykset piirtyvät tähän punaisina!)
-
-        // 1. Taustavarjostus sisäkehän vajealueelle (kevyt harmaa pohja säteellä 25..100)
+        // 1. Taustapohja sisäkehän vajealueelle (säde 25..100)
         const innerBgTrace = {
           type: "barpolar",
           theta: labels,
           base: data.map(() => 25),
           r: data.map(() => 75),
-          marker: { color: "#f8fafc", line: { color: "#e2e8f0", width: 1 } },
+          marker: { color: "#f8fafc", line: { color: "#cbd5e0", width: 1 } },
           hoverinfo: "skip"
         };
 
@@ -147,7 +139,6 @@
             const isSafe = String(r.is_safe).toLowerCase() === "true";
             if (r.domain === "Sosiaalinen perusta" && !isSafe) {
               const pct = parseFloat(r.ratio_pct) || 100;
-              // Mitä suurempi vaje (yli 100 %), sitä syvemmälle keskustaan (kohti sädettä 25) palkki ulottuu
               const depth = Math.min(75, Math.max(25, (pct - 100) * 0.45));
               return 100 - depth;
             }
@@ -163,7 +154,7 @@
           }),
           marker: {
             color: "#dd6b20",
-            line: { color: "#9c4221", width: 1.5 }
+            line: { color: "#9c4221", width: 2 }
           },
           opacity: 0.92,
           hovertemplate: data.map(r =>
@@ -171,7 +162,7 @@
           )
         };
 
-        // 3. VIHREÄ DONITSIKEHÄ (Säde 100..160 kaikille mittareille)
+        // 3. VIHREÄ DONITSIKEHÄ (Säde 100..160 kaikille mittareille, vahva tummanvihreä reunus)
         const safeDoughnutTrace = {
           type: "barpolar",
           name: "Turvallinen tila (Donitsi)",
@@ -180,7 +171,7 @@
           r: data.map(() => 60),
           marker: {
             color: data.map(r => String(r.is_safe).toLowerCase() === "true" ? "#2e7d32" : "#86efac"),
-            line: { color: "#14532d", width: 2 }
+            line: { color: "#14532d", width: 3 }
           },
           opacity: 0.95,
           hovertemplate: data.map(r =>
@@ -198,14 +189,13 @@
             const pct = parseFloat(r.ratio_pct) || 0;
             const isSafe = String(r.is_safe).toLowerCase() === "true";
             if (r.domain === "Ekologinen katto" && !isSafe && pct > 100) {
-              // Skaalataan ylitys säteelle 160 -> max 340
               return Math.min(180, (pct - 100) * 0.72);
             }
             return 0;
           }),
           marker: {
             color: "#c62828",
-            line: { color: "#7f1d1d", width: 1.5 }
+            line: { color: "#7f1d1d", width: 2 }
           },
           opacity: 0.92,
           hovertemplate: data.map(r =>
@@ -213,50 +203,35 @@
           )
         };
 
-        // 5. SELKEÄT YMPYRÄVIIVAT SISÄKEHÄLLE (r=100) JA ULKOKEHÄLLE (r=160)
-        const circleAngles = Array.from({length: 361}, (_, i) => i);
-        const innerBoundaryRing = {
-          type: "scatterpolar",
-          mode: "lines",
-          r: circleAngles.map(() => 100),
-          theta: circleAngles,
-          line: { color: "#14532d", width: 3 },
-          hoverinfo: "skip"
-        };
-        const outerBoundaryRing = {
-          type: "scatterpolar",
-          mode: "lines",
-          r: circleAngles.map(() => 160),
-          theta: circleAngles,
-          line: { color: "#14532d", width: 3 },
-          hoverinfo: "skip"
-        };
-
         const mainLayout = {
           polar: {
+            barmode: "overlay",
+            bargap: 0.06,
             radialaxis: {
               visible: true,
               range: [0, 350],
               tickvals: [25, 100, 160, 250, 340],
-              ticktext: ["", "SISÄRAJA (Sosiaalinen)", "ULKORAJA (Ekologinen)", "2x raja", "3x+ raja"],
-              tickangle: 15,
-              tickfont: { size: 11, color: "#1a202c", weight: "bold" },
-              gridcolor: "#cbd5e0"
+              ticktext: ["Keskusta", "SISÄRAJA", "ULKORAJA", "2x raja", "3x+ raja"],
+              tickangle: 0,
+              tickfont: { size: 11, color: "#1a202c" },
+              gridcolor: "#94a3b8",
+              gridwidth: 1.5
             },
             angularaxis: {
-              tickfont: { size: 12, color: "#1a202c" },
+              type: "category",
+              tickfont: { size: 13, color: "#1a202c" },
               direction: "clockwise",
-              period: labels.length
+              gridcolor: "#e2e8f0"
             }
           },
           showlegend: false,
           height: 660,
-          margin: { t: 45, b: 45, l: 110, r: 110 }
+          margin: { t: 50, b: 50, l: 110, r: 110 }
         };
 
         Plotly.newPlot(
           "doughnut-main",
-          [innerBgTrace, innerDeficitTrace, safeDoughnutTrace, outerOvershootTrace, innerBoundaryRing, outerBoundaryRing],
+          [innerBgTrace, innerDeficitTrace, safeDoughnutTrace, outerOvershootTrace],
           mainLayout,
           { responsive: true }
         );
