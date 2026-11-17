@@ -1,4 +1,4 @@
-# 🍩 Avoin Kuntadonitsi – käyttöönotto- ja muokkausopas
+# 🍩 Avoin Kuntadonitsi – Käyttöönotto- ja muokkausopas
 
 Tämä tietovarasto sisältää suomalaisille kunnille suunnatun, automaattisesti päivittyvän donitsitalousmallin (Kuntadonitsin). 
 
@@ -82,7 +82,7 @@ hinku_paastot,Alueelliset KHK-paastot (SYKE Hinku),Ekologinen katto,SYKE Hinku,5
 
 Voit upottaa Kuntadonitsi-näkymän suoraan osaksi mitä tahansa verkkosivustoa (esim. WordPress, Drupal, SharePoint tai muu julkaisujärjestelmä).
 
-Sivussa on sisäänrakennettu **upotustila (`?embed=true`)**, joka piilottaa sivun oman pääotsikon ja tekee taustasta läpinäkyvän, jotta näkymä sulautuu saumattomasti kunnan oman sivuston ulkoasuun:
+Sivussa on sisäänrakennettu **upotustila (`?embed=true`)**, joka piilottaa sivun oman pääotsikon ja alatunnisteen sekä tekee taustasta läpinäkyvän, jotta näkymä sulautuu saumattomasti kunnan oman sivuston ulkoasuun:
 
 ```html
 <iframe 
@@ -219,3 +219,11 @@ vedenkulutus,Ominaisvedenkulutus (l/as./vrk),Ekologinen katto,Kunnan vesilaitos,
 ajosuorite,Henkiloautojen ajosuorite asukasta kohti,Ekologinen katto,Traficom / Liiteri,6800.0,4500.0,km/as.,lower_is_better,2024
 metsahakkuut,Metsien hakkuiden suhde vuotuiseen kasvuun,Ekologinen katto,Luke,82.0,70.0,%,lower_is_better,2024
 ```
+
+---
+
+## 7. Tekijänoikeudet ja lisenssi
+
+* **Tekijänoikeus:** © 2026 **Mika Lammi**. Konsepti, järjestelmäarkkitehtuuri ja mittaristomäärittely: Mika Lammi (tekninen toteutus tuotettu tekoälyavusteisesti).
+* **Koodin lisenssi:** Julkaistu avoimella **MIT-lisenssillä** (`SPDX-License-Identifier: MIT`). Kuntien edustajat, tutkijat ja kehittäjät voivat vapaasti kopioida, muokata ja hyödyntää tätä tietovarastoa, kunhan alkuperäinen tekijänoikeusmerkintä (`© 2026 Mika Lammi`) säilytetään osana lähdekoodia ja dokumentaatiota.
+* **Tilastolähteet:** THL Sotkanet REST API ja Suomen ympäristökeskuksen (SYKE) tietopalvelut (avoin viranomaisdata, CC BY 4.0).
