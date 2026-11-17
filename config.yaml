@@ -31,11 +31,11 @@ indicators:
     unit: "%"
     direction: "lower_is_better"
 
-  - id: "nuorisotyottomyys"
-    name: "Nuorisotyöttömät (% 18-24-v. työvoimasta)"
+  - id: "huoltosuhde"
+    name: "Taloudellinen huoltosuhde"
     domain: "Sosiaalinen perusta"
     source: "sotkanet"
     indicator_id: 182
-    threshold: 10.0
-    unit: "%"
+    threshold: 135.0
+    unit: "indeksi"
     direction: "lower_is_better"
