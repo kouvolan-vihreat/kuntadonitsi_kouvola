@@ -1,6 +1,12 @@
 period,record_type,id,name,domain,value,threshold,unit,ratio_pct,is_safe
-2024,Vuositilasto,hinku_paastot,Alueelliset KHK-päästöt (SYKE / Hinku),Ekologinen katto,4.9,2.0,t CO2e/as.,245.0,False
-2026-11,Kuukausiseuranta,hinku_paastot,Alueelliset KHK-päästöt (SYKE / Hinku),Ekologinen katto,4.9,2.0,t CO2e/as.,245.0,False
+2019,Vuositilasto,hinku_paastot,Alueelliset KHK-päästöt (SYKE / Hinku),Ekologinen katto,0.88,2.0,t CO2e/as.,44.0,True
+2020,Vuositilasto,hinku_paastot,Alueelliset KHK-päästöt (SYKE / Hinku),Ekologinen katto,0.95,2.0,t CO2e/as.,47.5,True
+2021,Vuositilasto,hinku_paastot,Alueelliset KHK-päästöt (SYKE / Hinku),Ekologinen katto,0.87,2.0,t CO2e/as.,43.5,True
+2022,Vuositilasto,hinku_paastot,Alueelliset KHK-päästöt (SYKE / Hinku),Ekologinen katto,0.92,2.0,t CO2e/as.,46.0,True
+2023,Vuositilasto,hinku_paastot,Alueelliset KHK-päästöt (SYKE / Hinku),Ekologinen katto,0.97,2.0,t CO2e/as.,48.5,True
+2024,Vuositilasto,hinku_paastot,Alueelliset KHK-päästöt (SYKE / Hinku),Ekologinen katto,0.96,2.0,t CO2e/as.,48.0,True
+2025,Vuositilasto,hinku_paastot,Alueelliset KHK-päästöt (SYKE / Hinku),Ekologinen katto,1.02,2.0,t CO2e/as.,51.0,True
+2026-11,Kuukausiseuranta,hinku_paastot,Alueelliset KHK-päästöt (SYKE / Hinku),Ekologinen katto,1.02,2.0,t CO2e/as.,51.0,True
 2018,Vuositilasto,huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,156.7,135.0,indeksi,116.1,False
 2019,Vuositilasto,huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,158.1,135.0,indeksi,117.1,False
 2020,Vuositilasto,huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,164.7,135.0,indeksi,122.0,False
