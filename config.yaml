@@ -31,11 +31,11 @@ indicators:
     unit: "%"
     direction: "lower_is_better"
 
-  - id: "tuloerot"
-    name: "Tuloerot (Gini-kerroin)"
+  - id: "nuorisotyottomyys"
+    name: "Nuorisotyöttömät (% 18-24-v. työvoimasta)"
     domain: "Sosiaalinen perusta"
     source: "sotkanet"
-    indicator_id: 177
-    threshold: 25.0
-    unit: "indeksi"
+    indicator_id: 182
+    threshold: 10.0
+    unit: "%"
     direction: "lower_is_better"
