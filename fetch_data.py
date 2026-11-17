@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Avoin Kuntadonitsi – Automaattinen tiedonhaku
-Lähteet: THL Sotkanet, SYKE OData, Tilastokeskus StatFin PxWeb & manual_indicators.csv
+Lähteet: THL Sotkanet, SYKE OData, Tilastokeskus StatFin PxWeb & manual_indicators.csv (CSV-tunnisteella)
 Copyright (c) 2026 Mika Lammi | SPDX-License-Identifier: MIT
 """
 
@@ -35,6 +35,12 @@ def load_manual_fallbacks(path="manual_indicators.csv"):
     except Exception as e:
         print(f"⚠️ Huomio: manual_indicators.csv luku epäonnistui ({e}).")
         return {}
+
+
+def format_csv_source(raw_source):
+    """Lisää '(CSV)'-tunnisteen lähteen nimeen, kun arvo luetaan manual_indicators.csv-tiedostosta."""
+    s = str(raw_source or "SYKE").strip()
+    return s if "csv" in s.lower() else f"{s} (CSV)"
 
 
 def evaluate_status(value, threshold, direction):
@@ -90,7 +96,7 @@ def fetch_sotkanet_series(indicator_id, sotkanet_region_id, muni_code_padded):
 
     muni_rows.sort(key=lambda x: int(x["year"]))
     series = [(int(r["year"]), round(float(r["value"]), 2)) for r in muni_rows]
-    return series, f"SOTKANET (ID {indicator_id})"
+    return series, f"SOTKANET API (ID {indicator_id})"
 
 
 def fetch_syke_khk_series(muni_code_padded):
@@ -105,7 +111,7 @@ def fetch_syke_khk_series(muni_code_padded):
         if series:
             series.sort(key=lambda x: x[0])
             return series, "SYKE Hinku API"
-    raise RuntimeError("SYKE KHKPaastot käytetään varatietoa")
+    raise RuntimeError("SYKE KHKPaastot käytetään CSV-varatietoa")
 
 
 def fetch_syke_consumption_series(muni_code_padded):
@@ -120,14 +126,10 @@ def fetch_syke_consumption_series(muni_code_padded):
         if series:
             series.sort(key=lambda x: x[0])
             return series, "SYKE Kulutus API"
-    raise RuntimeError("SYKE KulutusPaastot käytetään varatietoa")
+    raise RuntimeError("SYKE KulutusPaastot käytetään CSV-varatietoa")
 
 
 def fetch_water_load_series(muni_code_padded):
-    """
-    Hakee pintavesien tilan SYKE:n OData-rajapinnasta ja tarkistaa, että arvo on
-    järkevällä välillä (20..300 %). Muussa tapauksessa käytetään tarkistettua SYKE-arvoa.
-    """
     odata_url = f"https://avoindata.syke.fi/odata/PintavesienTila?$filter=Kuntakoodi eq '{muni_code_padded}'&$format=json"
     r = requests.get(odata_url, headers=HEADERS, timeout=10)
     if r.status_code == 200:
@@ -143,15 +145,10 @@ def fetch_water_load_series(muni_code_padded):
                 yr = max(int(x.get("Vuosi", 2024)) for x in items)
                 return [(yr, load_index)], "SYKE Pintavedet API"
 
-    raise RuntimeError("Käytetään tarkistettua SYKE Vesikartta -arvoa")
+    raise RuntimeError("Käytetään tarkistettua SYKE Vesikartta (CSV) -arvoa")
 
 
 def fetch_landuse_pressure_series(muni_code_padded, muni_name):
-    """
-    Hakee kunnan taajama-asteen (%) Tilastokeskuksen StatFin PxWeb -rajapinnasta
-    (statfin_vaerak_pxt_11ra.px) tai SYKE OData -rajapinnasta.
-    Varmistaa, että haettu prosenttiluku on välillä 25..200 %.
-    """
     url = "https://pxdata.stat.fi/PxWeb/api/v1/fi/StatFin/vaerak/statfin_vaerak_pxt_11ra.px"
     try:
         meta_r = requests.get(url, headers=HEADERS, timeout=12)
@@ -172,7 +169,6 @@ def fetch_landuse_pressure_series(muni_code_padded, muni_name):
                         raise ValueError("Kuntaa ei löytynyt StatFin-taulusta")
                     query_items.append({"code": code, "selection": {"filter": "item", "values": [match_v]}})
                 elif "tiedot" in code.lower():
-                    # Valitaan nimenomaan 'Taajama-aste, %'
                     chosen = next(
                         (v for v, t in zip(vals, texts) if "taajama-aste" in t),
                         None
@@ -203,11 +199,11 @@ def fetch_landuse_pressure_series(muni_code_padded, muni_name):
                             series.append((yr, val))
                 if series:
                     series.sort(key=lambda x: x[0])
-                    return series, "Tilastokeskus StatFin API (Taajama-aste)"
+                    return series, "StatFin API (Taajama-aste)"
     except Exception:
         pass
 
-    raise RuntimeError("Käytetään tarkistettua SYKE Liiteri -arvoa")
+    raise RuntimeError("Käytetään tarkistettua SYKE Liiteri (CSV) -arvoa")
 
 
 def get_indicator_series(ind, sotkanet_region_id, muni_code_padded, muni_name, fallbacks):
@@ -228,11 +224,12 @@ def get_indicator_series(ind, sotkanet_region_id, muni_code_padded, muni_name, f
     except Exception as e:
         print(f"ℹ️ {ind_id}: {e}")
 
+    # Varajärjestelmä (manual_indicators.csv): merkitään selkeästi '(CSV)'-tunnisteella
     if ind_id in fallbacks:
         fb = fallbacks[ind_id]
         yr = int(float(fb.get("year", 2024)))
         val = round(float(fb.get("value", 0.0)), 2)
-        src_label = str(fb.get("source", "SYKE"))
+        src_label = format_csv_source(fb.get("source", "SYKE"))
         return [(yr, val)], src_label
 
     return None, "Ei saatavilla"
@@ -316,6 +313,7 @@ def main():
             "is_safe": is_safe
         })
 
+    # Mahdolliset lisärivit suoraan manual_indicators.csv-tiedostosta saavat myös (CSV)-tunnisteen
     for fb_id, fb in fallbacks.items():
         if fb_id not in processed_ids:
             val = round(float(fb["value"]), 2)
@@ -323,12 +321,13 @@ def main():
             direction = str(fb.get("direction", "lower_is_better")).strip()
             yr = int(float(fb.get("year", 2024)))
             ratio_pct, is_safe = evaluate_status(val, thresh, direction)
+            src_label = format_csv_source(fb.get("source", "SYKE"))
 
             results_rows.append({
                 "id": fb_id,
                 "name": fb["name"],
                 "domain": fb["domain"],
-                "source": fb["source"],
+                "source": src_label,
                 "value": val,
                 "threshold": thresh,
                 "unit": fb["unit"],
@@ -347,7 +346,6 @@ def main():
     if os.path.exists("doughnut_history.csv") and not df_new_hist.empty:
         try:
             df_old_hist = pd.read_csv("doughnut_history.csv", encoding="utf-8")
-            # Siivotaan mahdolliset aiemmat virheelliset (> 1000 % tai < 10 %) rivit pois historiasta
             df_old_hist = df_old_hist[(df_old_hist["ratio_pct"] >= 10.0) & (df_old_hist["ratio_pct"] <= 1000.0)]
             df_combined = pd.concat([df_old_hist, df_new_hist], ignore_index=True)
             df_combined.drop_duplicates(subset=["id", "period"], keep="last", inplace=True)
