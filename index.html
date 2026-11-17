@@ -217,7 +217,7 @@
       <div class="timestamp-badge" id="last-updated">🕒 Data päivitetty: Haetaan...</div>
     </div>
   </div>
-  <div class="subtitle">Automaattisesti avoimista rajapinnoista (THL Sotkanet & SYKE) päivittyvä tilannekuva: Sisäkehä (Sosiaalinen perusta) ja Ulkokehä (Ekologinen katto)</div>
+  <div class="subtitle">Automaattisesti avoimista rajapinnoista (THL Sotkanet, SYKE PxWeb & Tilastokeskus StatFin) päivittyvä tilannekuva</div>
 
   <div class="modal-overlay" id="info-modal" onclick="if(event.target===this)this.style.display='none'">
     <div class="modal-content">
@@ -226,11 +226,11 @@
         <button type="button" class="close-btn" onclick="document.getElementById('info-modal').style.display='none'">×</button>
       </div>
       <p style="font-size:14px; line-height:1.5; color:#2d3748; margin-top:0;">
-        Kuntadonitsi perustuu Kate Raworthin <strong>donitsitalousmalliin (Doughnut Economics)</strong> sekä suomalaiseen kuntatason sovellukseen (mm. Jyväskylän yliopiston JYU.Wisdom-tutkimusryhmä ja Sitra). Tavoitteena on ohjata kuntaa <strong>turvalliseen ja oikeudenmukaiseen tilaan (vihreälle donitsikehälle)</strong>, jossa hyvinvoinnin perusta toteutuu ilman, että ympäristön kantokyky ylittyy. Kaikki tiedot haetaan suoraan avoimista rajapinnoista; jos jokin rajapinta ei palauta tietoa, sektori merkitään nollaksi (harmaa "Ei dataa").
+        Kuntadonitsi perustuu Kate Raworthin <strong>donitsitalousmalliin (Doughnut Economics)</strong> sekä suomalaiseen kuntatason sovellukseen (mm. Jyväskylän yliopiston JYU.Wisdom-tutkimusryhmä ja Sitra). Tavoitteena on ohjata kuntaa <strong>turvalliseen ja oikeudenmukaiseen tilaan (vihreälle donitsikehälle)</strong>, jossa hyvinvoinnin perusta toteutuu ilman, että ympäristön kantokyky ylittyy. Kaikki tiedot haetaan 100 % automaattisesti avoimista viranomaisrajapinnoista.
       </p>
       <div class="modal-section-title">1. Sisäkehä: Sosiaalinen perusta (THL Sotkanet REST API)</div>
       <table class="modal-table">
-        <thead><tr><th>Mittari</th><th>Lähde & ID</th><th>Valintaperuste</th><th>Kestävä raja (100 %)</th></tr></thead>
+        <thead><tr><th>Mittari</th><th>Rajapinta & ID</th><th>Valintaperuste</th><th>Kestävä raja (100 %)</th></tr></thead>
         <tbody>
           <tr><td><strong>Kansanterveys</strong></td><td>Sotkanet (ID 244)</td><td>Yhdistää 7 vakavaa kansansairausryhmää ikävakioiduksi kokonaisluvuksi.</td><td><strong>100.0 indeksi</strong> (Maan keskiarvo = 100)</td></tr>
           <tr><td><strong>Työttömien osuus</strong></td><td>Sotkanet (ID 181)</td><td>Kuvaa kunnan elinvoimaa, työn saatavuutta ja osallisuutta.</td><td><strong>8.0 %</strong> (Hyvän työllisyyden raja)</td></tr>
@@ -238,14 +238,14 @@
           <tr><td><strong>Huoltosuhde</strong></td><td>Sotkanet (ID 182)</td><td>Ei-työllisten määrä 100 työllistä kohden; kuvaa ikä- ja työllisyysrakennetta.</td><td><strong>135.0</strong> (Kestävä palvelu- ja veropohja)</td></tr>
         </tbody>
       </table>
-      <div class="modal-section-title">2. Ulkokehä: Ekologinen katto (SYKE:n avoimet rajapinnat)</div>
+      <div class="modal-section-title">2. Ulkokehä: Ekologinen katto (SYKE PxWeb, StatFin PxWeb & Sotkanet)</div>
       <table class="modal-table">
-        <thead><tr><th>Mittari</th><th>Lähde</th><th>Valintaperuste</th><th>Kestävä raja (100 %)</th></tr></thead>
+        <thead><tr><th>Mittari</th><th>Rajapinta</th><th>Valintaperuste</th><th>Kestävä raja (100 %)</th></tr></thead>
         <tbody>
-          <tr><td><strong>Alueelliset KHK-päästöt</strong></td><td>SYKE API / ID 4007</td><td>Virallinen kuntien ilmastotyön seurantamittari (liikenne, lämmitys, maatalous).</td><td><strong>2.0 t CO2e/as.</strong> (Hinku -80 % tavoitetaso)</td></tr>
-          <tr><td><strong>Kulutuksen hiilijalanjälki</strong></td><td>SYKE Kulutus API</td><td>Sisältää kuntalaisten kuluttamien tavaroiden, ruoan ja palveluiden päästöt.</td><td><strong>2.5 t CO2e/as.</strong> (1,5 asteen globaali raja)</td></tr>
-          <tr><td><strong>Vesistökuormitus</strong></td><td>SYKE Pintavedet API</td><td>Kuvaa makean veden tilaa ja ravinnekuormitusta (rehevöitymistä).</td><td><strong>100.0 %</strong> (EU:n hyvä ekologinen tila)</td></tr>
-          <tr><td><strong>Maankäyttöpaine</strong></td><td>SYKE Maankäyttö API</td><td>Kuvaa maankäytön muutosta ja lähiluonnon monimuotoisuuden säilymistä.</td><td><strong>100.0 %</strong> (Ekologisen verkoston säilyminen)</td></tr>
+          <tr><td><strong>Alueelliset KHK-päästöt</strong></td><td>SYKE PxWeb API</td><td>Virallinen kuntien ilmastotyön seurantamittari (liikenne, lämmitys, maatalous).</td><td><strong>2.0 t CO2e/as.</strong> (Hinku -80 % tavoitetaso)</td></tr>
+          <tr><td><strong>Kulutuksen hiilijalanjälki</strong></td><td>SYKE Kulutus PxWeb</td><td>Sisältää kuntalaisten kuluttamien tavaroiden, ruoan, energian ja palveluiden päästöt.</td><td><strong>2.5 t CO2e/as.</strong> (1,5 asteen globaali raja)</td></tr>
+          <tr><td><strong>Fossiilikäyttöisten autojen osuus</strong></td><td>Tilastokeskus StatFin API</td><td>Mittaa tieliikenteen riippuvuutta fossiilisista polttoaineista (bensiini + diesel vs. koko autokanta).</td><td><strong>50.0 %</strong> (Liikenteen päästöpuolitus 2030)</td></tr>
+          <tr><td><strong>Pienhiukkasaltistus ja lähiympäristö</strong></td><td>THL / SYKE Sotkanet (ID 3560)</td><td>Kuvaa paikallista ilmanlaatua, liikenne- ja puunpolttopäästöjä sekä elinympäristön terveellisyyttä.</td><td><strong>5.0 µg/m³</strong> (WHO:n puhtaan ilman ohjearvo)</td></tr>
         </tbody>
       </table>
     </div>
@@ -292,7 +292,7 @@
 
   <footer class="site-footer">
     <strong>© 2026 Mika Lammi.</strong> Avoin Kuntadonitsi – Konsepti, arkkitehtuuri ja mittaristo: Mika Lammi (tekninen toteutus tuotettu tekoälyavusteisesti).<br>
-    Lähdedata: THL Sotkanet REST API & Suomen ympäristökeskus (SYKE), avoin data (CC BY 4.0).
+    Lähdedata: THL Sotkanet REST API, Suomen ympäristökeskus (SYKE PxWeb) & Tilastokeskus StatFin (CC BY 4.0).
   </footer>
 
 </body>
