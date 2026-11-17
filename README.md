@@ -83,7 +83,7 @@ luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,SYKE Liiteri,88.
 
 ---
 
-## 4. Upottaminen kunnan omille verkkosivuille (`<iframe>`)
+## 4. Upottaminen verkkosivuille (`<iframe>`)
 
 Voit upottaa Kuntadonitsi-näkymän suoraan osaksi mitä tahansa verkkosivustoa (esim. WordPress, Drupal, SharePoint tai muu julkaisujärjestelmä).
 
