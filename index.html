@@ -21,7 +21,7 @@
     .card .desc { font-size: 13px; color: #718096; margin-top: 4px; }
     .chart-box { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 24px; }
     .ring-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); gap: 20px; margin-bottom: 24px; }
-    .legend-bar { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; margin-bottom: 10px; font-size: 14px; }
+    .legend-bar { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; margin-bottom: 14px; font-size: 14px; background: #f1f5f9; padding: 10px 16px; border-radius: 8px; }
     .legend-item { display: flex; align-items: center; gap: 8px; }
     .dot { width: 14px; height: 14px; border-radius: 3px; display: inline-block; }
     table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
@@ -55,13 +55,13 @@
     </div>
   </div>
 
-  <!-- PÄÄKAAVIO: AITO KAKSIKEHÄINEN DONITSI -->
+  <!-- PÄÄKAAVIO: SELKEÄSTI EROTETTU KAKSIKEHÄINEN DONITSI -->
   <div class="chart-box">
-    <h2 style="margin-top:0; text-align:center;">Kokonaiskuva: Sisäkehän vajeet, vihreä turvallinen tila ja ulkokehän ylitykset</h2>
+    <h2 style="margin-top:0; text-align:center;">Kokonaiskuva: Sisäkehä (Sosiaalinen vaje keskellä), Vihreä donitsikehä ja Ulkokehä (Ekologinen ylitys ulkona)</h2>
     <div class="legend-bar">
-      <div class="legend-item"><span class="dot" style="background:#dd6b20;"></span> <strong>Sisäkehän vaje</strong> (Sosiaalinen perusta pettää)</div>
-      <div class="legend-item"><span class="dot" style="background:#2e7d32;"></span> <strong>Turvallinen ja reilu tila</strong> (Vihreä donitsikehä)</div>
-      <div class="legend-item"><span class="dot" style="background:#c62828;"></span> <strong>Ulkokehän ylitys</strong> (Ekologinen katto ylittyy)</div>
+      <div class="legend-item"><span class="dot" style="background:#dd6b20;"></span> <strong>1. Sisäkehän vaje</strong> (Sosiaalinen vaje työntyy keskustaan)</div>
+      <div class="legend-item"><span class="dot" style="background:#2e7d32; border: 2px solid #14532d;"></span> <strong>2. Vihreä donitsikehä</strong> (Turvallinen ja reilu tila)</div>
+      <div class="legend-item"><span class="dot" style="background:#c62828;"></span> <strong>3. Ulkokehän ylitys</strong> (Ekologinen kuormitus työntyy ulos)</div>
     </div>
     <div id="doughnut-main"></div>
   </div>
@@ -69,11 +69,11 @@
   <!-- RINNAKKAISET KEHÄT: SISÄKEHÄ VS ULKOKEHÄ -->
   <div class="ring-grid">
     <div class="chart-box" style="margin-bottom:0;">
-      <h2 style="margin-top:0;">1. Sisäkehä: Sosiaalinen perusta (Sotkanet)</h2>
+      <h2 style="margin-top:0;">1. Sisäkehän mittarit: Sosiaalinen perusta</h2>
       <div id="chart-social"></div>
     </div>
     <div class="chart-box" style="margin-bottom:0;">
-      <h2 style="margin-top:0;">2. Ulkokehä: Ekologinen katto (SYKE)</h2>
+      <h2 style="margin-top:0;">2. Ulkokehän mittarit: Ekologinen katto</h2>
       <div id="chart-eco"></div>
     </div>
   </div>
@@ -95,6 +95,13 @@
   </table>
 
   <script>
+    function wrapLabel(str) {
+      if (str.length <= 24) return str;
+      const words = str.split(" ");
+      const mid = Math.ceil(words.length / 2);
+      return words.slice(0, mid).join(" ") + "<br>" + words.slice(mid).join(" ");
+    }
+
     Papa.parse("doughnut_results.csv", {
       download: true,
       header: true,
@@ -111,106 +118,156 @@
         document.getElementById("eco-metric").innerText = `${ecoSafe} / ${eco.length} rajoissa`;
         document.getElementById("total-metric").innerText = `${totalSafePct} %`;
 
-        // 1. PÄÄDONITSI: Kerrostettu polaarikaavio
-        // Säde 0..35 = tyhjä keskusta
-        // Säde 35..100 = Sisäkehä (Sosiaalinen perusta: jos vaje, näkyy oranssina keskustassa)
-        // Säde 100..150 = Vihreä donitsikehä (Turvallinen tila kaikille sektoreille)
-        // Säde 150..350 = Ulkokehä (Ylitys yli 100 % tavoiterajan kasvaa punaisena ulospäin)
+        const labels = data.map(r => wrapLabel(r.name));
 
-        const labels = data.map(r => r.name);
+        // KEHÄRAKENNE:
+        // Säde 0..25   = Tyhjä napa
+        // Säde 25..100 = SISÄKEHÄN VAJEALUE (Vain Sosiaalisen perustan vajeet piirtyvät tähän oransseina!)
+        // Säde 100     = Musta/tummanvihreä SISÄKEHÄN RAJAVIIVA (Sosiaalinen perusta)
+        // Säde 100..160= VIHREÄ DONITSIKEHÄ ("Turvallinen ja oikeudenmukainen tila")
+        // Säde 160     = Musta/tummanvihreä ULKOKEHÄN RAJAVIIVA (Ekologinen katto)
+        // Säde 160..340= ULKOKEHÄN YLITYSALUE (Vain Ekologisen katon ylitykset piirtyvät tähän punaisina!)
 
-        // Kerros A: Sisäkehän vaje (näkyy säteellä 35..100 jos mittari on Sosiaalinen perusta eikä ole kunnossa)
+        // 1. Taustavarjostus sisäkehän vajealueelle (kevyt harmaa pohja säteellä 25..100)
+        const innerBgTrace = {
+          type: "barpolar",
+          theta: labels,
+          base: data.map(() => 25),
+          r: data.map(() => 75),
+          marker: { color: "#f8fafc", line: { color: "#e2e8f0", width: 1 } },
+          hoverinfo: "skip"
+        };
+
+        // 2. SISÄKEHÄN VAJE (Vain Sosiaalinen perusta: kasvaa sisärajan 100 kohdalta kohti keskustaa!)
         const innerDeficitTrace = {
           type: "barpolar",
-          name: "Sisäkehän sosiaalinen vaje",
+          name: "Sisäkehän vaje",
           theta: labels,
-          base: data.map(() => 35),
+          base: data.map(r => {
+            const isSafe = String(r.is_safe).toLowerCase() === "true";
+            if (r.domain === "Sosiaalinen perusta" && !isSafe) {
+              const pct = parseFloat(r.ratio_pct) || 100;
+              // Mitä suurempi vaje (yli 100 %), sitä syvemmälle keskustaan (kohti sädettä 25) palkki ulottuu
+              const depth = Math.min(75, Math.max(25, (pct - 100) * 0.45));
+              return 100 - depth;
+            }
+            return 100;
+          }),
           r: data.map(r => {
             const isSafe = String(r.is_safe).toLowerCase() === "true";
             if (r.domain === "Sosiaalinen perusta" && !isSafe) {
-              return 65; // Täyttää sisäkehän (35 -> 100) oranssilla vajevaroitusvärillä
+              const pct = parseFloat(r.ratio_pct) || 100;
+              return Math.min(75, Math.max(25, (pct - 100) * 0.45));
             }
             return 0;
           }),
           marker: {
             color: "#dd6b20",
-            line: { color: "white", width: 2 }
+            line: { color: "#9c4221", width: 1.5 }
           },
-          opacity: 0.85,
+          opacity: 0.92,
           hovertemplate: data.map(r =>
-            `<b>[SISÄKEHÄ] ${r.name}</b><br>Kunnan arvo: ${r.value} ${r.unit} (Tavoiteraja: ${r.threshold} ${r.unit})<br>Suhde rajaan: ${r.ratio_pct} %<extra></extra>`
+            `<b>[SISÄKEHÄ: SOSIAALINEN PERUSTA]</b><br><b>${r.name}</b><br>Arvo: ${r.value} ${r.unit} (Tavoiteraja: ${r.threshold} ${r.unit})<br>Suhde rajaan: ${r.ratio_pct} %<extra></extra>`
           )
         };
 
-        // Kerros B: Vihreä donitsi ("Turvallinen ja oikeudenmukainen tila", säde 100..150)
+        // 3. VIHREÄ DONITSIKEHÄ (Säde 100..160 kaikille mittareille)
         const safeDoughnutTrace = {
           type: "barpolar",
           name: "Turvallinen tila (Donitsi)",
           theta: labels,
           base: data.map(() => 100),
-          r: data.map(() => 50),
+          r: data.map(() => 60),
           marker: {
-            color: data.map(r => String(r.is_safe).toLowerCase() === "true" ? "#2e7d32" : "#68d391"),
-            line: { color: "white", width: 2 }
+            color: data.map(r => String(r.is_safe).toLowerCase() === "true" ? "#2e7d32" : "#86efac"),
+            line: { color: "#14532d", width: 2 }
           },
-          opacity: 0.9,
+          opacity: 0.95,
           hovertemplate: data.map(r =>
-            `<b>${r.name}</b><br>Vihreä donitsikehä (Kestävä raja = 100 %)<br>Nykyinen suhdeluku: ${r.ratio_pct} %<extra></extra>`
+            `<b>[VIHREÄ DONITSIKEHÄ] ${r.name}</b><br>Tila: ${String(r.is_safe).toLowerCase() === "true" ? "Tavoitteessa (Vihreä)" : "Raja rikottu"}<br>Suhde rajaan: ${r.ratio_pct} %<extra></extra>`
           )
         };
 
-        // Kerros C: Ulkokehän ylitys (säde 150 -> ulospäin, kun ratio_pct > 100 %)
+        // 4. ULKOKEHÄN YLITYS (Vain Ekologinen katto: kasvaa ulkorajan 160 kohdalta ulospäin!)
         const outerOvershootTrace = {
           type: "barpolar",
-          name: "Rajan ylitys",
+          name: "Ulkokehän ylitys",
           theta: labels,
-          base: data.map(() => 150),
+          base: data.map(() => 160),
           r: data.map(r => {
             const pct = parseFloat(r.ratio_pct) || 0;
             const isSafe = String(r.is_safe).toLowerCase() === "true";
-            if (!isSafe && pct > 100) {
-              return Math.min(pct - 100, 220); // Ylityksen pituus ulospäin
+            if (r.domain === "Ekologinen katto" && !isSafe && pct > 100) {
+              // Skaalataan ylitys säteelle 160 -> max 340
+              return Math.min(180, (pct - 100) * 0.72);
             }
             return 0;
           }),
           marker: {
-            color: data.map(r => r.domain === "Ekologinen katto" ? "#c62828" : "#dd6b20"),
-            line: { color: "white", width: 2 }
+            color: "#c62828",
+            line: { color: "#7f1d1d", width: 1.5 }
           },
-          opacity: 0.9,
+          opacity: 0.92,
           hovertemplate: data.map(r =>
-            `<b>[${r.domain.toUpperCase()}] ${r.name}</b><br>Arvo: ${r.value} ${r.unit} (Kestävä raja: ${r.threshold} ${r.unit})<br>Suhde rajaan: ${r.ratio_pct} % (Ylitys +${(parseFloat(r.ratio_pct)-100).toFixed(1)} %)<extra></extra>`
+            `<b>[ULKOKEHÄ: EKOLOGINEN KATTO]</b><br><b>${r.name}</b><br>Arvo: ${r.value} ${r.unit} (Kestävä raja: ${r.threshold} ${r.unit})<br>Suhde rajaan: ${r.ratio_pct} % (Ylitys +${(parseFloat(r.ratio_pct)-100).toFixed(1)} %)<extra></extra>`
           )
+        };
+
+        // 5. SELKEÄT YMPYRÄVIIVAT SISÄKEHÄLLE (r=100) JA ULKOKEHÄLLE (r=160)
+        const circleAngles = Array.from({length: 361}, (_, i) => i);
+        const innerBoundaryRing = {
+          type: "scatterpolar",
+          mode: "lines",
+          r: circleAngles.map(() => 100),
+          theta: circleAngles,
+          line: { color: "#14532d", width: 3 },
+          hoverinfo: "skip"
+        };
+        const outerBoundaryRing = {
+          type: "scatterpolar",
+          mode: "lines",
+          r: circleAngles.map(() => 160),
+          theta: circleAngles,
+          line: { color: "#14532d", width: 3 },
+          hoverinfo: "skip"
         };
 
         const mainLayout = {
           polar: {
             radialaxis: {
               visible: true,
-              range: [0, 370],
-              tickvals: [35, 100, 150, 250, 350],
-              ticktext: ["Keskusta", "Sisäraja", "Ulkoraja (100%)", "200%", "300%+"],
-              tickfont: { size: 11, color: "#4a5568" },
+              range: [0, 350],
+              tickvals: [25, 100, 160, 250, 340],
+              ticktext: ["", "SISÄRAJA (Sosiaalinen)", "ULKORAJA (Ekologinen)", "2x raja", "3x+ raja"],
+              tickangle: 15,
+              tickfont: { size: 11, color: "#1a202c", weight: "bold" },
               gridcolor: "#cbd5e0"
             },
             angularaxis: {
-              tickfont: { size: 13, color: "#1a202c" },
-              direction: "clockwise"
+              tickfont: { size: 12, color: "#1a202c" },
+              direction: "clockwise",
+              period: labels.length
             }
           },
           showlegend: false,
-          height: 620,
-          margin: { t: 30, b: 30, l: 80, r: 80 }
+          height: 660,
+          margin: { t: 45, b: 45, l: 110, r: 110 }
         };
 
-        Plotly.newPlot("doughnut-main", [innerDeficitTrace, safeDoughnutTrace, outerOvershootTrace], mainLayout, { responsive: true });
+        Plotly.newPlot(
+          "doughnut-main",
+          [innerBgTrace, innerDeficitTrace, safeDoughnutTrace, outerOvershootTrace, innerBoundaryRing, outerBoundaryRing],
+          mainLayout,
+          { responsive: true }
+        );
 
-        // 2. APUKAAVIOT: Sisäkehä ja Ulkokehä vaakapalkkeina + 100 % kestävyysraja
+        // APUKAAVIOT: Sisäkehä ja Ulkokehä vaakapalkkeina
         function renderBarChart(divId, subset, overColor) {
+          const maxRatio = Math.max(360, ...subset.map(r => (parseFloat(r.ratio_pct) || 0) * 1.15));
           const barTrace = {
             type: "bar",
             orientation: "h",
-            y: subset.map(r => r.name),
+            y: subset.map(r => wrapLabel(r.name)),
             x: subset.map(r => parseFloat(r.ratio_pct) || 0),
             text: subset.map(r => `${r.value} ${r.unit} (${r.ratio_pct} %)`),
             textposition: "auto",
@@ -223,16 +280,16 @@
           };
 
           const barLayout = {
-            xaxis: { title: "Suhde kestävään tavoiterajaan (100 % = raja)", range: [0, 370], ticksuffix: "%" },
+            xaxis: { title: "Suhde kestävään tavoiterajaan (100 % = raja)", range: [0, maxRatio], ticksuffix: "%" },
             yaxis: { automargin: true },
             shapes: [{
               type: "line",
               x0: 100, x1: 100,
               y0: -0.5, y1: subset.length - 0.5,
-              line: { color: "#1a202c", width: 2, dash: "dash" }
+              line: { color: "#1a202c", width: 2.5, dash: "dash" }
             }],
-            height: 300,
-            margin: { t: 10, b: 40, l: 10, r: 20 }
+            height: 320,
+            margin: { t: 10, b: 45, l: 10, r: 30 }
           };
 
           Plotly.newPlot(divId, [barTrace], barLayout, { responsive: true, displayModeBar: false });
@@ -241,7 +298,7 @@
         renderBarChart("chart-social", soc, "#dd6b20");
         renderBarChart("chart-eco", eco, "#c62828");
 
-        // 3. TAULUKKO
+        // TAULUKKO
         const tbody = document.querySelector("#data-table tbody");
         data.forEach(r => {
           const isSafe = String(r.is_safe).toLowerCase() === "true";
