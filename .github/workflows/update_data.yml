@@ -2,15 +2,25 @@ name: Paivita Kuntadonitsin Data
 
 on:
   schedule:
-    # Ajetaan automaattisesti kuukauden 1. paivana klo 05:00 UTC
-    - cron: '0 5 1 * *'
-  workflow_dispatch: # Mahdollistaa ajon napista painamalla milloin vain
+    - cron: '0 4 1 * *'
+  workflow_dispatch:
+  push:
+    paths:
+      - 'config.yaml'
+      - 'manual_indicators.csv'
+      - 'fetch_data.py'
+
+permissions:
+  contents: write
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   fetch-and-update:
     runs-on: ubuntu-latest
     steps:
-      - name: Lataa projektin tiedostot
+      - name: Lataa tietovarasto
         uses: actions/checkout@v4
 
       - name: Asenna Python
@@ -18,16 +28,23 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Asenna kirjastot
-        run: pip install -r requirements.txt
+      - name: Asenna riippuvuudet
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
 
-      - name: Hae tuore data rajapinnoista
+      - name: Hae data rajapinnoista ja paivita CSV-tiedostot
         run: python fetch_data.py
 
-      - name: Tallenna paivitetty data GitHubiin
+      - name: Tallenna paivitetyt tulokset GitHubiin
         run: |
-          git config --global user.name "Kuntadonitsi-botti"
-          git config --global user.email "actions@github.com"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
           git add doughnut_results.csv doughnut_history.csv
-          git diff --staged --quiet || git commit -m "Automaattinen datapaivitys"
-          git push
+          if git diff --staged --quiet; then
+            echo "Ei uusia datamuutoksia tallennettavaksi."
+          else
+            git commit -m "Automaattinen datapaivitys (Sotkanet & SYKE)"
+            git pull --rebase origin main || true
+            git push
+          fi
