@@ -1,9 +1,15 @@
+# Avoin Kuntadonitsi – Kuntakohtainen konfiguraatio
+# Copyright (c) 2026 Mika Lammi | SPDX-License-Identifier: MIT
+
 municipality:
   name: "Kouvola"
   statfin_code: "KU286"
   sotkanet_code: "286"
 
 indicators:
+  # ==========================================
+  # 1. SISÄKEHÄ: SOSIAALINEN PERUSTA (THL Sotkanet)
+  # ==========================================
   - id: "sairastavuus"
     name: "Kansanterveys (THL sairastavuusindeksi)"
     domain: "Sosiaalinen perusta"
@@ -22,7 +28,7 @@ indicators:
     unit: "%"
     direction: "lower_is_better"
 
-  - id: "toimeentulo"
+  - id: "toimeentulotuki"
     name: "Toimeentulotukea saaneet asukkaat"
     domain: "Sosiaalinen perusta"
     source: "sotkanet"
@@ -38,4 +44,39 @@ indicators:
     indicator_id: 182
     threshold: 135.0
     unit: "indeksi"
+    direction: "lower_is_better"
+
+  # ==========================================
+  # 2. ULKOKEHÄ: EKOLOGINEN KATTO (SYKE Avoimet Rajapinnat)
+  # ==========================================
+  - id: "hinku_paastot"
+    name: "Alueelliset KHK-päästöt (SYKE Hinku)"
+    domain: "Ekologinen katto"
+    source: "syke_khk"
+    threshold: 2.0
+    unit: "t CO2e/as."
+    direction: "lower_is_better"
+
+  - id: "kulutus_hiili"
+    name: "Kulutusperusteinen hiilijalanjälki"
+    domain: "Ekologinen katto"
+    source: "syke_kulutus"
+    threshold: 2.5
+    unit: "t CO2e/as."
+    direction: "lower_is_better"
+
+  - id: "vesistot"
+    name: "Pintavesien ravinnekuormitus"
+    domain: "Ekologinen katto"
+    source: "syke_vesistot"
+    threshold: 100.0
+    unit: "% kuormitus"
+    direction: "lower_is_better"
+
+  - id: "luonto_paine"
+    name: "Maankäyttöpaine vs. lähiluonto"
+    domain: "Ekologinen katto"
+    source: "syke_maankaytto"
+    threshold: 100.0
+    unit: "% kuormitus"
     direction: "lower_is_better"
