@@ -7,49 +7,87 @@
   <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 1100px; margin: 0 auto; padding: 20px; color: #1a202c; background: #f8fafc; }
+    body { font-family: Arial, sans-serif; max-width: 1180px; margin: 0 auto; padding: 20px; color: #1a202c; background: #f8fafc; }
     h1 { color: #1a365d; margin-bottom: 5px; }
+    h2 { color: #1a365d; margin-top: 28px; margin-bottom: 12px; font-size: 20px; }
     .subtitle { color: #4a5568; margin-bottom: 24px; }
     .cards { display: flex; gap: 20px; margin-bottom: 24px; flex-wrap: wrap; }
-    .card { flex: 1; min-width: 240px; background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); border-left: 5px solid #2b6cb0; }
-    .card h3 { margin: 0 0 8px 0; font-size: 14px; color: #4a5568; text-transform: uppercase; }
-    .card .val { font-size: 28px; font-weight: bold; color: #1a202c; }
-    #chart { background: white; border-radius: 10px; padding: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); margin-bottom: 24px; }
+    .card { flex: 1; min-width: 240px; background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+    .card.soc { border-left: 5px solid #dd6b20; }
+    .card.safe { border-left: 5px solid #2e7d32; }
+    .card.eco { border-left: 5px solid #c62828; }
+    .card h3 { margin: 0 0 8px 0; font-size: 13px; color: #4a5568; text-transform: uppercase; letter-spacing: 0.5px; }
+    .card .val { font-size: 26px; font-weight: bold; color: #1a202c; }
+    .card .desc { font-size: 13px; color: #718096; margin-top: 4px; }
+    .chart-box { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 24px; }
+    .ring-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(480px, 1fr)); gap: 20px; margin-bottom: 24px; }
+    .legend-bar { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; margin-bottom: 10px; font-size: 14px; }
+    .legend-item { display: flex; align-items: center; gap: 8px; }
+    .dot { width: 14px; height: 14px; border-radius: 3px; display: inline-block; }
     table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
     th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
     th { background: #edf2f7; font-weight: bold; }
-    .badge-ok { background: #c6f6d5; color: #22543d; padding: 4px 8px; border-radius: 4px; font-weight: bold; }
-    .badge-warn { background: #fed7d7; color: #742a2a; padding: 4px 8px; border-radius: 4px; font-weight: bold; }
+    .badge-ok { background: #c6f6d5; color: #22543d; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; }
+    .badge-soc { background: #feebc8; color: #7b341e; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; }
+    .badge-eco { background: #fed7d7; color: #742a2a; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; }
   </style>
 </head>
 <body>
 
-  <h1>Kuntakohtainen Kuntadonitsi</h1>
-  <div class="subtitle">Automaattisesti avoimista rajapinnoista (THL Sotkanet & SYKE) päivittyvä tilannekuva</div>
+  <h1>🍩 Kuntakohtainen Kuntadonitsi</h1>
+  <div class="subtitle">Automaattisesti avoimista rajapinnoista (THL Sotkanet & SYKE) päivittyvä tilannekuva: Sisäkehä (Sosiaalinen perusta) ja Ulkokehä (Ekologinen katto)</div>
 
   <div class="cards">
-    <div class="card">
-      <h3>Sosiaalinen perusta tavoitteessa</h3>
+    <div class="card soc">
+      <h3>Sisäkehä: Sosiaalinen perusta</h3>
       <div class="val" id="soc-metric">- / -</div>
+      <div class="desc">Mittaria tavoitetasolla (ei sosiaalista vajetta)</div>
     </div>
-    <div class="card">
-      <h3>Ekologinen katto rajoissa</h3>
+    <div class="card safe">
+      <h3>Donitsin vihreä kehä</h3>
+      <div class="val" id="total-metric">- %</div>
+      <div class="desc">Kaikista mittareista turvallisessa tilassa (≤ 100 %)</div>
+    </div>
+    <div class="card eco">
+      <h3>Ulkokehä: Ekologinen katto</h3>
       <div class="val" id="eco-metric">- / -</div>
+      <div class="desc">Mittaria luonnon kantokyvyn rajoissa</div>
     </div>
   </div>
 
-  <div id="chart"></div>
+  <!-- PÄÄKAAVIO: AITO KAKSIKEHÄINEN DONITSI -->
+  <div class="chart-box">
+    <h2 style="margin-top:0; text-align:center;">Kokonaiskuva: Sisäkehän vajeet, vihreä turvallinen tila ja ulkokehän ylitykset</h2>
+    <div class="legend-bar">
+      <div class="legend-item"><span class="dot" style="background:#dd6b20;"></span> <strong>Sisäkehän vaje</strong> (Sosiaalinen perusta pettää)</div>
+      <div class="legend-item"><span class="dot" style="background:#2e7d32;"></span> <strong>Turvallinen ja reilu tila</strong> (Vihreä donitsikehä)</div>
+      <div class="legend-item"><span class="dot" style="background:#c62828;"></span> <strong>Ulkokehän ylitys</strong> (Ekologinen katto ylittyy)</div>
+    </div>
+    <div id="doughnut-main"></div>
+  </div>
 
-  <h2>Lähdedata ja kynnysarvot</h2>
+  <!-- RINNAKKAISET KEHÄT: SISÄKEHÄ VS ULKOKEHÄ -->
+  <div class="ring-grid">
+    <div class="chart-box" style="margin-bottom:0;">
+      <h2 style="margin-top:0;">1. Sisäkehä: Sosiaalinen perusta (Sotkanet)</h2>
+      <div id="chart-social"></div>
+    </div>
+    <div class="chart-box" style="margin-bottom:0;">
+      <h2 style="margin-top:0;">2. Ulkokehä: Ekologinen katto (SYKE)</h2>
+      <div id="chart-eco"></div>
+    </div>
+  </div>
+
+  <h2>Lähdedata ja kynnysarvot (100 % = kestävä tavoiteraja)</h2>
   <table id="data-table">
     <thead>
       <tr>
-        <th>Ulottuvuus</th>
+        <th>Kehä / Ulottuvuus</th>
         <th>Mittari</th>
-        <th>Arvo</th>
+        <th>Kunnan arvo</th>
         <th>Kestävä raja</th>
         <th>Suhde rajaan</th>
-        <th>Tila</th>
+        <th>Tila donitsissa</th>
         <th>Lähde (Vuosi)</th>
       </tr>
     </thead>
@@ -67,47 +105,157 @@
         const eco = data.filter(r => r.domain === "Ekologinen katto");
         const socSafe = soc.filter(r => String(r.is_safe).toLowerCase() === "true").length;
         const ecoSafe = eco.filter(r => String(r.is_safe).toLowerCase() === "true").length;
+        const totalSafePct = Math.round(((socSafe + ecoSafe) / data.length) * 100);
 
-        document.getElementById("soc-metric").innerText = `${socSafe} / ${soc.length} mittaria`;
-        document.getElementById("eco-metric").innerText = `${ecoSafe} / ${eco.length} mittaria`;
+        document.getElementById("soc-metric").innerText = `${socSafe} / ${soc.length} kunnossa`;
+        document.getElementById("eco-metric").innerText = `${ecoSafe} / ${eco.length} rajoissa`;
+        document.getElementById("total-metric").innerText = `${totalSafePct} %`;
 
-        const trace = {
+        // 1. PÄÄDONITSI: Kerrostettu polaarikaavio
+        // Säde 0..35 = tyhjä keskusta
+        // Säde 35..100 = Sisäkehä (Sosiaalinen perusta: jos vaje, näkyy oranssina keskustassa)
+        // Säde 100..150 = Vihreä donitsikehä (Turvallinen tila kaikille sektoreille)
+        // Säde 150..350 = Ulkokehä (Ylitys yli 100 % tavoiterajan kasvaa punaisena ulospäin)
+
+        const labels = data.map(r => r.name);
+
+        // Kerros A: Sisäkehän vaje (näkyy säteellä 35..100 jos mittari on Sosiaalinen perusta eikä ole kunnossa)
+        const innerDeficitTrace = {
           type: "barpolar",
-          r: data.map(r => parseFloat(r.ratio_pct) || 0),
-          theta: data.map(r => r.name),
+          name: "Sisäkehän sosiaalinen vaje",
+          theta: labels,
+          base: data.map(() => 35),
+          r: data.map(r => {
+            const isSafe = String(r.is_safe).toLowerCase() === "true";
+            if (r.domain === "Sosiaalinen perusta" && !isSafe) {
+              return 65; // Täyttää sisäkehän (35 -> 100) oranssilla vajevaroitusvärillä
+            }
+            return 0;
+          }),
           marker: {
-            color: data.map(r => String(r.is_safe).toLowerCase() === "true" ? "#2e7d32" : "#c62828"),
+            color: "#dd6b20",
             line: { color: "white", width: 2 }
           },
           opacity: 0.85,
           hovertemplate: data.map(r =>
-            `<b>${r.name}</b><br>Arvo: ${r.value} ${r.unit} (Raja: ${r.threshold})<br>Suhde rajaan: ${r.ratio_pct} %<br>Lähde: ${r.source} (${r.year})<extra></extra>`
+            `<b>[SISÄKEHÄ] ${r.name}</b><br>Kunnan arvo: ${r.value} ${r.unit} (Tavoiteraja: ${r.threshold} ${r.unit})<br>Suhde rajaan: ${r.ratio_pct} %<extra></extra>`
           )
         };
 
-        const layout = {
-          polar: {
-            radialaxis: { visible: true, range: [0, 350], ticksuffix: "%" },
-            hole: 0.35
+        // Kerros B: Vihreä donitsi ("Turvallinen ja oikeudenmukainen tila", säde 100..150)
+        const safeDoughnutTrace = {
+          type: "barpolar",
+          name: "Turvallinen tila (Donitsi)",
+          theta: labels,
+          base: data.map(() => 100),
+          r: data.map(() => 50),
+          marker: {
+            color: data.map(r => String(r.is_safe).toLowerCase() === "true" ? "#2e7d32" : "#68d391"),
+            line: { color: "white", width: 2 }
           },
-          showlegend: false,
-          height: 600,
-          margin: { t: 40, b: 40, l: 60, r: 60 }
+          opacity: 0.9,
+          hovertemplate: data.map(r =>
+            `<b>${r.name}</b><br>Vihreä donitsikehä (Kestävä raja = 100 %)<br>Nykyinen suhdeluku: ${r.ratio_pct} %<extra></extra>`
+          )
         };
 
-        Plotly.newPlot("chart", [trace], layout, { responsive: true });
+        // Kerros C: Ulkokehän ylitys (säde 150 -> ulospäin, kun ratio_pct > 100 %)
+        const outerOvershootTrace = {
+          type: "barpolar",
+          name: "Rajan ylitys",
+          theta: labels,
+          base: data.map(() => 150),
+          r: data.map(r => {
+            const pct = parseFloat(r.ratio_pct) || 0;
+            const isSafe = String(r.is_safe).toLowerCase() === "true";
+            if (!isSafe && pct > 100) {
+              return Math.min(pct - 100, 220); // Ylityksen pituus ulospäin
+            }
+            return 0;
+          }),
+          marker: {
+            color: data.map(r => r.domain === "Ekologinen katto" ? "#c62828" : "#dd6b20"),
+            line: { color: "white", width: 2 }
+          },
+          opacity: 0.9,
+          hovertemplate: data.map(r =>
+            `<b>[${r.domain.toUpperCase()}] ${r.name}</b><br>Arvo: ${r.value} ${r.unit} (Kestävä raja: ${r.threshold} ${r.unit})<br>Suhde rajaan: ${r.ratio_pct} % (Ylitys +${(parseFloat(r.ratio_pct)-100).toFixed(1)} %)<extra></extra>`
+          )
+        };
 
+        const mainLayout = {
+          polar: {
+            radialaxis: {
+              visible: true,
+              range: [0, 370],
+              tickvals: [35, 100, 150, 250, 350],
+              ticktext: ["Keskusta", "Sisäraja", "Ulkoraja (100%)", "200%", "300%+"],
+              tickfont: { size: 11, color: "#4a5568" },
+              gridcolor: "#cbd5e0"
+            },
+            angularaxis: {
+              tickfont: { size: 13, color: "#1a202c" },
+              direction: "clockwise"
+            }
+          },
+          showlegend: false,
+          height: 620,
+          margin: { t: 30, b: 30, l: 80, r: 80 }
+        };
+
+        Plotly.newPlot("doughnut-main", [innerDeficitTrace, safeDoughnutTrace, outerOvershootTrace], mainLayout, { responsive: true });
+
+        // 2. APUKAAVIOT: Sisäkehä ja Ulkokehä vaakapalkkeina + 100 % kestävyysraja
+        function renderBarChart(divId, subset, overColor) {
+          const barTrace = {
+            type: "bar",
+            orientation: "h",
+            y: subset.map(r => r.name),
+            x: subset.map(r => parseFloat(r.ratio_pct) || 0),
+            text: subset.map(r => `${r.value} ${r.unit} (${r.ratio_pct} %)`),
+            textposition: "auto",
+            marker: {
+              color: subset.map(r => String(r.is_safe).toLowerCase() === "true" ? "#2e7d32" : overColor)
+            },
+            hovertemplate: subset.map(r =>
+              `<b>${r.name}</b><br>Arvo: ${r.value} ${r.unit}<br>Tavoiteraja: ${r.threshold} ${r.unit} (100 %)<br>Suhde rajaan: ${r.ratio_pct} %<extra></extra>`
+            )
+          };
+
+          const barLayout = {
+            xaxis: { title: "Suhde kestävään tavoiterajaan (100 % = raja)", range: [0, 370], ticksuffix: "%" },
+            yaxis: { automargin: true },
+            shapes: [{
+              type: "line",
+              x0: 100, x1: 100,
+              y0: -0.5, y1: subset.length - 0.5,
+              line: { color: "#1a202c", width: 2, dash: "dash" }
+            }],
+            height: 300,
+            margin: { t: 10, b: 40, l: 10, r: 20 }
+          };
+
+          Plotly.newPlot(divId, [barTrace], barLayout, { responsive: true, displayModeBar: false });
+        }
+
+        renderBarChart("chart-social", soc, "#dd6b20");
+        renderBarChart("chart-eco", eco, "#c62828");
+
+        // 3. TAULUKKO
         const tbody = document.querySelector("#data-table tbody");
         data.forEach(r => {
           const isSafe = String(r.is_safe).toLowerCase() === "true";
+          const isSoc = r.domain === "Sosiaalinen perusta";
+          const badgeClass = isSafe ? "badge-ok" : (isSoc ? "badge-soc" : "badge-eco");
+          const badgeText = isSafe ? "Vihreällä kehällä (Kunnossa)" : (isSoc ? "Sisäkehän vaje" : "Ulkokehän ylitys");
           const tr = document.createElement("tr");
           tr.innerHTML = `
-            <td>${r.domain}</td>
+            <td><strong>${isSoc ? "Sisäkehä" : "Ulkokehä"}</strong> (${r.domain})</td>
             <td><strong>${r.name}</strong></td>
             <td>${r.value} ${r.unit}</td>
             <td>${r.threshold} ${r.unit}</td>
             <td>${r.ratio_pct} %</td>
-            <td><span class="${isSafe ? 'badge-ok' : 'badge-warn'}">${isSafe ? 'Rajoissa' : 'Ylitys / Vaje'}</span></td>
+            <td><span class="${badgeClass}">${badgeText}</span></td>
             <td>${r.source} (${r.year})</td>
           `;
           tbody.appendChild(tr);
