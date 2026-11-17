@@ -111,7 +111,6 @@
           if (!data.length) return;
           document.getElementById("last-updated").innerText = "🕒 Data päivitetty: " + (data[0].updated_at || data[0].year);
 
-          // Tallennetaan nykyisten aktiivisten mittareiden ID-lista ja nimet aikasarjasuodatusta varten
           var activeIds = {};
           var activeOrder = [];
           data.forEach(function(r) {
@@ -154,31 +153,40 @@
             return "<b>" + wrapLabel(r.name) + "</b><br><span style='font-size:11px;color:#4a5568;'>" + tag + ": " + r.ratio_pct + " % (" + mult + ")</span>";
           });
 
+          // ============================================================================
+          // TASAPAINOTETUT KEHÄSUHTEET (Molemmat poikkeamakehät = 120 sädeyksikköä):
+          // - Sisäkehä (Sosiaalinen vaje): r = 25 .. 145 (leveys 120, kerroin 0.60 / %)
+          // - Sisäraja (100 % = 1.0x):     r = 149 .. 157
+          // - Vihreä turvallinen tila:     r = 161 .. 205 (leveys 44)
+          // - Ulkoraja (100 % = 1.0x):     r = 209 .. 217
+          // - Ulkokehä (Ekologinen ylitys):r = 221 .. 341 (leveys 120, kerroin 0.60 / %)
+          // ============================================================================
           var traces = [
-            // 1. Sisäkehän pohjasektorit (r = 25..90)
+            // 1. Sisäkehän pohjasektorit (r = 25..145, leveys 120)
             {
               type: "barpolar",
               theta: labels,
               base: data.map(function(){ return 25; }),
-              r: data.map(function(){ return 65; }),
-              marker: { color: "#f8fafc", line: { color: "#e2e8f0", width: 1 } },
+              r: data.map(function(){ return 120; }),
+              marker: { color: "#f8fafc", line: { color: "#cbd5e0", width: 1 } },
               hoverinfo: "skip"
             },
-            // 2. Sisäkehän sosiaaliset vajeet (mitä suurempi vaje %, sitä lähemmäs keskipistettä 25 palkki ulottuu)
+            // 2. Sisäkehän sosiaaliset vajeet (kasvavat sisärajan 145 sisäpuolelle kohti keskipistettä 25)
             {
               type: "barpolar",
               theta: labels,
               base: data.map(function(r){
                 var ok = String(r.is_safe).toLowerCase() === "true";
                 if (!isNoData(r) && r.domain === "Sosiaalinen perusta" && !ok) {
-                  return 90 - Math.min(65, Math.max(18, ((parseFloat(r.ratio_pct)||100) - 100) * 0.42));
+                  var len = Math.min(120, Math.max(20, ((parseFloat(r.ratio_pct)||100) - 100) * 0.60));
+                  return 145 - len;
                 }
-                return 90;
+                return 145;
               }),
               r: data.map(function(r){
                 var ok = String(r.is_safe).toLowerCase() === "true";
                 if (!isNoData(r) && r.domain === "Sosiaalinen perusta" && !ok) {
-                  return Math.min(65, Math.max(18, ((parseFloat(r.ratio_pct)||100) - 100) * 0.42));
+                  return Math.min(120, Math.max(20, ((parseFloat(r.ratio_pct)||100) - 100) * 0.60));
                 }
                 return 0;
               }),
@@ -187,21 +195,21 @@
                 return "<b>" + r.name + "</b><br>Arvo: " + r.value + " " + r.unit + " (Raja: " + r.threshold + ")<br>Suhde: " + r.ratio_pct + " % (" + (parseFloat(r.ratio_pct)/100).toFixed(2) + "x)<extra></extra>";
               })
             },
-            // 3. Sisäraja: Sosiaalinen perusta (100 % = 1.0x, r = 94..102)
+            // 3. Sisäraja: Sosiaalinen perusta (100 % = 1.0x, r = 149..157)
             {
               type: "barpolar",
               theta: labels,
-              base: data.map(function(){ return 94; }),
+              base: data.map(function(){ return 149; }),
               r: data.map(function(){ return 8; }),
               marker: { color: "#ffffff", line: { color: "#000000", width: 2 } },
               hovertemplate: data.map(function(){ return "<b>Sisäraja: Sosiaalinen perusta (100 % = 1.0x)</b><extra></extra>"; })
             },
-            // 4. Vihreä turvallisen tilan donitsikehä (r = 106..154)
+            // 4. Vihreä turvallisen tilan donitsikehä (r = 161..205, leveys 44)
             {
               type: "barpolar",
               theta: labels,
-              base: data.map(function(){ return 106; }),
-              r: data.map(function(){ return 48; }),
+              base: data.map(function(){ return 161; }),
+              r: data.map(function(){ return 44; }),
               marker: {
                 color: data.map(function(r){
                   if (isNoData(r)) return "#cbd5e0";
@@ -214,24 +222,24 @@
                 return "<b>" + r.name + "</b><br>Tila: " + (ok ? "Tavoitetilassa vihreällä kehällä (≤ 100 %)" : "Poikkeama turvallisesta tilasta (" + r.ratio_pct + " %)") + "<extra></extra>";
               })
             },
-            // 5. Ulkoraja: Ekologinen katto (100 % = 1.0x, r = 158..166)
+            // 5. Ulkoraja: Ekologinen katto (100 % = 1.0x, r = 209..217)
             {
               type: "barpolar",
               theta: labels,
-              base: data.map(function(){ return 158; }),
+              base: data.map(function(){ return 209; }),
               r: data.map(function(){ return 8; }),
               marker: { color: "#ffffff", line: { color: "#000000", width: 2 } },
               hovertemplate: data.map(function(){ return "<b>Ulkoraja: Ekologinen katto (100 % = 1.0x)</b><extra></extra>"; })
             },
-            // 6. Ulkokehän ekologiset ylitykset (1.0x = 170, 1.5x = 204, 2.0x = 238, 2.5x = 272, 3.0x = 306)
+            // 6. Ulkokehän ekologiset ylitykset (r = 221..341, leveys 120: 1.0x=221, 1.5x=251, 2.0x=281, 2.5x=311, 3.0x=341)
             {
               type: "barpolar",
               theta: labels,
-              base: data.map(function(){ return 170; }),
+              base: data.map(function(){ return 221; }),
               r: data.map(function(r){
                 if (isNoData(r)) return 0;
                 var pct = parseFloat(r.ratio_pct)||0, ok = String(r.is_safe).toLowerCase() === "true";
-                return (r.domain === "Ekologinen katto" && !ok && pct > 100) ? Math.min(170, (pct - 100) * 0.68) : 0;
+                return (r.domain === "Ekologinen katto" && !ok && pct > 100) ? Math.min(130, (pct - 100) * 0.60) : 0;
               }),
               marker: { color: "#c62828", line: { color: "#ffffff", width: 1.5 } },
               hovertemplate: data.map(function(r){
@@ -248,8 +256,8 @@
                 visible: true,
                 range: [0, 355],
                 tickmode: "array",
-                tickvals: [170, 204, 238, 272, 306],
-                ticktext: ["1.0x", "1.5x", "2.0x", "2.5x", "3.0x"],
+                tickvals: [85, 145, 221, 251, 281, 311, 341],
+                ticktext: ["2.0x vaje", "1.0x", "1.0x", "1.5x", "2.0x", "2.5x", "3.0x"],
                 showticklabels: true,
                 tickangle: 0,
                 tickfont: { size: 10.5, color: "#475569" },
@@ -291,7 +299,6 @@
           renderBar("chart-social", soc, "#dd6b20");
           renderBar("chart-eco", eco, "#c62828");
 
-          // Haetaan ja suodatetaan aikasarja vain nykyisten aktiivisten mittareiden osalta
           fetch("doughnut_history.csv?t=" + Date.now())
             .then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
             .then(function(hTxt) {
@@ -359,7 +366,7 @@
         Kuntadonitsi perustuu Kate Raworthin <strong>donitsitalousmalliin (Doughnut Economics)</strong> sekä sen suomalaisiin kuntatason sovelluksiin (mm. Jyväskylän yliopiston JYU.Wisdom-tutkimusryhmä ja Sitra). Tavoitteena on ohjata kuntaa <strong>turvalliseen ja oikeudenmukaiseen tilaan (vihreälle donitsikehälle)</strong>, jossa ihmisten hyvinvoinnin sosiaalinen perusta toteutuu ilman, että maapallon ja lähiympäristön ekologinen kantokyky ylittyy.
       </p>
       <p style="font-size:13.5px; line-height:1.5; color:#4a5568; background:#f1f5f9; padding:10px 14px; border-radius:8px;">
-        <strong>Miten suhdeluvut ja asteikko (100 % = 1.0x) luetaan?</strong> Kaikki mittarit on normalisoitu siten, että <strong>100 % (1.0x)</strong> vastaa kestävää tavoiterajaa. Arvot <strong>≤ 100 % (≤ 1.0x)</strong> ovat tavoitetilassa vihreällä kehällä. Sisäkehän ylittävät arvot (> 1.0x) kuvaavat sosiaalista vajetta (palkit kasvavat sisäänpäin kohti keskipistettä) ja ulkokehän ylittävät arvot (> 1.0x) ekologista ylikulutusta (palkit kasvavat ulospäin asteikolla 1.5x–3.0x).
+        <strong>Miten suhdeluvut ja asteikko (100 % = 1.0x) luetaan?</strong> Kaikki mittarit on normalisoitu siten, että <strong>100 % (1.0x)</strong> vastaa kestävää tavoiterajaa. Arvot <strong>≤ 100 % (≤ 1.0x)</strong> ovat tavoitetilassa vihreällä kehällä. Sisäkehän ylittävät arvot (> 1.0x) kuvaavat sosiaalista vajetta (palkit kasvavat sisäänpäin kohti keskipistettä) ja ulkokehän ylittävät arvot (> 1.0x) ekologista ylikulutusta (palkit kasvavat ulospäin). Molemmilla kehillä on yhtä suuri visuaalinen liikkumatila.
       </p>
 
       <div class="modal-section-title">1. Sisäkehä: Sosiaalinen perusta (THL Sotkanet REST API)</div>
