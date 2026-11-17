@@ -4,7 +4,7 @@ Tämä tietovarasto ja vaiheittainen opas näyttävät, kuinka rakennat mille ta
 
 Toteutus ei vaadi omaa palvelinta, ulkoisia pilvipalveluita, maksullisia ohjelmistolisenssejä eikä aiempaa syvällistä ohjelmointikokemusta – kaikki tiedostot, automaattinen tiedonhaku ja salamannopea julkinen verkkosivu pyörivät **100 % suoraan GitHubin sisällä** (GitHub Actions & GitHub Pages).
 
-*(Oletusasetuksissa esimerkkinä on Kouvolan kaupunki, kuntakoodi `286`, mutta muiden kuntien edustajat voivat vaihtaa minkä tahansa Suomen 309 kunnasta muuttamalla kuntanumeron asetustiedostossa[cite: 1, 3]!)*
+*(Oletusasetuksissa esimerkkinä on Kouvolan kaupunki, kuntakoodi `286`, mutta muiden kuntien edustajat voivat vaihtaa minkä tahansa Suomen 309 kunnasta muuttamalla kuntanumeron asetustiedostossa!)*
 
 ---
 
@@ -442,4 +442,4 @@ Sivusto aukeaa välittömästi ilman minkäänlaista latausviivettä, toimii tie
 ## 7. Miten muokkaan mittaristoa omalle kunnalleni?
 
 * **Uusien automaattisten mittareiden lisääminen (`config.yaml`):** Etsi haluamasi kuntatason indikaattori osoitteesta [sotkanet.fi](https://sotkanet.fi/sotkanet/fi/haku). Katso mittarin nimen perässä suluissa oleva ID-numero (esim. `244`, `181`, `232`, `182` tai `175` = taloudellinen huoltosuhde) ja lisää se uutena lohkona `config.yaml`-tiedostoon.
-* **Ympäristömittareiden päivittäminen (`manual_indicators.csv`):** Kuntakohtaiset kasvihuonekaasupäästöt löydät suoraan [SYKE:n päästötietopalvelusta](https://paastot.hiilineutraalisuomi.fi/)[cite: 1]. Muokkaa luvut suoraan `manual_indicators.csv`-tiedostoon.
+* **Ympäristömittareiden päivittäminen (`manual_indicators.csv`):** Kuntakohtaiset kasvihuonekaasupäästöt löydät suoraan [SYKE:n päästötietopalvelusta](https://paastot.hiilineutraalisuomi.fi/). Muokkaa luvut suoraan `manual_indicators.csv`-tiedostoon.
