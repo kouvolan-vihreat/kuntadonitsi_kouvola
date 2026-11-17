@@ -14,7 +14,7 @@ Ratkaisu toimii täysin **ilmaisilla, avoimen lähdekoodin työkaluilla** suoraa
 | :--- | :--- | :--- |
 | **GitHub-tietovarasto** | Säilyttää asetustiedostot, hakuskriptin, tilasto- ja historiadatan sekä verkkosivun lähdekoodin. | 0 € (Julkinen projekti) |
 | **GitHub Actions** | Ajaa tiedonhaun automaattisesti kerran kuukaudessa (tai heti kun muokkaat asetuksia) ja tallentaa uudet luvut sekä aikasarjan. | 0 € |
-| **Python (`fetch_data.py`)** | Hakee kuntakohtaisen datan THL:n Sotkanet-rajapinnasta, yhdistää sen ympäristömittareihin ja laskee suhdeluvut kestäviin rajoihin (`100 % = raja`). | 0 € |
+| **Python (`fetch_data.py`)** | Hakee kuntakohtaisen datan automaattisesti **THL:n Sotkanet-rajapinnasta** (sosiaalinen perusta) ja **SYKE:n avoimista rajapinnoista** (ekologinen katto), hyödyntää `manual_indicators.csv`-tiedostoa varajärjestelmänä (fallback) ja laskee suhdeluvut kestäviin rajoihin (`100 % = raja`). | 0 € |
 | **GitHub Pages (`index.html`)** | Julkaisee interaktiivisen kuntadonitsin, perustelumodaalin ja aikasarjakaaviot suoraan verkkosivuna ilman latausviiveitä. | 0 € |
 
 ---
@@ -25,11 +25,11 @@ Kaikki järjestelmän koodi on valmiina tämän tietovaraston tiedostoissa:
 
 ```text
 kuntadonitsi/
-├── config.yaml                         # MUOKATTAVA: Kunnan nimi, kuntakoodi ja Sotkanet-mittarit
-├── manual_indicators.csv               # MUOKATTAVA: Kerran vuodessa päivitettävät ympäristöluvut
+├── config.yaml                         # MUOKATTAVA: Kunnan nimi, kuntakoodi sekä Sotkanet- ja SYKE-mittarit
+├── manual_indicators.csv               # MUOKATTAVA: Vikasietoinen varajärjestelmä (fallback) ja omat lisämittarit
 ├── doughnut_results.csv                # (Päivittyy automaattisesti) Viimeisin tilannekuva ja aikaleima
 ├── doughnut_history.csv                # (Päivittyy automaattisesti) Vuosi- ja kuukausitason aikasarja
-├── fetch_data.py                       # Robottiskripti, joka hakee datan ja tallentaa historian
+├── fetch_data.py                       # Robottiskripti, joka hakee Sotkanet- ja SYKE-datan ja tallentaa historian
 ├── index.html                          # Verkkosivun, perustelumodaalin ja kaavioiden lähdekoodi
 ├── requirements.txt                    # Python-kirjastoriippuvuudet
 └── .github/workflows/update_data.yml   # GitHub Actions -automaatioajastin
@@ -52,7 +52,7 @@ Voit tehdä kaikki käyttöönoton vaiheet suoraan verkkoselaimessa.
 
 ### Vaihe 3: Vaihda oman kuntasi tiedot (`config.yaml` ja `manual_indicators.csv`)
 
-#### A) Kunnan nimi ja numero (`config.yaml`)
+#### A) Kunnan nimi, numero ja ydinmittarit (`config.yaml`)
 Avaa tiedosto `config.yaml`, klikkaa kynäkuvaketta (*Edit*) ja vaihda kuntasi nimi sekä virallinen kuntanumero (esim. Kouvola `286`, Lohja `444`, Helsinki `091`, Tampere `837`, Jyväskylä `179`):
 
 ```yaml
@@ -61,14 +61,19 @@ municipality:
   statfin_code: "KU286"
   sotkanet_code: "286"
 ```
-Kun tallennat muutoksen (**Commit changes**), GitHub Actions käynnistyy taustalla automaattisesti, hakee kuntasi tuoreet tilastot ja päivittää verkkosivun pääotsikon.
+Kun tallennat muutoksen (**Commit changes**), GitHub Actions käynnistyy taustalla automaattisesti, hakee kuntasi tuoreet tilastot sekä THL:n Sotkanetista että SYKE:n avoimista rajapinnoista (`syke_khk`, `syke_kulutus`, `syke_vesistot`, `syke_maankaytto`) ja päivittää verkkosivun.
 
-#### B) Ekologisen katon mittarit (`manual_indicators.csv`)
-Avaa tiedosto `manual_indicators.csv` ja päivitä siihen kuntasi tuoreimmat ympäristöluvut (pilkulla eroteltuna). Kuntakohtaiset kasvihuonekaasupäästöt löydät suoraan [SYKE:n päästötietopalvelusta](https://paastot.hiilineutraalisuomi.fi/).
+#### B) Varajärjestelmä ja paikalliset lisämittarit (`manual_indicators.csv`)
+Tiedosto `manual_indicators.csv` toimii kahdessa roolissa:
+1. **Automaattinen varajärjestelmä (Fallback):** Jos jokin SYKE:n avoimista rajapinnoista on tilapäisesti huollossa tai ei palauta suoraa kuntakohtaista arvoa, `fetch_data.py` lukee tarkistetun arvon automaattisesti tästä tiedostosta, jolloin sivu toimii 100 % varmuudella.
+2. **Omat paikalliset lisämittarit:** Jos lisäät tiedostoon uusia rivejä (joiden `id` ei ole `config.yaml`-tiedostossa), skripti nostaa ne automaattisesti mukaan Kuntadonitsiin.
 
 ```csv
 id,name,domain,source,value,threshold,unit,direction,year
-hinku_paastot,Alueelliset KHK-paastot (SYKE Hinku),Ekologinen katto,SYKE Hinku,5.2,2.0,t CO2e/as.,lower_is_better,2024
+hinku_paastot,Alueelliset KHK-päästöt (SYKE Hinku),Ekologinen katto,SYKE Hinku,4.9,2.0,t CO2e/as.,lower_is_better,2024
+kulutus_hiili,Kulutusperusteinen hiilijalanjälki,Ekologinen katto,SYKE Kulutus,8.2,2.5,t CO2e/as.,lower_is_better,2023
+vesistot,Pintavesien ravinnekuormitus,Ekologinen katto,SYKE Vesikartta,122.0,100.0,% kuormitus,lower_is_better,2024
+luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,SYKE Liiteri,88.0,100.0,% kuormitus,lower_is_better,2024
 ```
 
 ### Vaihe 4: Julkaise verkkosivu (GitHub Pages)
@@ -214,9 +219,9 @@ Voit laajentaa kuntasi donitsia (esim. 8 mittarista 10–12 mittariin) tai vaiht
 Voit lisätä esimerkiksi seuraavat paikalliset ympäristömittarit `manual_indicators.csv`-tiedostoon (muuta sarake `value` vastaamaan oman kuntasi arvoa):
 
 ```csv
-kierratysaste,Yhdyskuntajatteen kierratysaste,Ekologinen katto,Jateyhtio / SYKE,48.0,65.0,%,higher_is_better,2024
+kierratysaste,Yhdyskuntajätteen kierrätysaste,Ekologinen katto,Jäteyhtiö / SYKE,48.0,65.0,%,higher_is_better,2024
 vedenkulutus,Ominaisvedenkulutus (l/as./vrk),Ekologinen katto,Kunnan vesilaitos,125.0,110.0,l/vrk,lower_is_better,2024
-ajosuorite,Henkiloautojen ajosuorite asukasta kohti,Ekologinen katto,Traficom / Liiteri,6800.0,4500.0,km/as.,lower_is_better,2024
+ajosuorite,Henkilöautojen ajosuorite asukasta kohti,Ekologinen katto,Traficom / Liiteri,6800.0,4500.0,km/as.,lower_is_better,2024
 metsahakkuut,Metsien hakkuiden suhde vuotuiseen kasvuun,Ekologinen katto,Luke,82.0,70.0,%,lower_is_better,2024
 ```
 
@@ -226,4 +231,4 @@ metsahakkuut,Metsien hakkuiden suhde vuotuiseen kasvuun,Ekologinen katto,Luke,82
 
 * **Tekijänoikeus:** © 2026 **Mika Lammi**. Konsepti, järjestelmäarkkitehtuuri ja mittaristomäärittely: Mika Lammi (tekninen toteutus tuotettu tekoälyavusteisesti).
 * **Koodin lisenssi:** Julkaistu avoimella **MIT-lisenssillä** (`SPDX-License-Identifier: MIT`). Kuntien edustajat, tutkijat ja kehittäjät voivat vapaasti kopioida, muokata ja hyödyntää tätä tietovarastoa, kunhan alkuperäinen tekijänoikeusmerkintä (`© 2026 Mika Lammi`) säilytetään osana lähdekoodia ja dokumentaatiota.
-* **Tilastolähteet:** THL Sotkanet REST API ja Suomen ympäristökeskuksen (SYKE) tietopalvelut (avoin viranomaisdata, CC BY 4.0).
+* **Tilastolähteet:** THL Sotkanet REST API ja Suomen ympäristökeskuksen (SYKE) avoimet rajapinnat ja tietopalvelut (avoin viranomaisdata, CC BY 4.0).
