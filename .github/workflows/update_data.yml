@@ -7,6 +7,7 @@ on:
   push:
     paths:
       - 'config.yaml'
+      - 'manual_indicators.csv'
       - 'fetch_data.py'
 
 permissions:
@@ -43,7 +44,7 @@ jobs:
           if git diff --staged --quiet; then
             echo "Ei uusia datamuutoksia tallennettavaksi."
           else
-            git commit -m "Automaattinen datapaivitys (Sotkanet & SYKE API)"
+            git commit -m "Automaattinen datapaivitys (Sotkanet & SYKE)"
             git pull --rebase origin main || true
             git push
           fi
