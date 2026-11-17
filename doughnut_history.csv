@@ -11,8 +11,15 @@ period,record_type,id,name,domain,value,threshold,unit,ratio_pct,is_safe
 2026-11,Kuukausiseuranta,huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,158.8,135.0,indeksi,117.6,False
 2023,Vuositilasto,kulutus_hiili,Kulutusperusteinen hiilijalanjälki,Ekologinen katto,8.2,2.5,t CO2e/as.,328.0,False
 2026-11,Kuukausiseuranta,kulutus_hiili,Kulutusperusteinen hiilijalanjälki,Ekologinen katto,8.2,2.5,t CO2e/as.,328.0,False
-2024,Vuositilasto,luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,88.0,100.0,% kuormitus,88.0,True
-2026-11,Kuukausiseuranta,luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,88.0,100.0,% kuormitus,88.0,True
+2018,Vuositilasto,luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,85.3,100.0,% kuormitus,85.3,True
+2019,Vuositilasto,luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,96.6,100.0,% kuormitus,96.6,True
+2020,Vuositilasto,luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,97.4,100.0,% kuormitus,97.4,True
+2021,Vuositilasto,luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,92.5,100.0,% kuormitus,92.5,True
+2022,Vuositilasto,luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,86.1,100.0,% kuormitus,86.1,True
+2023,Vuositilasto,luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,84.4,100.0,% kuormitus,84.4,True
+2024,Vuositilasto,luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,82.8,100.0,% kuormitus,82.8,True
+2025,Vuositilasto,luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,81.2,100.0,% kuormitus,81.2,True
+2026-11,Kuukausiseuranta,luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,81.2,100.0,% kuormitus,81.2,True
 2018,Vuositilasto,sairastavuus,Kansanterveys (THL sairastavuusindeksi),Sosiaalinen perusta,117.0,100.0,indeksi,117.0,False
 2019,Vuositilasto,sairastavuus,Kansanterveys (THL sairastavuusindeksi),Sosiaalinen perusta,114.8,100.0,indeksi,114.8,False
 2024,Vuositilasto,sairastavuus,Kansanterveys (THL sairastavuusindeksi),Sosiaalinen perusta,114.8,100.0,indeksi,114.8,False
