@@ -1,9 +1,9 @@
 id,name,domain,source,value,threshold,unit,direction,year,ratio_pct,is_safe,updated_at
-sairastavuus,Kansanterveys (THL sairastavuusindeksi),Sosiaalinen perusta,Ei saatavilla (Rajapintavirhe),0.0,100.0,indeksi,lower_is_better,-,0.0,no_data,17.11.2026 klo 16:58
-tyottomyys,Työttömien osuus työvoimasta,Sosiaalinen perusta,Ei saatavilla (Rajapintavirhe),0.0,8.0,%,lower_is_better,-,0.0,no_data,17.11.2026 klo 16:58
-toimeentulotuki,Toimeentulotukea saaneet asukkaat,Sosiaalinen perusta,Ei saatavilla (Rajapintavirhe),0.0,6.0,%,lower_is_better,-,0.0,no_data,17.11.2026 klo 16:58
-huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,Ei saatavilla (Rajapintavirhe),0.0,135.0,indeksi,lower_is_better,-,0.0,no_data,17.11.2026 klo 16:58
-hinku_paastot,Alueelliset KHK-päästöt (SYKE Hinku),Ekologinen katto,Ei saatavilla (Rajapintavirhe),0.0,2.0,t CO2e/as.,lower_is_better,-,0.0,no_data,17.11.2026 klo 16:58
-kulutus_hiili,Kulutusperusteinen hiilijalanjälki,Ekologinen katto,Ei saatavilla (Rajapintavirhe),0.0,2.5,t CO2e/as.,lower_is_better,-,0.0,no_data,17.11.2026 klo 16:58
-vesistot,Pintavesien ravinnekuormitus,Ekologinen katto,Ei saatavilla (Rajapintavirhe),0.0,100.0,% kuormitus,lower_is_better,-,0.0,no_data,17.11.2026 klo 16:58
-luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,Ei saatavilla (Rajapintavirhe),0.0,100.0,% kuormitus,lower_is_better,-,0.0,no_data,17.11.2026 klo 16:58
+sairastavuus,Kansanterveys (THL sairastavuusindeksi),Sosiaalinen perusta,SOTKANET (ID 244),114.8,100.0,indeksi,lower_is_better,2019,114.8,false,17.11.2026 klo 17:06
+tyottomyys,Työttömien osuus työvoimasta,Sosiaalinen perusta,SOTKANET (ID 181),13.3,8.0,%,lower_is_better,2025,166.2,false,17.11.2026 klo 17:06
+toimeentulotuki,Toimeentulotukea saaneet asukkaat,Sosiaalinen perusta,SOTKANET (ID 232),15.3,6.0,%,lower_is_better,2025,255.0,false,17.11.2026 klo 17:06
+huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,SOTKANET (ID 182),158.8,135.0,indeksi,lower_is_better,2024,117.6,false,17.11.2026 klo 17:06
+hinku_paastot,Alueelliset KHK-päästöt (SYKE Hinku),Ekologinen katto,Ei saatavilla (Rajapinta),0.0,2.0,t CO2e/as.,lower_is_better,-,0.0,no_data,17.11.2026 klo 17:06
+kulutus_hiili,Kulutusperusteinen hiilijalanjälki,Ekologinen katto,Ei saatavilla (Rajapinta),0.0,2.5,t CO2e/as.,lower_is_better,-,0.0,no_data,17.11.2026 klo 17:06
+vesistot,Pintavesien ravinnekuormitus,Ekologinen katto,Ei saatavilla (Rajapinta),0.0,100.0,% kuormitus,lower_is_better,-,0.0,no_data,17.11.2026 klo 17:06
+luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,Ei saatavilla (Rajapinta),0.0,100.0,% kuormitus,lower_is_better,-,0.0,no_data,17.11.2026 klo 17:06
