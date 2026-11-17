@@ -419,9 +419,9 @@
         </thead>
         <tbody>
           <tr>
-            <td><strong>Alueelliset KHK-päästöt (SYKE Hinku)</strong></td>
-            <td>SYKE OData API (<code>KHKPaastot</code>)<br><em>Varalla: SYKE Hinku -tietokanta</em></td>
-            <td>Virallinen kuntien ilmastotyön seurantamittari (liikenne, lämmitys, maatalous ja jätehuolto ilman päästökauppateollisuutta).</td>
+            <td><strong>Alueelliset KHK-päästöt (SYKE / Hinku)</strong></td>
+            <td>SYKE / THL Sotkanet API (<code>ID 4007</code>)<br><em>Varalla: SYKE Hinku (<code>CSV</code>)</em></td>
+            <td>Virallinen kuntien ilmastotyön seurantamittari (liikenne, lämmitys, maatalous ja jätehuolto asukasta kohti).</td>
             <td><strong>2.0 t CO2e/as.</strong><br>(Hinku-kuntien -80 % tavoitetaso)</td>
           </tr>
           <tr>
@@ -438,9 +438,9 @@
           </tr>
           <tr>
             <td><strong>Maankäyttöpaine vs. lähiluonto</strong></td>
-            <td>Tilastokeskus StatFin API (<code>Taajama-aste, %</code>)<br><em>Varalla: SYKE Liiteri (<code>manual_indicators.csv</code>)</em></td>
-            <td>Kuvaa yhdyskuntarakenteen tiiviyttä, rakennetun maan osuutta sekä lähiluonnon ja ekologisten verkostojen säilymistä.</td>
-            <td><strong>100.0 % kuormitus</strong><br>(Lähiluonnon kantokykyraja)</td>
+            <td>Yhdistelmä-API: Taajama-aste (<code>ID 195</code> / StatFin 40 %), Yhdyskuntarakenne (<code>ID 3218</code> / <code>184</code> 25 %), Lähiympäristön hiukkaskuormitus (<code>ID 3560</code> 20 %) & Lipas lähiluonto (15 %)</td>
+            <td>Monimuuttujainen approksimaatioindeksi, joka yhdistää rakennetun maan osuuden, yhdyskuntarakenteen hajautumisen, lähiympäristön kuormituksen ja virkistysalueiden saavutettavuuden.</td>
+            <td><strong>100.0 % kuormitus</strong><br>(Lähiluonnon kantokykyraja = 1.0x)</td>
           </tr>
         </tbody>
       </table>
