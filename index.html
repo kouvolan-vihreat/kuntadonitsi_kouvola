@@ -6,6 +6,7 @@
   <title>Avoin Kuntadonitsi</title>
   <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
   <style>
     body { font-family: Arial, sans-serif; max-width: 1180px; margin: 0 auto; padding: 20px; color: #1a202c; background: #f8fafc; }
     h1 { color: #1a365d; margin-bottom: 5px; }
@@ -34,7 +35,7 @@
 </head>
 <body>
 
-  <h1>🍩 Kuntakohtainen Kuntadonitsi</h1>
+  <h1 id="main-title">🍩 Kuntakohtainen Kuntadonitsi</h1>
   <div class="subtitle">Automaattisesti avoimista rajapinnoista (THL Sotkanet & SYKE) päivittyvä tilannekuva: Sisäkehä (Sosiaalinen perusta) ja Ulkokehä (Ekologinen katto)</div>
 
   <div class="cards">
@@ -95,6 +96,19 @@
   </table>
 
   <script>
+    // 1. Haetaan kunnan nimi automaattisesti config.yaml-tiedostosta ja päivitetään otsikot
+    fetch("config.yaml")
+      .then(response => response.text())
+      .then(yamlText => {
+        const config = jsyaml.load(yamlText);
+        if (config && config.municipality && config.municipality.name) {
+          const muniName = config.municipality.name;
+          document.getElementById("main-title").innerText = `🍩 Kuntadonitsi: ${muniName}`;
+          document.title = `Kuntadonitsi – ${muniName}`;
+        }
+      })
+      .catch(err => console.warn("Kunnan nimeä ei voitu lukea config.yaml-tiedostosta:", err));
+
     function wrapLabel(str) {
       if (str.length <= 22) return str;
       const words = str.split(" ");
@@ -102,6 +116,7 @@
       return words.slice(0, mid).join(" ") + "<br>" + words.slice(mid).join(" ");
     }
 
+    // 2. Luetaan tulosdata ja piirretään kaaviot
     Papa.parse("doughnut_results.csv", {
       download: true,
       header: true,
