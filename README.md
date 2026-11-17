@@ -1,40 +1,40 @@
-# 🍩 Avoin Kuntadonitsi – toteutusopas ja dokumentaatio
+# 🍩 Avoin Kuntadonitsi – Koko toteutusopas ja dokumentaatio
 
 Tämä tietovarasto ja vaiheittainen opas näyttävät, kuinka rakennat mille tahansa suomalaiselle kunnalle automaattisesti päivittyvän donitsitalousmallin (Kuntadonitsin) täysin **ilmaisilla, avoimen lähdekoodin työkaluilla**. 
 
-Toteutus ei vaadi omaa palvelinta, maksullisia ohjelmistolisenssejä eikä aiempaa syvällistä ohjelmointikokemusta – kaikki tiedostot, automaattinen tiedonhaku ja julkinen verkkosovellus pyörivät suoraan GitHubin ja Streamlitin ilmaisissa pilvipalveluissa.
+Toteutus ei vaadi omaa palvelinta, ulkoisia pilvipalveluita, maksullisia ohjelmistolisenssejä eikä aiempaa syvällistä ohjelmointikokemusta – kaikki tiedostot, automaattinen tiedonhaku ja salamannopea julkinen verkkosivu pyörivät **100 % suoraan GitHubin sisällä** (GitHub Actions & GitHub Pages).
 
-*(Oletusasetuksissa esimerkkinä on Kouvolan kaupunki, kuntakoodi `286`, mutta muiden kuntien edustajat voivat vaihtaa minkä tahansa Suomen 309 kunnasta muuttamalla kuntanumeron asetustiedostossa)*
+*(Oletusasetuksissa esimerkkinä on Kouvolan kaupunki, kuntakoodi `286`, mutta muiden kuntien edustajat voivat vaihtaa minkä tahansa Suomen 309 kunnasta muuttamalla kuntanumeron asetustiedostossa[cite: 1, 3]!)*
 
 ---
 
 ## 1. Mitä työkaluja käytämme ja miksi?
 
-Ratkaisu koostuu neljästä ilmaisesta työkalusta, jotka keskustelevat keskenään automaattisesti:
+Ratkaisu koostuu neljästä ilmaisesta työkalusta, jotka toimivat suoraan GitHubissa:
 
 | Työkalu | Mikä se on? | Mitä se tekee tässä projektissa? | Hinta |
 | :--- | :--- | :--- | :--- |
-| **GitHub-tietovarasto** | Pilvipohjainen kansio koodille ja tiedostoille | Säilyttää projektin asetustiedostot, hakuskriptin sekä haetun tilastodatan. | 0 € (Julkinen projekti) |
+| **GitHub-tietovarasto (Repository)** | Pilvipohjainen kansio koodille ja tiedostoille | Säilyttää projektin asetustiedostot, hakuskriptin, tilastodatan sekä verkkosivun. | 0 € (Julkinen projekti) |
 | **GitHub Actions** | GitHubin sisäänrakennettu ajastin ja automaattirobotti | Herää automaattisesti kerran kuukaudessa (tai heti kun muokkaat asetuksia), hakee tuoreet kuntaluvut THL:n Sotkanet-rajapinnasta ja tallentaa ne GitHubiin. | 0 € (2000 min/kk ilmaista ajoaikaa) |
-| **Python (Pandas ja Plotly)** | Avoimen lähdekoodin ohjelmointikieli ja tilastokirjastot | Laskee suhdeluvut verrattuna kestäviin raja-arvoihin ja piirtää interaktiivisen kuntadonitsin. | 0 € (Avoin lähdekoodi) |
-| **Streamlit Community Cloud** | Ilmainen julkaisualusta datanäkymille | Lukee GitHub-kansiosi ja julkaisee siitä valmiin verkkosivun, jota kuntalaiset ja päättäjät voivat selata tietokoneella tai puhelimella. | 0 € |
+| **Python (Pandas ja Requests)** | Avoimen lähdekoodin ohjelmointikieli ja datakirjastot | Hakee datan rajapinnoista ja laskee suhdeluvut verrattuna kestäviin raja-arvoihin. | 0 € (Avoin lähdekoodi) |
+| **GitHub Pages (HTML + Plotly.js)** | GitHubin oma, välitön verkkosivujen julkaisualusta | Lukee `doughnut_results.csv`-tiedoston ja piirtää interaktiivisen kuntadonitsin välittömästi selaimeen ilman palvelimen latausviiveitä. | 0 € |
 
 ---
 
-## 2. Vaihe 1: GitHub-tilin ja projektikansion luominen tai kopiointi
+## 2. Vaihe 1: GitHub-tilin ja projektikansion (Repository) luominen tai kopiointi
 
 Voit tehdä kaikki tämän oppaan vaiheet suoraan verkkoselaimessa asentamatta mitään omalle tietokoneellesi.
 
 ### Vaihtoehto A: Kopioi tämä valmis projekti omalle kunnallesi (Suositeltu)
 1. Luo ilmainen käyttäjätunnus GitHub-palveluun ja kirjaudu sisään.
 2. Klikkaa tämän sivun oikeasta yläkulmasta **Fork**-painiketta, jolloin saat kaikki alla olevat tiedostot suoraan omalle GitHub-tilillesi.
-3. Siirry suoraan kohtaan **Vaihe 4 (kohta 1–2)** kytkeäksesi automaattirobotin kirjoitusoikeudet päälle, ja muokkaa sen jälkeen kuntasi tiedot `config.yaml`- ja `manual_indicators.csv`-tiedostoihin.
+3. Siirry kohtaan **Vaihe 4 (kohta 1–2)** kytkeäksesi automaattirobotin kirjoitusoikeudet päälle, muokkaa kuntasi tiedot `config.yaml`- ja `manual_indicators.csv`-tiedostoihin, ja kytke verkkosivu päälle **Vaiheessa 5**.
 
 ### Vaihtoehto B: Luo projekti kokonaan alusta
 1. Luo ilmainen käyttäjätunnus GitHub-palveluun ja kirjaudu sisään.
 2. Klikkaa oikeasta yläkulmasta **+ (plus) -painiketta** ja valitse **New repository** (Uusi tietovarasto).
 3. Anna projektille nimi kohtaan *Repository name*, esimerkiksi **kuntadonitsi**.
-4. Valitse näkyvyydeksi **Public** (Julkinen). Tämä on tärkeää, jotta saat GitHub Actionsin automaattiset ajot ja Streamlit-julkaisun täysin ilmaiseksi.
+4. Valitse näkyvyydeksi **Public** (Julkinen). Tämä on tärkeää, jotta saat GitHub Actionsin automaattiset ajot ja GitHub Pages -verkkosivun täysin ilmaiseksi.
 5. Laita rasti ruutuun **Add a README file** ja klikkaa vihreää **Create repository** -painiketta.
 
 Projektikansioon tulee kuusi ydintiedostoa (voit luoda uuden tiedoston klikkaamalla GitHubissa **Add file** ja **Create new file**):
@@ -45,7 +45,7 @@ kuntadonitsi/
 ├── manual_indicators.csv               # Kerran vuodessa käsin päivitettävät luvut
 ├── requirements.txt                    # Tarvittavat ilmaiset Python-kirjastot
 ├── fetch_data.py                       # Robottiskripti, joka hakee datan rajapinnoista
-├── app.py                              # Verkkosivun ja donitsikaavion piirtävä koodi
+├── index.html                          # Verkkosivu, joka piirtää interaktiivisen donitsikaavion
 └── .github/workflows/update_data.yml   # GitHubin ajastin (ajaa haun automaattisesti)
 ```
 
@@ -54,19 +54,17 @@ kuntadonitsi/
 ## 3. Vaihe 2: Asetustiedostojen luominen ja muokkaaminen
 
 ### 3.1 Tiedosto 1: `requirements.txt`
-Klikkaa GitHubissa **Add file -> Create new file**. Kirjoita tiedoston nimeksi `requirements.txt` ja liitä sisältöön seuraavat rivit. Ne kertovat GitHubille, mitkä ilmaiset lisäosat sen tulee ladata:
+Klikkaa GitHubissa **Add file -> Create new file**. Kirjoita tiedoston nimeksi `requirements.txt` ja liitä sisältöön seuraavat rivit. Ne kertovat GitHubille, mitkä ilmaiset Python-lisäosat tietojen hakuun ladataan:
 
 ```text
-requests==2.31.0
-pandas==2.2.0
-pyyaml==6.0.1
-streamlit==1.32.0
-plotly==5.19.0
+requests
+pandas
+pyyaml
 ```
 Tallenna tiedosto klikkaamalla oikeasta yläkulmasta **Commit changes...**
 
 ### 3.2 Tiedosto 2: `config.yaml` (Kunnan valinta ja varmennetut Sotkanet-indikaattorit)
-Luo tai muokkaa tiedostoa nimeltä `config.yaml`. Tässä tiedostossa määrität, minkä kunnan tiedot haetaan. Jos haluat vaihtaa kuntaa (esimerkiksi Kouvolasta Lohjaan tai Tampereelle), muutat vain kuntanumeron kohtaan `sotkanet_code` (esim. Kouvola on `286`, Lohja `444`, Helsinki `091`).
+Luo tai muokkaa tiedostoa nimeltä `config.yaml`. Tässä tiedostossa määrität, minkä kunnan tiedot haetaan. Jos haluat vaihtaa kuntaa (esimerkiksi Kouvolasta Lohjaan tai Tampereelle), muutat vain kuntanumeron kohtaan `sotkanet_code` (esim. Kouvola on `286`, Lohja `444`, Helsinki `091`, Tampere `837`).
 
 Kaikki sosiaalisen perustan mittarit haetaan luotettavasti suoraan THL:n Sotkanet-tietokannasta, joka sisältää valmiiksi sekä THL:n, Kelan että Tilastokeskuksen kuntakohtaiset avainluvut:
 
@@ -317,78 +315,127 @@ jobs:
 
 ---
 
-## 6. Vaihe 5: Verkkosovelluksen (`app.py`) luominen ja julkaisu
+## 6. Vaihe 5: Verkkosivun (`index.html`) luominen ja julkaisu GitHub Pagesilla
 
-Viimeisenä luomme tiedoston `app.py`, joka lukee valmiin datan ja piirtää interaktiivisen Kuntadonitsi-verkkosivun.
+Viimeisenä luomme tiedoston `index.html`, joka lukee suoraan `doughnut_results.csv`-tiedoston ja piirtää interaktiivisen Kuntadonitsi-verkkosivun selaimeen välittömästi ilman erillisiä palvelimia.
 
-```python
-import streamlit as st
-import pandas as pd
-import plotly.graph_objects as go
-import yaml
+1. Klikkaa GitHubissa **Add file -> Create new file**, anna nimeksi `index.html` ja liitä siihen seuraava koodi:
 
-st.set_page_config(page_title="Kuntadonitsi", layout="wide")
+```html
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Avoin Kuntadonitsi</title>
+  <script src="[https://cdn.plot.ly/plotly-2.30.0.min.js](https://cdn.plot.ly/plotly-2.30.0.min.js)"></script>
+  <script src="[https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js](https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js)"></script>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 1100px; margin: 0 auto; padding: 20px; color: #1a202c; background: #f8fafc; }
+    h1 { color: #1a365d; margin-bottom: 5px; }
+    .subtitle { color: #4a5568; margin-bottom: 24px; }
+    .cards { display: flex; gap: 20px; margin-bottom: 24px; flex-wrap: wrap; }
+    .card { flex: 1; min-width: 240px; background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); border-left: 5px solid #2b6cb0; }
+    .card h3 { margin: 0 0 8px 0; font-size: 14px; color: #4a5568; text-transform: uppercase; }
+    .card .val { font-size: 28px; font-weight: bold; color: #1a202c; }
+    #chart { background: white; border-radius: 10px; padding: 15px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); margin-bottom: 24px; }
+    table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+    th, td { padding: 12px 14px; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 14px; }
+    th { background: #edf2f7; font-weight: bold; }
+    .badge-ok { background: #c6f6d5; color: #22543d; padding: 4px 8px; border-radius: 4px; font-weight: bold; }
+    .badge-warn { background: #fed7d7; color: #742a2a; padding: 4px 8px; border-radius: 4px; font-weight: bold; }
+  </style>
+</head>
+<body>
 
-with open("config.yaml", "r", encoding="utf-8") as f:
-    config = yaml.safe_load(f)
+  <h1>Kuntakohtainen Kuntadonitsi</h1>
+  <div class="subtitle">Automaattisesti avoimista rajapinnoista (THL Sotkanet & SYKE) päivittyvä tilannekuva</div>
 
-muni_name = config["municipality"]["name"]
-st.title(f"{muni_name}n kaupungin Kuntadonitsi")
-st.markdown("Automaattisesti avoimista rajapinnoista (THL Sotkanet, SYKE) päivittyvä tilannekuva.")
+  <div class="cards">
+    <div class="card">
+      <h3>Sosiaalinen perusta tavoitteessa</h3>
+      <div class="val" id="soc-metric">- / -</div>
+    </div>
+    <div class="card">
+      <h3>Ekologinen katto rajoissa</h3>
+      <div class="val" id="eco-metric">- / -</div>
+    </div>
+  </div>
 
-df = pd.read_csv("doughnut_results.csv")
+  <div id="chart"></div>
 
-# Yhteenvetokortit
-col1, col2 = st.columns(2)
-soc_df = df[df["domain"] == "Sosiaalinen perusta"]
-eco_df = df[df["domain"] == "Ekologinen katto"]
+  <h2>Lähdedata ja kynnysarvot</h2>
+  <table id="data-table">
+    <thead>
+      <tr>
+        <th>Ulottuvuus</th>
+        <th>Mittari</th>
+        <th>Arvo</th>
+        <th>Kestävä raja</th>
+        <th>Suhde rajaan</th>
+        <th>Tila</th>
+        <th>Lähde (Vuosi)</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 
-col1.metric("Sosiaalinen perusta tavoitteessa", f"{soc_df['is_safe'].sum()} / {len(soc_df)} mittaria")
-col2.metric("Ekologinen katto rajoissa", f"{eco_df['is_safe'].sum()} / {len(eco_df)} mittaria")
+  <script>
+    Papa.parse("doughnut_results.csv", {
+      download: true,
+      header: true,
+      skipEmptyLines: true,
+      complete: function(results) {
+        const data = results.data;
+        const soc = data.filter(r => r.domain === "Sosiaalinen perusta");
+        const eco = data.filter(r => r.domain === "Ekologinen katto");
+        const socSafe = soc.filter(r => String(r.is_safe).toLowerCase() === "true").length;
+        const ecoSafe = eco.filter(r => String(r.is_safe).toLowerCase() === "true").length;
 
-# Piirretään ympyränmuotoinen kuntadonitsi (Plotly Barpolar)
-fig = go.Figure()
+        document.getElementById("soc-metric").innerText = `${socSafe} / ${soc.length} mittaria`; document.getElementById("eco-metric").innerText = `${ecoSafe} / ${eco.length} mittaria`;  const trace = { type: "barpolar", r: data.map(r => parseFloat(r.ratio_pct) \vert{}\vert{} 0), theta: data.map(r => r.name), marker: { color: data.map(r => String(r.is_safe).toLowerCase() === "true" ? "#2e7d32" : "#c62828"), line: { color: "white", width: 2 } }, opacity: 0.85, hovertemplate: data.map(r => `<b>${r.name}</b><br>Arvo: ${r.value}${r.unit} (Raja: ${r.threshold})<br>Suhde rajaan:${r.ratio_pct} %<br>Lähde: ${r.source} (${r.year})<extra></extra>`
+          )
+        };
 
-colors = ["#2e7d32" if safe else "#c62828" for safe in df["is_safe"]]
+        const layout = {
+          polar: {
+            radialaxis: { visible: true, range: [0, 350], ticksuffix: "%" },
+            hole: 0.35
+          },
+          showlegend: false,
+          height: 600,
+          margin: { t: 40, b: 40, l: 60, r: 60 }
+        };
 
-fig.add_trace(go.Barpolar(
-    r=df["ratio_pct"],
-    theta=df["name"],
-    marker_color=colors,
-    marker_line_color="white",
-    marker_line_width=2,
-    opacity=0.85,
-    customdata=df[["value", "unit", "threshold", "source", "year"]],
-    hovertemplate=(
-        "<b>%{theta}</b><br>"
-        "Arvo: %{customdata[0]} %{customdata[1]} (Raja: %{customdata[2]})<br>"
-        "Suhde kestävään rajaan: %{r} %<br>"
-        "Lähde: %{customdata[3]} (%{customdata[4]})<extra></extra>"
-    )
-))
+        Plotly.newPlot("chart", [trace], layout, { responsive: true });
 
-fig.update_layout(
-    polar=dict(
-        radialaxis=dict(visible=True, range=[0, 350], ticksuffix="%"),
-        hole=0.35
-    ),
-    showlegend=False,
-    height=650
-)
-
-st.plotly_chart(fig, use_container_width=True)
-
-st.subheader("Lähdedata ja kynnysarvot")
-st.dataframe(df[["domain", "name", "value", "unit", "threshold", "ratio_pct", "source", "year"]], use_container_width=True)
+        const tbody = document.querySelector("#data-table tbody");
+        data.forEach(r => {
+          const isSafe = String(r.is_safe).toLowerCase() === "true";
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${r.domain}</td>
+            <td><strong>${r.name}</strong></td>
+            <td>${r.value}${r.unit}</td>
+            <td>${r.threshold}${r.unit}</td>
+            <td>${r.ratio_pct} %</td>
+            <td><span class="${isSafe ? 'badge-ok' : 'badge-warn'}">${isSafe ? 'Rajoissa' : 'Ylitys / Vaje'}</span></td>
+            <td>${r.source} (${r.year})</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      }
+    });
+  </script>
+</body>
+</html>
 ```
 
-### Julkaisu verkossa (Streamlit Community Cloud)
-1. Avaa selaimessa [Streamlit Community Cloud](https://share.streamlit.io/) ja kirjaudu sisään samalla GitHub-tunnuksellasi (*Sign in with GitHub*).
-2. Klikkaa oikeasta yläkulmasta **Create app** (Luo sovellus).
-3. Valitse listasta äsken luomasi **kuntadonitsi**-tietovarasto ja päähaara (`main`).
-4. Valitse kohtaan *Main file path* tiedosto `app.py` ja klikkaa **Deploy!**
+### Julkaisu verkossa (GitHub Pages)
+1. Mene GitHub-projektisi yläreunasta kohtaan **Settings** (Asetukset) -> vasemmasta reunasta **Pages**.
+2. Valitse kohdasta *Build and deployment -> Branch* pudotusvalikosta **`main`** (ja kansioksi `/(root)`) ja klikkaa **Save**.
+3. Noin 30 sekunnin kuluttua sivun yläreunaan ilmestyy julkinen verkko-osoite (muodossa `https://<käyttäjätunnus>.github.io/kuntadonitsi/`).
 
-Noin minuutin kuluttua sinulla on valmis, julkinen verkkosivusto (esimerkiksi `kuntadonitsi.streamlit.app`), jonka voit jakaa päättäjille ja kuntalaisille tai upottaa suoraan kunnan omille verkkosivuille. Kun GitHub Actions -robotti päivittää datan kerran kuukaudessa, verkkosivu päivittyy automaattisesti ilman, että sinun tarvitsee koskea koodiin.
+Sivusto aukeaa välittömästi ilman minkäänlaista latausviivettä, toimii tietokoneella ja puhelimella ja päivittyy automaattisesti aina, kun GitHub Actions -robotti päivittää `doughnut_results.csv`-tiedoston!
 
 ---
 
