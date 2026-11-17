@@ -1,9 +1,8 @@
 id,name,domain,source,value,threshold,unit,direction,year,ratio_pct,is_safe,updated_at
-sairastavuus,Kansanterveys (THL sairastavuusindeksi),Sosiaalinen perusta,SOTKANET (ID 244),114.8,100.0,indeksi,lower_is_better,2019,114.8,False,17.11.2026 klo 21:16
-tyottomyys,Työttömien osuus työvoimasta,Sosiaalinen perusta,SOTKANET (ID 181),13.3,8.0,%,lower_is_better,2025,166.2,False,17.11.2026 klo 21:16
-toimeentulotuki,Toimeentulotukea saaneet asukkaat,Sosiaalinen perusta,SOTKANET (ID 232),15.3,6.0,%,lower_is_better,2025,255.0,False,17.11.2026 klo 21:16
-huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,SOTKANET (ID 182),158.8,135.0,indeksi,lower_is_better,2024,117.6,False,17.11.2026 klo 21:16
-hinku_paastot,Alueelliset KHK-päästöt (SYKE Hinku),Ekologinen katto,SYKE Hinku,4.9,2.0,t CO2e/as.,lower_is_better,2024,245.0,False,17.11.2026 klo 21:16
-kulutus_hiili,Kulutusperusteinen hiilijalanjälki,Ekologinen katto,SYKE Kulutus,8.2,2.5,t CO2e/as.,lower_is_better,2023,328.0,False,17.11.2026 klo 21:16
-vesistot,Vesistö- ja ravinnekuormitus,Ekologinen katto,THL / Vesihuolto API (ID 3369),32666.7,100.0,% kuormitus,lower_is_better,2025,32666.7,False,17.11.2026 klo 21:16
-luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,SYKE / Sotkanet API (ID 3218),4.2,100.0,% kuormitus,lower_is_better,2025,4.2,True,17.11.2026 klo 21:16
+sairastavuus,Kansanterveys (THL sairastavuusindeksi),Sosiaalinen perusta,SOTKANET (ID 244),114.8,100.0,indeksi,lower_is_better,2019,114.8,False,17.11.2026 klo 21:24
+toimeentulotuki,Toimeentulotukea saaneet asukkaat,Sosiaalinen perusta,SOTKANET (ID 232),15.3,6.0,%,lower_is_better,2025,255.0,False,17.11.2026 klo 21:24
+huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,SOTKANET (ID 182),158.8,135.0,indeksi,lower_is_better,2024,117.6,False,17.11.2026 klo 21:24
+hinku_paastot,Alueelliset KHK-päästöt (SYKE Hinku),Ekologinen katto,SYKE Hinku,4.9,2.0,t CO2e/as.,lower_is_better,2024,245.0,False,17.11.2026 klo 21:24
+kulutus_hiili,Kulutusperusteinen hiilijalanjälki,Ekologinen katto,SYKE Kulutus,8.2,2.5,t CO2e/as.,lower_is_better,2023,328.0,False,17.11.2026 klo 21:24
+vesistot,Vesistö- ja ravinnekuormitus,Ekologinen katto,SYKE Vesikartta,122.0,100.0,% kuormitus,lower_is_better,2024,122.0,False,17.11.2026 klo 21:24
+luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,SYKE Liiteri,88.0,100.0,% kuormitus,lower_is_better,2024,88.0,True,17.11.2026 klo 21:24
