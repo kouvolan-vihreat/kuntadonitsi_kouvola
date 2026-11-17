@@ -111,6 +111,16 @@
           if (!data.length) return;
           document.getElementById("last-updated").innerText = "🕒 Data päivitetty: " + (data[0].updated_at || data[0].year);
 
+          // Tallennetaan nykyisten aktiivisten mittareiden ID-lista ja nimet aikasarjasuodatusta varten
+          var activeIds = {};
+          var activeOrder = [];
+          data.forEach(function(r) {
+            if (r.id) {
+              activeIds[r.id] = r.name;
+              activeOrder.push(r.id);
+            }
+          });
+
           var soc = data.filter(function(r) { return r.domain === "Sosiaalinen perusta"; });
           var eco = data.filter(function(r) { return r.domain === "Ekologinen katto"; });
           var socValid = soc.filter(function(r) { return !isNoData(r); });
@@ -280,33 +290,51 @@
           }
           renderBar("chart-social", soc, "#dd6b20");
           renderBar("chart-eco", eco, "#c62828");
+
+          // Haetaan ja suodatetaan aikasarja vain nykyisten aktiivisten mittareiden osalta
+          fetch("doughnut_history.csv?t=" + Date.now())
+            .then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
+            .then(function(hTxt) {
+              var rawHist = parseCSV(hTxt);
+              var hData = rawHist.filter(function(r) { return r.id && activeIds[r.id] !== undefined; });
+              var sel = document.getElementById("history-select");
+              if (!hData.length) return;
+
+              var ids = activeOrder.filter(function(id) {
+                return hData.some(function(r) { return r.id === id; });
+              });
+
+              sel.innerHTML = "<option value='ALL'>Kaikki mittarit rinnakkain (Suhde rajaan %)</option>";
+              ids.forEach(function(id) {
+                sel.innerHTML += "<option value='" + id + "'>" + activeIds[id] + "</option>";
+              });
+
+              function drawHist(val) {
+                var tr = [], list = val === "ALL" ? ids : [val];
+                list.forEach(function(id) {
+                  var rows = hData.filter(function(r) { return r.id === id; });
+                  tr.push({
+                    type: "scatter",
+                    mode: "lines+markers",
+                    name: activeIds[id],
+                    x: rows.map(function(r){ return r.period; }),
+                    y: rows.map(function(r){ return parseFloat(r.ratio_pct) || 0; })
+                  });
+                });
+                Plotly.newPlot("chart-history", tr, {
+                  xaxis: { title: "Ajanjakso (Tilastovuodet & Kuukausiseuranta YYYY-MM)", type: "category" },
+                  yaxis: { title: "Suhde kestävään rajaan (%)", ticksuffix: "%", rangemode: "tozero" },
+                  shapes: [{ type: "line", xref: "paper", x0: 0, x1: 1, y0: 100, y1: 100, line: { color: "#2e7d32", width: 2.5, dash: "dash" } }],
+                  legend: { orientation: "h", y: -0.25 },
+                  height: 420,
+                  margin: { t: 25, b: 90, l: 70, r: 45, pad: 8 }
+                }, { responsive: true });
+              }
+              sel.addEventListener("change", function(e) { drawHist(e.target.value); });
+              drawHist("ALL");
+            }).catch(function() {});
+
         }).catch(function(e) { document.getElementById("last-updated").innerText = "⚠️ Virhe: " + e.message; });
-
-      fetch("doughnut_history.csv?t=" + Date.now())
-        .then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.text(); })
-        .then(function(hTxt) {
-          var hData = parseCSV(hTxt), sel = document.getElementById("history-select"), ids = [], names = {};
-          if (!hData.length) return;
-          hData.forEach(function(r) { if (r.id && !names[r.id]) { ids.push(r.id); names[r.id] = r.name; } });
-          sel.innerHTML = "<option value='ALL'>Kaikki mittarit rinnakkain (Suhde rajaan %)</option>";
-          ids.forEach(function(id) { sel.innerHTML += "<option value='" + id + "'>" + names[id] + "</option>"; });
-
-          function drawHist(val) {
-            var tr = [], list = val === "ALL" ? ids : [val];
-            list.forEach(function(id) {
-              var rows = hData.filter(function(r) { return r.id === id; });
-              tr.push({ type: "scatter", mode: "lines+markers", name: names[id], x: rows.map(function(r){return r.period;}), y: rows.map(function(r){return parseFloat(r.ratio_pct)||0;}) });
-            });
-            Plotly.newPlot("chart-history", tr, {
-              xaxis: { title: "Ajanjakso (Tilastovuodet & Kuukausiseuranta YYYY-MM)", type: "category" },
-              yaxis: { title: "Suhde kestävään rajaan (%)", ticksuffix: "%", rangemode: "tozero" },
-              shapes: [{ type: "line", xref: "paper", x0: 0, x1: 1, y0: 100, y1: 100, line: { color: "#2e7d32", width: 2.5, dash: "dash" } }],
-              legend: { orientation: "h", y: -0.25 }, height: 420, margin: { t: 25, b: 90, l: 70, r: 45, pad: 8 }
-            }, { responsive: true });
-          }
-          sel.addEventListener("change", function(e) { drawHist(e.target.value); });
-          drawHist("ALL");
-        }).catch(function() {});
     });
   </script>
 </head>
@@ -319,9 +347,9 @@
       <div class="timestamp-badge" id="last-updated">🕒 Data päivitetty: Haetaan...</div>
     </div>
   </div>
-  <div class="subtitle">Automaattisesti avoimista rajapinnoista (THL Sotkanet, SYKE, Luke, StatFin & Lipas) päivittyvä tilannekuva</div>
+  <div class="subtitle">Automaattisesti avoimista rajapinnoista (THL Sotkanet, SYKE & Tilastokeskus StatFin) päivittyvä tilannekuva</div>
 
-<div class="modal-overlay" id="info-modal" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal-overlay" id="info-modal" onclick="if(event.target===this)this.style.display='none'">
     <div class="modal-content">
       <div class="modal-header">
         <h2>🍩 Miksi juuri nämä mittarit ja raja-arvot on valittu?</h2>
@@ -411,6 +439,7 @@
       </table>
     </div>
   </div>
+
   <div class="cards">
     <div class="card soc"><h3>Sisäkehä: Sosiaalinen perusta</h3><div class="val" id="soc-metric">- / -</div><div class="desc">Mittaria tavoitetasolla (ei sosiaalista vajetta)</div></div>
     <div class="card safe"><h3>Donitsin vihreä kehä</h3><div class="val" id="total-metric">- %</div><div class="desc">Kaikista mittareista turvallisessa tilassa (≤ 100 %)</div></div>
@@ -452,7 +481,7 @@
 
   <footer class="site-footer">
     <strong>© 2026 Mika Lammi.</strong> Avoin Kuntadonitsi – Konsepti, arkkitehtuuri ja mittaristo: Mika Lammi (tekninen toteutus tuotettu tekoälyavusteisesti).<br>
-    Lähdedata: THL Sotkanet REST API, Suomen ympäristökeskus (SYKE), Luke, Tilastokeskus StatFin & Lipas (CC BY 4.0).
+    Lähdedata: THL Sotkanet REST API, Suomen ympäristökeskus (SYKE) & Tilastokeskus StatFin (CC BY 4.0).
   </footer>
 
 </body>
