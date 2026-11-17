@@ -27,7 +27,7 @@
     .legend-bar { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; margin-bottom: 14px; font-size: 14px; background: #f1f5f9; padding: 12px 18px; border-radius: 8px; }
     .legend-item { display: flex; align-items: center; gap: 8px; }
     .dot { width: 16px; height: 16px; border-radius: 4px; display: inline-block; }
-    .ring-line { width: 22px; height: 5px; border-radius: 2px; display: inline-block; }
+    .ring-line { width: 22px; height: 8px; border-radius: 2px; display: inline-block; background: #ffffff; border: 2px solid #000000; }
     .controls-row { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-bottom: 14px; background: #f1f5f9; padding: 12px 16px; border-radius: 8px; }
     select { padding: 8px 12px; border-radius: 6px; border: 1px solid #cbd5e0; font-size: 14px; background: white; color: #1a202c; font-weight: bold; }
     table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
@@ -69,9 +69,8 @@
     <h2 style="margin-top:0; text-align:center;">Kuntadonitsin kokonaiskuva</h2>
     <div class="legend-bar">
       <div class="legend-item"><span class="dot" style="background:#dd6b20;"></span> <strong>Sosiaalinen vaje</strong> (Sisäkehän sisäpuoli)</div>
-      <div class="legend-item"><span class="ring-line" style="background:#9c4221;"></span> <strong>Sisäraja</strong> (Sosiaalinen perusta)</div>
+      <div class="legend-item"><span class="ring-line"></span> <strong>Sisä- ja ulkoraja</strong> (100 % kestävä tavoiteraja)</div>
       <div class="legend-item"><span class="dot" style="background:#2e7d32; border: 2px solid #14532d;"></span> <strong>Turvallinen tila</strong> (Vihreä donitsikehä)</div>
-      <div class="legend-item"><span class="ring-line" style="background:#7f1d1d;"></span> <strong>Ulkoraja</strong> (Ekologinen katto)</div>
       <div class="legend-item"><span class="dot" style="background:#c62828;"></span> <strong>Ekologinen ylitys</strong> (Ulkokehän ulkopuoli)</div>
     </div>
     <div id="doughnut-main"></div>
@@ -89,7 +88,7 @@
     </div>
   </div>
 
-  <!-- UUSI OSIO: AJALLINEN KEHITYS JA KUUKAUSISEURANTA -->
+  <!-- AJALLINEN KEHITYS JA KUUKAUSISEURANTA -->
   <div class="chart-box">
     <h2 style="margin-top:0;">📈 Ajallinen kehitys ja kuukausiseuranta</h2>
     <div class="controls-row">
@@ -117,8 +116,7 @@
   </table>
 
   <script>
-    // 1. Haetaan kunnan nimi automaattisesti config.yaml-tiedostosta
-    fetch("config.yaml")
+    fetch("config.yaml?t=" + Date.now())
       .then(response => response.text())
       .then(yamlText => {
         const config = jsyaml.load(yamlText);
@@ -137,8 +135,7 @@
       return words.slice(0, mid).join(" ") + "<br>" + words.slice(mid).join(" ");
     }
 
-    // 2. Luetaan nykyhetken tulosdata ja piirretään donitsi
-    Papa.parse("doughnut_results.csv", {
+    Papa.parse("doughnut_results.csv?t=" + Date.now(), {
       download: true,
       header: true,
       skipEmptyLines: true,
@@ -199,12 +196,13 @@
           )
         };
 
+        // SISÄRAJA-RENGAS: Valkoinen täyttö, mustat reunat
         const innerRimTrace = {
           type: "barpolar",
           theta: labels,
           base: data.map(() => 96),
           r: data.map(() => 6),
-          marker: { color: "#9c4221", line: { color: "#9c4221", width: 1 } },
+          marker: { color: "#ffffff", line: { color: "#000000", width: 2 } },
           hovertemplate: data.map(() => `<b>Sisäraja: Sosiaalinen perusta (100 %)</b><extra></extra>`)
         };
 
@@ -224,12 +222,13 @@
           )
         };
 
+        // ULKORAJA-RENGAS: Valkoinen täyttö, mustat reunat
         const outerRimTrace = {
           type: "barpolar",
           theta: labels,
           base: data.map(() => 158),
           r: data.map(() => 6),
-          marker: { color: "#7f1d1d", line: { color: "#7f1d1d", width: 1 } },
+          marker: { color: "#ffffff", line: { color: "#000000", width: 2 } },
           hovertemplate: data.map(() => `<b>Ulkoraja: Ekologinen katto (100 %)</b><extra></extra>`)
         };
 
@@ -342,8 +341,7 @@
       }
     });
 
-    // 3. Luetaan historiatiedosto (doughnut_history.csv) ja piirretään kehityskäyrä
-    Papa.parse("doughnut_history.csv", {
+    Papa.parse("doughnut_history.csv?t=" + Date.now(), {
       download: true,
       header: true,
       skipEmptyLines: true,
@@ -362,7 +360,6 @@
           }
         });
 
-        // Lisätään valinta "Kaikki mittarit (Suhde rajaan %)" sekä yksittäiset mittarit
         const allOpt = document.createElement("option");
         allOpt.value = "ALL";
         allOpt.innerText = "Kaikki mittarit rinnakkain (Suhde rajaan %)";
