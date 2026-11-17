@@ -47,7 +47,7 @@ indicators:
     direction: "lower_is_better"
 
   # ==========================================
-  # 2. ULKOKEHÄ: EKOLOGINEN KATTO (SYKE Avoimet Rajapinnat)
+  # 2. ULKOKEHÄ: EKOLOGINEN KATTO (SYKE, Luke, StatFin & Lipas API)
   # ==========================================
   - id: "hinku_paastot"
     name: "Alueelliset KHK-päästöt (SYKE Hinku)"
@@ -66,7 +66,7 @@ indicators:
     direction: "lower_is_better"
 
   - id: "vesistot"
-    name: "Pintavesien ravinnekuormitus"
+    name: "Vesistö- ja ravinnekuormitus"
     domain: "Ekologinen katto"
     source: "syke_vesistot"
     threshold: 100.0
