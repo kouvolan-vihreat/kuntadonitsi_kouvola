@@ -1,9 +1,5 @@
 id,name,domain,source,value,threshold,unit,direction,year,ratio_pct,is_safe,updated_at
-sairastavuus,Kansanterveys (THL sairastavuusindeksi),Sosiaalinen perusta,SOTKANET API (ID 244),114.8,100.0,indeksi,lower_is_better,2019,114.8,false,17.11.2026 klo 17:23
-tyottomyys,Työttömien osuus työvoimasta,Sosiaalinen perusta,SOTKANET API (ID 181),13.3,8.0,%,lower_is_better,2025,166.2,false,17.11.2026 klo 17:23
-toimeentulotuki,Toimeentulotukea saaneet asukkaat,Sosiaalinen perusta,SOTKANET API (ID 232),15.3,6.0,%,lower_is_better,2025,255.0,false,17.11.2026 klo 17:23
-huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,SOTKANET API (ID 182),158.8,135.0,indeksi,lower_is_better,2024,117.6,false,17.11.2026 klo 17:23
-hinku_paastot,Alueelliset KHK-päästöt (SYKE Hinku),Ekologinen katto,SYKE / Sotkanet API (ID 3561),1.4,2.0,t CO2e/as.,lower_is_better,2025,70.0,true,17.11.2026 klo 17:23
-kulutus_hiili,Kulutusperusteinen hiilijalanjälki,Ekologinen katto,Ei saatavilla (Rajapinta),0.0,2.5,t CO2e/as.,lower_is_better,-,0.0,no_data,17.11.2026 klo 17:23
-fossiilinen_liikenne,Fossiilikäyttöisten autojen osuus,Ekologinen katto,Sotkanet API (ID 3218),4.2,50.0,%,lower_is_better,2025,8.4,true,17.11.2026 klo 17:23
-ilmanlaatu_altistus,Pienhiukkasaltistus ja lähiympäristö,Ekologinen katto,THL / SYKE Sotkanet API (ID 3560),2.3,5.0,µg/m³,lower_is_better,2025,46.0,true,17.11.2026 klo 17:23
+sairastavuus,Kansanterveys (THL sairastavuusindeksi),Sosiaalinen perusta,SOTKANET API (ID 244),114.8,100.0,indeksi,lower_is_better,2019,114.8,false,17.11.2026 klo 19:48
+tyottomyys,Työttömien osuus työvoimasta,Sosiaalinen perusta,SOTKANET API (ID 181),13.3,8.0,%,lower_is_better,2025,166.2,false,17.11.2026 klo 19:48
+toimeentulotuki,Toimeentulotukea saaneet asukkaat,Sosiaalinen perusta,SOTKANET API (ID 232),15.3,6.0,%,lower_is_better,2025,255.0,false,17.11.2026 klo 19:48
+huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,SOTKANET API (ID 182),158.8,135.0,indeksi,lower_is_better,2024,117.6,false,17.11.2026 klo 19:48
