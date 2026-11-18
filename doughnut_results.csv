@@ -1,9 +1,9 @@
 id,name,domain,source,value,threshold,unit,direction,year,ratio_pct,is_safe,updated_at
-sairastavuus,Kansanterveys (THL sairastavuusindeksi),Sosiaalinen perusta,SOTKANET API (ID 244),114.8,100.0,indeksi,lower_is_better,2019,114.8,False,18.11.2026 klo 08:08
-tyottomyys,Työttömien osuus työvoimasta,Sosiaalinen perusta,SOTKANET API (ID 181),13.3,8.0,%,lower_is_better,2025,166.2,False,18.11.2026 klo 08:08
-toimeentulotuki,Toimeentulotukea saaneet asukkaat,Sosiaalinen perusta,SOTKANET API (ID 232),15.3,6.0,%,lower_is_better,2025,255.0,False,18.11.2026 klo 08:08
-huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,SOTKANET API (ID 182),158.8,135.0,indeksi,lower_is_better,2024,117.6,False,18.11.2026 klo 08:08
-hinku_paastot,Alueelliset KHK-päästöt (SYKE / Hinku),Ekologinen katto,Yhdistelmä-API (SYKE/Sotkanet ID 3218 + SYKE/THL ID 3560 + Sotkanet ID 182),4.34,2.0,t CO2e/as.,lower_is_better,2025,217.0,False,18.11.2026 klo 08:08
-kulutus_hiili,Kulutusperusteinen hiilijalanjälki,Ekologinen katto,Yhdistelmä-API (Sotkanet ID 181 + SYKE/Sotkanet ID 3218 + Sotkanet ID 182),8.71,2.5,t CO2e/as.,lower_is_better,2025,348.4,False,18.11.2026 klo 08:08
-vesistot,Vesistö- ja ravinnekuormitus,Ekologinen katto,Yhdistelmä-API (SYKE/Sotkanet ID 3218 + SYKE/THL ID 3560 + Sotkanet ID 182),108.8,100.0,% kuormitus,lower_is_better,2025,108.8,False,18.11.2026 klo 08:08
-luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,Yhdistelmä-API (SYKE/Sotkanet ID 3218 + SYKE/THL ID 3560),81.2,100.0,% kuormitus,lower_is_better,2025,81.2,True,18.11.2026 klo 08:08
+sairastavuus,Kansanterveys (THL sairastavuusindeksi),Sosiaalinen perusta,SOTKANET API (ID 244),114.8,100.0,indeksi,lower_is_better,2019,114.8,False,18.11.2026 klo 08:10
+tyottomyys,Työttömien osuus työvoimasta,Sosiaalinen perusta,SOTKANET API (ID 181),13.3,8.0,%,lower_is_better,2025,166.2,False,18.11.2026 klo 08:10
+toimeentulotuki,Toimeentulotukea saaneet asukkaat,Sosiaalinen perusta,SOTKANET API (ID 232),15.3,6.0,%,lower_is_better,2025,255.0,False,18.11.2026 klo 08:10
+huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,SOTKANET API (ID 182),158.8,135.0,indeksi,lower_is_better,2024,117.6,False,18.11.2026 klo 08:10
+hinku_paastot,Alueelliset KHK-päästöt (SYKE / Hinku),Ekologinen katto,Yhdistelmä-API (SYKE/Sotkanet ID 3218 + SYKE/THL ID 3560 + Sotkanet ID 182),4.34,2.0,t CO2e/as.,lower_is_better,2025,217.0,False,18.11.2026 klo 08:10
+kulutus_hiili,Kulutusperusteinen hiilijalanjälki,Ekologinen katto,Yhdistelmä-API (Sotkanet ID 181 + SYKE/Sotkanet ID 3218 + Sotkanet ID 182),8.71,2.5,t CO2e/as.,lower_is_better,2025,348.4,False,18.11.2026 klo 08:10
+vesistot,Vesistö- ja ravinnekuormitus,Ekologinen katto,Yhdistelmä-API (SYKE/Sotkanet ID 3218 + SYKE/THL ID 3560 + Sotkanet ID 182),108.8,100.0,% kuormitus,lower_is_better,2025,108.8,False,18.11.2026 klo 08:10
+luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,Yhdistelmä-API (SYKE/Sotkanet ID 3218 + SYKE/THL ID 3560),81.2,100.0,% kuormitus,lower_is_better,2025,81.2,True,18.11.2026 klo 08:10
