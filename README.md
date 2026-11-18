@@ -1,10 +1,10 @@
 # 🍩 Avoin Kuntadonitsi – Käyttöönotto- ja muokkausopas
 
-Tämä tietovarasto sisältää suomalaisille kunnille suunnatun, automaattisesti avoimista viranomaisrajapinnoista päivittyvän donitsitalousmallin (**Avoin Kuntadonitsi**). 
+Tämä tietovarasto sisältää suomalaisille kunnille suunnatun, automaattisesti avoimista viranomaisrajapinnoista päivittyvän donitsitalousmallin. 
 
 Ratkaisu toimii täysin **ilmaisilla, avoimen lähdekoodin työkaluilla** suoraan GitHubin sisällä (GitHub Actions & GitHub Pages). Se ei vaadi omaa palvelinta, ulkoisia pilvipalveluita, maksullisia lisenssejä eikä ohjelmointikokemusta.
 
-*(Oletusasetuksissa esimerkkinä on Kouvolan kaupunki, kuntakoodi `286`, mutta minkä tahansa Suomen kunnan edustaja voi ottaa mallin käyttöönsä muuttamalla kuntanumeron asetustiedostossa.)*
+*(Oletusasetuksissa esimerkkinä on Kouvolan kaupunki, kuntakoodi `286`, mutta minkä tahansa Suomen kunta voi ottaa mallin käyttöönsä muuttamalla kuntanumeron asetustiedostossa.)*
 
 ---
 
