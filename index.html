@@ -155,7 +155,8 @@
             var ratioTxt = nodata ? "0.0 % (Ei dataa)" : (r.ratio_pct + " % (" + (parseFloat(r.ratio_pct)/100).toFixed(1) + "x)");
 
             // Tarkistetaan, tuleeko rivi CSV-lähteestä, jolloin rivin loppuun lisätään oma info-painike
-            var isCsvSource = String(r.source || "").toLowerCase().indexOf("(csv)") !== -1;
+            var srcLower = String(r.source || "").toLowerCase();
+            var isCsvSource = srcLower.indexOf("(csv)") !== -1 || srcLower.indexOf("yhdistelmä-api") !== -1 || r.domain === "Ekologinen katto";
             var sourceCellHtml = "<span>" + r.source + " (" + r.year + ")</span>";
             if (isCsvSource) {
               sourceCellHtml = "<div class='source-cell-wrap'><span>" + r.source + " (" + r.year + ")</span>" +
