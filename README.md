@@ -13,7 +13,7 @@ Ratkaisu toimii täysin **ilmaisilla, avoimen lähdekoodin työkaluilla** suoraa
 | Työkalu | Tehtävä tässä projektissa | Hinta |
 | :--- | :--- | :--- |
 | **GitHub-tietovarasto** | Säilyttää asetustiedostot, hakuskriptin, tilasto- ja historiadatan sekä verkkosivun lähdekoodin. | 0 € (Julkinen projekti) |
-| **GitHub Actions** | Ajaa tiedonhaun automaattisesti kerran kuukaudessa (tai heti kun muokkaat asetuksia), estää päällekkäiset ajot (`concurrency`) ja tallentaa uudet luvut sekä aikasarjan. | 0 € |
+| **GitHub Actions** | Ajaa tiedonhaun automaattisesti kerran kuukaudessa (tai heti kun muokkaat asetuksia), estää päällekkäiset ajot ja tallentaa uudet luvut sekä aikasarjan. | 0 € |
 | **Python (`fetch_data.py`)** | Hakee kuntakohtaisen datan automaattisesti **THL:n Sotkanet-rajapinnasta** (sosiaalinen perusta) ja **monimuuttujaisista Yhdistelmä-API-rajapinnoista** (ekologinen katto: SYKE, Tilastokeskus StatFin & JYU Lipas). Hyödyntää `manual_indicators.csv`-tiedostoa vikasietoisena varajärjestelmänä selkeällä `(CSV)`-lähdemerkinnällä ja laskee suhdeluvut kestäviin rajoihin (`100 % = 1.0x raja`). | 0 € |
 | **GitHub Pages (`index.html`)** | Julkaisee interaktiivisen kuntadonitsin (tasapainotetulla `120 / 120` -kehäsuhteella), yleisen perustelumodaalin, jokaisen mittarin oman **ℹ️ Perustelut** -laskentamodaalin sekä aktiivisten mittareiden mukaan suodattuvan aikasarjakaavion. | 0 € |
 
