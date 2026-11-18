@@ -1,6 +1,13 @@
 period,record_type,id,name,domain,value,threshold,unit,ratio_pct,is_safe
-2024,Vuositilasto,hinku_paastot,Alueelliset KHK-päästöt (SYKE / Hinku),Ekologinen katto,4.9,2.0,t CO2e/as.,245.0,False
-2026-11,Kuukausiseuranta,hinku_paastot,Alueelliset KHK-päästöt (SYKE / Hinku),Ekologinen katto,4.9,2.0,t CO2e/as.,245.0,False
+2018,Vuositilasto,hinku_paastot,Alueelliset KHK-päästöt (SYKE / Hinku),Ekologinen katto,4.61,2.0,t CO2e/as.,230.5,False
+2019,Vuositilasto,hinku_paastot,Alueelliset KHK-päästöt (SYKE / Hinku),Ekologinen katto,5.07,2.0,t CO2e/as.,253.5,False
+2020,Vuositilasto,hinku_paastot,Alueelliset KHK-päästöt (SYKE / Hinku),Ekologinen katto,5.13,2.0,t CO2e/as.,256.5,False
+2021,Vuositilasto,hinku_paastot,Alueelliset KHK-päästöt (SYKE / Hinku),Ekologinen katto,4.9,2.0,t CO2e/as.,245.0,False
+2022,Vuositilasto,hinku_paastot,Alueelliset KHK-päästöt (SYKE / Hinku),Ekologinen katto,4.63,2.0,t CO2e/as.,231.5,False
+2023,Vuositilasto,hinku_paastot,Alueelliset KHK-päästöt (SYKE / Hinku),Ekologinen katto,4.58,2.0,t CO2e/as.,229.0,False
+2024,Vuositilasto,hinku_paastot,Alueelliset KHK-päästöt (SYKE / Hinku),Ekologinen katto,4.52,2.0,t CO2e/as.,226.0,False
+2025,Vuositilasto,hinku_paastot,Alueelliset KHK-päästöt (SYKE / Hinku),Ekologinen katto,4.34,2.0,t CO2e/as.,217.0,False
+2026-11,Kuukausiseuranta,hinku_paastot,Alueelliset KHK-päästöt (SYKE / Hinku),Ekologinen katto,4.34,2.0,t CO2e/as.,217.0,False
 2018,Vuositilasto,huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,156.7,135.0,indeksi,116.1,False
 2019,Vuositilasto,huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,158.1,135.0,indeksi,117.1,False
 2020,Vuositilasto,huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,164.7,135.0,indeksi,122.0,False
@@ -9,8 +16,15 @@ period,record_type,id,name,domain,value,threshold,unit,ratio_pct,is_safe
 2023,Vuositilasto,huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,156.7,135.0,indeksi,116.1,False
 2024,Vuositilasto,huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,158.8,135.0,indeksi,117.6,False
 2026-11,Kuukausiseuranta,huoltosuhde,Taloudellinen huoltosuhde,Sosiaalinen perusta,158.8,135.0,indeksi,117.6,False
-2023,Vuositilasto,kulutus_hiili,Kulutusperusteinen hiilijalanjälki,Ekologinen katto,8.2,2.5,t CO2e/as.,328.0,False
-2026-11,Kuukausiseuranta,kulutus_hiili,Kulutusperusteinen hiilijalanjälki,Ekologinen katto,8.2,2.5,t CO2e/as.,328.0,False
+2018,Vuositilasto,kulutus_hiili,Kulutusperusteinen hiilijalanjälki,Ekologinen katto,8.55,2.5,t CO2e/as.,342.0,False
+2019,Vuositilasto,kulutus_hiili,Kulutusperusteinen hiilijalanjälki,Ekologinen katto,8.59,2.5,t CO2e/as.,343.6,False
+2020,Vuositilasto,kulutus_hiili,Kulutusperusteinen hiilijalanjälki,Ekologinen katto,8.52,2.5,t CO2e/as.,340.8,False
+2021,Vuositilasto,kulutus_hiili,Kulutusperusteinen hiilijalanjälki,Ekologinen katto,8.56,2.5,t CO2e/as.,342.4,False
+2022,Vuositilasto,kulutus_hiili,Kulutusperusteinen hiilijalanjälki,Ekologinen katto,8.6,2.5,t CO2e/as.,344.0,False
+2023,Vuositilasto,kulutus_hiili,Kulutusperusteinen hiilijalanjälki,Ekologinen katto,8.6,2.5,t CO2e/as.,344.0,False
+2024,Vuositilasto,kulutus_hiili,Kulutusperusteinen hiilijalanjälki,Ekologinen katto,8.57,2.5,t CO2e/as.,342.8,False
+2025,Vuositilasto,kulutus_hiili,Kulutusperusteinen hiilijalanjälki,Ekologinen katto,8.71,2.5,t CO2e/as.,348.4,False
+2026-11,Kuukausiseuranta,kulutus_hiili,Kulutusperusteinen hiilijalanjälki,Ekologinen katto,8.71,2.5,t CO2e/as.,348.4,False
 2018,Vuositilasto,luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,85.3,100.0,% kuormitus,85.3,True
 2019,Vuositilasto,luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,96.6,100.0,% kuormitus,96.6,True
 2020,Vuositilasto,luonto_paine,Maankäyttöpaine vs. lähiluonto,Ekologinen katto,97.4,100.0,% kuormitus,97.4,True
@@ -51,5 +65,12 @@ period,record_type,id,name,domain,value,threshold,unit,ratio_pct,is_safe
 2024,Vuositilasto,tyottomyys,Työttömien osuus työvoimasta,Sosiaalinen perusta,11.8,8.0,%,147.5,False
 2025,Vuositilasto,tyottomyys,Työttömien osuus työvoimasta,Sosiaalinen perusta,13.3,8.0,%,166.2,False
 2026-11,Kuukausiseuranta,tyottomyys,Työttömien osuus työvoimasta,Sosiaalinen perusta,13.3,8.0,%,166.2,False
-2024,Vuositilasto,vesistot,Vesistö- ja ravinnekuormitus,Ekologinen katto,122.0,100.0,% kuormitus,122.0,False
-2026-11,Kuukausiseuranta,vesistot,Vesistö- ja ravinnekuormitus,Ekologinen katto,122.0,100.0,% kuormitus,122.0,False
+2018,Vuositilasto,vesistot,Vesistö- ja ravinnekuormitus,Ekologinen katto,114.4,100.0,% kuormitus,114.4,False
+2019,Vuositilasto,vesistot,Vesistö- ja ravinnekuormitus,Ekologinen katto,124.5,100.0,% kuormitus,124.5,False
+2020,Vuositilasto,vesistot,Vesistö- ja ravinnekuormitus,Ekologinen katto,125.8,100.0,% kuormitus,125.8,False
+2021,Vuositilasto,vesistot,Vesistö- ja ravinnekuormitus,Ekologinen katto,120.8,100.0,% kuormitus,120.8,False
+2022,Vuositilasto,vesistot,Vesistö- ja ravinnekuormitus,Ekologinen katto,114.9,100.0,% kuormitus,114.9,False
+2023,Vuositilasto,vesistot,Vesistö- ja ravinnekuormitus,Ekologinen katto,113.7,100.0,% kuormitus,113.7,False
+2024,Vuositilasto,vesistot,Vesistö- ja ravinnekuormitus,Ekologinen katto,112.4,100.0,% kuormitus,112.4,False
+2025,Vuositilasto,vesistot,Vesistö- ja ravinnekuormitus,Ekologinen katto,108.8,100.0,% kuormitus,108.8,False
+2026-11,Kuukausiseuranta,vesistot,Vesistö- ja ravinnekuormitus,Ekologinen katto,108.8,100.0,% kuormitus,108.8,False
